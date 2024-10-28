@@ -20,7 +20,7 @@ services:
     environment:
       MONGO_INITDB_DATABASE: wadadb
       MONGO_INITDB_ROOT_USERNAME: root
-      ONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_ROOT_PASSWORD: 1234
     networks:
       - wada-network
 networks:
