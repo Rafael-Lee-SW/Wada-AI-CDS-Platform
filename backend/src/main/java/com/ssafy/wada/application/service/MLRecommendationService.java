@@ -12,7 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.wada.application.domain.ChatRoom;
 import com.ssafy.wada.application.domain.CsvResult;
+import com.ssafy.wada.application.domain.Guest;
+import com.ssafy.wada.application.repository.ChatRoomRepository;
+import com.ssafy.wada.application.repository.GuestRepository;
 import com.ssafy.wada.common.error.BusinessException;
 import com.ssafy.wada.common.error.CsvParsingErrorCode;
 import com.ssafy.wada.presentation.response.MLRecommendResponse;
@@ -26,9 +30,17 @@ public class MLRecommendationService {
 	private static final int RANDOM_SELECT_ROWS = 20;
 
 	private final CsvParsingService csvParsingService;
+	private final GuestRepository guestRepository;
+	private final ChatRoomRepository chatRoomRepository;
 	private final ObjectMapper objectMapper;
 
-	public MLRecommendResponse recommend(MultipartFile file, String chatRoomId) {
+	public MLRecommendResponse recommend(String sessionId, String chatRoomId, MultipartFile file) {
+		Guest guest = guestRepository.findById(sessionId)
+			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
+
+		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
+			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest.getId())));
+
 		CsvResult csvResult = csvParsingService.parse(file);
 		String[] headers = csvResult.headers();
 		List<String[]> rows = csvResult.rows();

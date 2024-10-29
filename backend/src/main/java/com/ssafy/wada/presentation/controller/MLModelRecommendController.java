@@ -28,6 +28,6 @@ public class MLModelRecommendController {
 		@RequestParam("file") MultipartFile file,
 		@RequestParam("chatRoomId") String chatRoomId) {
 		log.info(sessionId);
-		return mlRecommendationService.recommend(file, chatRoomId);
+		return mlRecommendationService.recommend(sessionId, chatRoomId, file);
 	}
 }
