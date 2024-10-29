@@ -7,7 +7,7 @@ const styles = {
     sidebar: {
         width: '250px',
         backgroundColor: '#fff',
-        padding: '20px',
+        padding: '5px 10px',
         boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
     },
     userInfo: {
@@ -16,7 +16,6 @@ const styles = {
         marginBottom: '20px',
     },
     avatar: {
-        marginTop: '5px',
         display: 'flex',
         alignItems: 'center',
         marginRight: '10px',
@@ -60,10 +59,12 @@ const styles = {
         top: 0,
         width: '100%',
         height: '50px',
-        borderBottom: '1px solid gray'
+        boxShadow: '2px 0 5px rgba(0,0,0,0.1)'
     },
     headerMessage: {
         fontSize: '18px',
+        fontWeight: 'bold',
+        color: '#1a4682'
     },
     contentContainer: {
         display: 'flex',
@@ -81,14 +82,41 @@ const styles = {
         boxShadow: '0 0 5px rgba(0,0,0,0.1)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flexDirection: 'column'
+    },
+    logoImg: {
+        width: '100px',
+        opacity: '0.7'
+    },
+    message: {
+        fontSize: '18px'
+    },
+    fileDisplay: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '10px',
+    },
+    removeButton: {
+        background: '#d3d3d3',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        padding: '0 5px',
+        marginLeft: '10px'
     },
     inputWrapper: {
+        position: 'absolute',
+        bottom: 0,
         display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
         justifyContent: 'center',
         padding: '10px',
+        paddingLeft: '220px',
         backgroundColor: 'white',
-        boxShadow: '2px 0 5px rgba(0,0,0,0.2)'
     },
     inputContainer: {
         display: 'flex',
@@ -98,10 +126,27 @@ const styles = {
     },
     input: {
         flex: 1,
-        padding: '10px',
+        paddingLeft: '40px', 
+        paddingTop: '10px',
+        paddingBottom: '10px',
         border: '1px solid #ccc',
-        borderRadius: '4px',
+        borderRadius: '10px',
         marginRight: '10px',
+    },
+    fileInput: {
+        display: 'none'
+    },
+    fileImg: {
+        position: 'relative',
+        left: '47px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        cursor: 'pointer',
+        width: '50px',
+        paddingTop: "10px",
+        paddingRight: "15px",
+        paddingBottom: "10px",
+        paddingLeft: "15px"
     },
     inputButton: {
         padding: '10px 20px',
