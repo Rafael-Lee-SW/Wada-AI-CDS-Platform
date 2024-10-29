@@ -29,7 +29,7 @@ public class CsvParsingService {
 			headers = reader.readNext();
 
 			if (headers == null) {
-				throw new BusinessException(CsvParsingErrorCode.INVALID_HEADER);
+				throw new BusinessException(CsvParsingErrorCode.INVALID_CSV_HEADER);
 			}
 
 			String[] nextLine;
