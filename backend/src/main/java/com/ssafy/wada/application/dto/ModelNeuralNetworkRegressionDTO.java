@@ -1,4 +1,4 @@
-package com.ssafy.wada.dto;
+package com.ssafy.wada.application.dto;
 
 import java.util.List;
 import lombok.Getter;
