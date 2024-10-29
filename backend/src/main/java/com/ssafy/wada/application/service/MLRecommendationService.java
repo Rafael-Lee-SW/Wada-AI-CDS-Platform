@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.wada.application.domain.CsvResult;
 import com.ssafy.wada.common.error.BusinessException;
+import com.ssafy.wada.common.error.CsvParsingErrorCode;
 import com.ssafy.wada.presentation.response.MLRecommendResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class MLRecommendationService {
 			}
 			return objectMapper.writeValueAsString(result);
 		} catch (JsonProcessingException e) {
-			throw new BusinessException("JSON 변환 중 오류가 발생했습니다.", e);
+			throw new BusinessException(CsvParsingErrorCode.JSON_PROCESSING_ERROR);
 		}
 	}
 }
