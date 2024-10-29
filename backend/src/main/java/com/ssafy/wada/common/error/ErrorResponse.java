@@ -1,12 +1,7 @@
 package com.ssafy.wada.common.error;
 
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public class ErrorResponse {
-	private final String code;
-	private final String message;
-
+public record ErrorResponse(String code, String message) {
 	public static ErrorResponse of(String code, String message) {
 		return new ErrorResponse(code, message);
 	}

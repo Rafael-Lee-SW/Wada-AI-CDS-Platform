@@ -28,7 +28,7 @@ public class MLRecommendationService {
 	private final CsvParsingService csvParsingService;
 	private final ObjectMapper objectMapper;
 
-	public MLRecommendResponse recommend(MultipartFile file, String chatId) {
+	public MLRecommendResponse recommend(MultipartFile file, String chatRoomId) {
 		CsvResult csvResult = csvParsingService.parse(file);
 		String[] headers = csvResult.headers();
 		List<String[]> rows = csvResult.rows();
