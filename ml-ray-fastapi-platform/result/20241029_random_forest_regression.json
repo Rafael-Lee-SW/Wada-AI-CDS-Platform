@@ -1,0 +1,304 @@
+{
+    "Mean Squared Error": 0.13700476190476193,
+    "R^2 Score": 0.03927226148409846,
+    "Feature Importances": {
+        "DaysLateLast30": 0.6251921291723936,
+        "Salary": 0.09197357720240633,
+        "EngagementSurvey": 0.06298321745401887,
+        "Absences": 0.05247007322904182,
+        "ManagerID": 0.044587273522854014,
+        "EmpSatisfaction": 0.03758369199719424,
+        "TenureDays": 0.025850237379059716,
+        "Position_Area Sales Manager": 0.01194644803041096,
+        "Position_Production Technician II": 0.007002849330198359,
+        "Department_Production       ": 0.005611759888518295,
+        "Position_Production Technician I": 0.005064345864124043,
+        "Position_Data Analyst": 0.005039855813862817,
+        "Position_Production Manager": 0.004369124745212769,
+        "Position_Director of Operations": 0.004026575450140758,
+        "Position_IT Director": 0.0033919710765083423,
+        "SpecialProjectsCount": 0.003353340822277295,
+        "Department_Sales": 0.0028919851025084554,
+        "Position_IT Support": 0.0026488587729451203,
+        "Position_Software Engineer": 0.0012948991169252832,
+        "Department_Software Engineering": 0.0010684579044496552,
+        "Department_IT/IS": 0.0006922158532816995,
+        "Position_Director of Sales": 0.00026073480956977584,
+        "Position_Sales Manager": 0.0002556373802143459,
+        "Position_Network Engineer": 0.00021300910082519366,
+        "Position_Data Architect": 9.009009009009035e-05,
+        "Position_IT Manager - DB": 8.903440749037754e-05,
+        "Position_Database Administrator": 4.8606483477715527e-05,
+        "Department_Executive Office": 0.0,
+        "Position_IT Manager - Infra": 0.0,
+        "Position_Enterprise Architect": 0.0,
+        "Position_CIO": 0.0,
+        "Position_Administrative Assistant": 0.0,
+        "Position_BI Developer": 0.0,
+        "Position_BI Director": 0.0,
+        "Position_Data Analyst ": 0.0,
+        "Position_IT Manager - Support": 0.0,
+        "Position_Principal Data Architect": 0.0,
+        "Position_President & CEO": 0.0,
+        "Position_Senior BI Developer": 0.0,
+        "Position_Shared Services Manager": 0.0,
+        "Position_Software Engineering Manager": 0.0,
+        "Position_Sr. Accountant": 0.0,
+        "Position_Sr. DBA": 0.0,
+        "Position_Sr. Network Engineer": 0.0
+    },
+    "Actual vs Predicted": [
+        {
+            "Actual": 3,
+            "Predicted": 3.34
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.62
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.14
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.05
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.12
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.13
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.52
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.11
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.07
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.18
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.26
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.24
+        },
+        {
+            "Actual": 2,
+            "Predicted": 1.53
+        },
+        {
+            "Actual": 4,
+            "Predicted": 3.39
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.3
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.11
+        },
+        {
+            "Actual": 4,
+            "Predicted": 3.21
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.0
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.3
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.1
+        },
+        {
+            "Actual": 2,
+            "Predicted": 3.36
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.12
+        },
+        {
+            "Actual": 2,
+            "Predicted": 1.48
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.35
+        },
+        {
+            "Actual": 4,
+            "Predicted": 3.1
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.01
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.3
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.24
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.03
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.15
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.04
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.11
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.04
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.04
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.3
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.13
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.01
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.15
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.11
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.15
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.11
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.22
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.56
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.28
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.03
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.1
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.64
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.24
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.03
+        },
+        {
+            "Actual": 4,
+            "Predicted": 3.12
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.17
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.07
+        },
+        {
+            "Actual": 4,
+            "Predicted": 3.43
+        },
+        {
+            "Actual": 2,
+            "Predicted": 1.94
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.0
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.15
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.53
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.45
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.38
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.04
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.2
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.15
+        },
+        {
+            "Actual": 3,
+            "Predicted": 3.11
+        }
+    ]
+}

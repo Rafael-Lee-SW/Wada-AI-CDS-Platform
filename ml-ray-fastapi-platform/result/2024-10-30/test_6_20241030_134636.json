@@ -1,0 +1,9 @@
+{
+    "status": "success",
+    "result": {
+        "number_of_nodes": 0,
+        "number_of_edges": 0,
+        "average_degree": 0,
+        "density": 0
+    }
+}
