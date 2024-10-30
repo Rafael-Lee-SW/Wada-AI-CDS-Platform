@@ -6,6 +6,15 @@ const styles = {
         justifyContent: 'center',
         minHeight: '100vh',
         textAlign: 'center',
+        backgroundColor: 'white',
+        width: '100%'
+    },
+    h2: {
+        fontSize: '30px',
+        padding: '10px'
+    },
+    infoBox: {
+        padding: '10px'
     },
     cardContainer: {
         display: 'flex',
@@ -21,5 +30,8 @@ const styles = {
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         textAlign: 'center',
+        cursor: 'pointer'
     },
 };
+
+export default styles;
