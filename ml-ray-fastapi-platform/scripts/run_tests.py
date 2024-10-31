@@ -8,6 +8,8 @@ import os
 import time
 import json
 
+test_config_now = 'test_config.yaml'
+
 def setup_logging(base_log_dir, trial_num):
     """
     Sets up logging for a specific test trial.
@@ -78,7 +80,7 @@ def determine_next_trial_num(base_result_dir, current_date):
         trial_numbers = [int(name.replace("TestTrial", "")) for name in existing_trials if name.replace("TestTrial", "").isdigit()]
         return max(trial_numbers) + 1 if trial_numbers else 1
 
-def load_config(config_path='test_config.yaml'):
+def load_config(config_path=test_config_now):
     """
     Loads the test configuration from a YAML file.
     
