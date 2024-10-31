@@ -16,9 +16,9 @@ public class ModelParameter {
     private String id;
     private String fileUrl;     //csv file 저장용
 
-    private Map<String, Object> recommendedLLM; //모델 추천 저장
+    private List<RecommendedLLM> recommendedLLM; //모델 추천 저장
     private Map<String, Object> resultSummary; // 최종 결과 요약(llm description 요청용)
     private Map<String, Object> resultAll; // 최종 결과 All
-    private String resultLlmDescription; //최종 llm 설명
-
+    private Map<String, Object> resultLlmDescription; //최종 llm 설명
 }
+

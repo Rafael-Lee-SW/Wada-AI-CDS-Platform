@@ -18,12 +18,12 @@ import lombok.experimental.SuperBuilder;
 public class ChatRoom extends BaseTimeEntity {
 
 	@Id
-	private String id;  // ChatRoom ID
+	private String id;
 
-	private String mongoId;  // MongoDB의 ModelParameter ID
+	private String requestId;
 
 	@ManyToOne
-	@JoinColumn(name = "guest_id")
+	@JoinColumn(name = "guest_id" , nullable = false)
 	private Guest guest;  // N:1 관계 - Guest와 연관
 
 	// ChatRoom.java

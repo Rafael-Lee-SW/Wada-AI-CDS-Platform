@@ -21,8 +21,6 @@ public class Guest extends BaseTimeEntity {
 	@Id
 	private String id;  // Guest ID (Session ID 역할)
 
-	@OneToMany(mappedBy = "guest")
-	private List<ChatRoom> chatRooms;  // 1:N 관계 - ChatRoom과 연관
 
 	public static Guest create(String id) {
 		return Guest.builder()
