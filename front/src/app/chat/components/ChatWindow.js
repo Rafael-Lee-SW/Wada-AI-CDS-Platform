@@ -6,10 +6,11 @@ import { v4 as uuidv4 } from "uuid"
 import DefaultPage from "./DefaultPage";
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
-import DashBoard from "./DashBoard";
 
 export default function Home() {
 
+    const [submittedFile, setSubmittedFile] = useState(null);
+    const [submittedMessage, setSubmittedMessage] = useState('');   
     const [message, setMessage] = useState('');
     const [file, setFile] = useState(null);
     const [page, setPage] = useState('default');
@@ -17,6 +18,8 @@ export default function Home() {
     const [purpose, setPurpose] = useState();
     const [overview, setOverview] = useState();
     const [result, setResult] = useState(null);
+    const [chatRoomId, setChatRoomId] = useState('');
+    const [sessionId, setSessionId] = useState('');
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]); 
@@ -29,7 +32,10 @@ export default function Home() {
     const handleSubmit = async (event) => {
         event.preventDefault(); 
 
-        const sessionKey = uuidv4(); 
+        setSubmittedFile(file);
+        setSubmittedMessage(message);
+        setChatRoomId(uuidv4())
+        setSessionId(uuidv4());
         const formData = new FormData();
 
         formData.append("file", file); 
@@ -41,7 +47,7 @@ export default function Home() {
                 method: "POST",
                 body: formData, 
                 headers: {
-                'sessionId': sessionKey 
+                'sessionId': sessionId
                 }
             });
             
@@ -152,10 +158,19 @@ export default function Home() {
     }
 
     // selectMl 에서 선택된 모델로 분석 요청
-    const handleModelSelect = async (selectedModel) => {
+    const handleModelSelect = async (chatRoomId, index) => {
         try {
-            // 요청 방식 수정 필요
-            const response = await fetch("요청api", { method: "POST", body: JSON.stringify({ model: selectedModel }) });
+            const data = {
+                "chatRoomId": chatRoomId,
+                "selectedModel": index,
+            }
+            // 요청 방식 확인 필요
+            const response = await fetch("요청api", { 
+                method: "POST", 
+                body: data, 
+                headers: {
+                'sessionId': sessionId
+                }});
             // 분석 결과
             const result = await response.json();
 
@@ -164,12 +179,16 @@ export default function Home() {
             setPage('chatContent'); 
 
         } catch (error) {
+            // 테스트용 
+            setPage('chatContent'); 
             console.error("모델 선택 중 에러 발생:", error);
         }
     };
 
-    const handleMakeDashBoard = (result) => {
+    const handleMakeDashBoard = () => {
         // result 를 받았을 때 어떻게 채팅페이지와 대시보드를 함께 보여줄것인지 고민
+        // 채팅 페이지와 분석 페이지를 한 번에 보여주는 새로운 컴포넌트 생성
+        setPage('dashBoard');
     }
 
     return (
@@ -205,10 +224,9 @@ export default function Home() {
             </div>
 
             {page === 'default' && <DefaultPage />}
-            {page === 'selectML' && <SelectML models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
+            {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
             {/* 채팅 컴포넌트에서 분석결과 탭을 누르면 왼쪽에는 채팅, 오른쪽에는 대시보드가 나오도록 랜더링 */}
-            {page === 'chatContent' && <ChatContent result={result} onMakeDashBoard={handleMakeDashBoard}/>}
-            {page === 'dashBoard' && <DashBoard result={result}/>}
+            {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result} onMakeDashBoard={handleMakeDashBoard}/>}
 
             <div style={styles.inputWrapper}>
                 {file && (
