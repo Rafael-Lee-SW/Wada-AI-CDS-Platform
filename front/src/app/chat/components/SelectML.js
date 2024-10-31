@@ -1,9 +1,9 @@
 import styles from "/styles/selectMlStyle";
 
-export default function SelectML({ models, purpose, overview, onModelSelect }) {
+export default function SelectML({ chatRoomId, models, purpose, overview, onModelSelect }) {
 
-    const handleModelClick = (model) => {
-        onModelSelect(model); 
+    const handleModelClick = (chatRoomId, index) => {
+        onModelSelect(chatRoomId, index); 
     };
 
     return (
@@ -15,7 +15,7 @@ export default function SelectML({ models, purpose, overview, onModelSelect }) {
             </div>
             <div style={styles.cardContainer}>
                 {models.map((model, index) => (
-                    <div key={index} style={styles.card} onClick={() => handleModelClick(model)}>
+                    <div key={index} style={styles.card} onClick={() => handleModelClick(chatRoomId, index)}>
                         <h3>{model.model_name}</h3>
                         <p>{model.selection_reasoning}</p>
                     </div>

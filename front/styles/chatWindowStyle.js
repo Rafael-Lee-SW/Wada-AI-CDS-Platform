@@ -2,13 +2,14 @@ const styles = {
     mainContainer: {
         display: 'flex',
         height: '100vh',
-        backgroundColor: '#f9f9f9',
+        backgroundColor: 'white',
     },
     sidebar: {
         width: '250px',
         backgroundColor: '#fff',
         padding: '5px 10px',
         boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
+        zIndex: '2'
     },
     userInfo: {
         display: 'flex',
@@ -48,9 +49,6 @@ const styles = {
         backgroundColor: '#e0e0e0',
     },
     header: {
-        marginLeft: '250px',
-        padding: '10px 20px',
-        paddingLeft: '20px',
         backgroundColor: '#fff',
         color: 'black',
         position: 'fixed',
@@ -59,9 +57,10 @@ const styles = {
         top: 0,
         width: '100%',
         height: '50px',
-        boxShadow: '2px 0 5px rgba(0,0,0,0.1)'
+        boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
     },
     headerMessage: {
+        paddingLeft: '270px',
         fontSize: '18px',
         fontWeight: 'bold',
         color: '#1a4682'
