@@ -1,0 +1,181 @@
+tests:
+  - id: 1
+    description: "1. Random Forest Regression"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "PerfScoreID"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+    expected_status: 200
+
+  - id: 2
+    description: "2. Random Forest Classification"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "random_forest_classification"
+      target_variable: "Termd"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "PerfScoreID"
+        - "Salary"
+        - "TenureDays"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "ManagerID"
+    expected_status: 200
+
+  - id: 3
+    description: "3. Logistic Regression Binary Classification - Generate Overpaid Feature"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "logistic_regression_binary"
+      target_variable: "Overpaid"
+      feature_columns:
+        - "PerfScoreID"
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+      binary_conditions:
+        - column: "Salary"
+          operator: ">"
+          value: 75000
+          target_column: "Overpaid"
+        - column: "PerfScoreID"
+          operator: "<"
+          value: 3
+          target_column: "Overpaid"
+    expected_status: 200
+
+  - id: 4
+    description: "4. Logistic Regression Multinomial Classification"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "logistic_regression_multinomial"
+      target_variable: "PerfScoreID"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+      plot_filename: "multinomial_plot.png"
+    expected_status: 200
+
+  - id: 5
+    description: "5. K-Means Clustering - Employee Segmentation"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "Position"
+        - "Department"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+      num_clusters: 4
+    expected_status: 200
+
+  - id: 6
+    description: "6. Neural Network Regression"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "PerfScoreID"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+      epochs: 100
+      batch_size: 20
+    expected_status: 200
+
+  - id: 7
+    description: "7. Graph Neural Network Analysis"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "graph_neural_network_analysis"
+      node_features_path: "./dataset/node_features.csv"
+      edges_path: "./dataset/edges.csv"
+      id_column: "EmpID"
+      edge_source_column: "source"  # As per the generated edges
+      edge_target_column: "target"  # As per the generated edges
+      additional_features:
+        - "PerfScoreID"
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "ManagerID"
+      feature_generations:
+        - type: "period"
+          new_column: "TenureDays"
+          start_column: "DateofHire"
+          end_column: "DateofTermination"
+    expected_status: 200
+
+  - id: 8
+    description: "8. K-Means Clustering - Anomaly Detection"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "kmeans_clustering_anomaly_detection"
+      feature_columns:
+        - "Salary"
+        - "TenureDays"
+        - "Absences"
+        - "EngagementSurvey"
+        - "ManagerID"
+      num_clusters: 4
+      threshold: 1.5
+    expected_status: 200

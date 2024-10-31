@@ -78,7 +78,7 @@ def determine_next_trial_num(base_result_dir, current_date):
         trial_numbers = [int(name.replace("TestTrial", "")) for name in existing_trials if name.replace("TestTrial", "").isdigit()]
         return max(trial_numbers) + 1 if trial_numbers else 1
 
-def load_config(config_path='test_config.yaml'):
+def load_config(config_path='test_config_soowan_1.yaml'):
     """
     Loads the test configuration from a YAML file.
     
