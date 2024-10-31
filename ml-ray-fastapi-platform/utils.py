@@ -1,4 +1,5 @@
 # utils.py
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -15,6 +16,9 @@ def load_and_preprocess_data(
         df = pd.read_csv(data)
     else:
         df = data.copy()
+
+    # Preserve the original indices
+    original_indices = df.index.copy()
 
     # Handle date columns
     date_cols = [col for col in df.columns if "date" in col.lower()]
@@ -57,10 +61,36 @@ def load_and_preprocess_data(
             le = LabelEncoder()
             y = le.fit_transform(y)
 
+    # Restore original indices
+    X.index = original_indices
+    if y is not None:
+        y.index = original_indices
+
     return X, y
 
-def split_data(X, y, test_size=0.2, random_state=42):
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False):
+    if ids is not None:
+        # Convert ids to a Series if it's not already
+        if not isinstance(ids, pd.Series):
+            ids = pd.Series(ids, index=X.index)
+
+        # Align ids with X and y
+        ids = ids.loc[X.index]
+
+        X_train, X_test, y_train, y_test, id_train, id_test = train_test_split(
+            X, y, ids, test_size=test_size, random_state=random_state, stratify=y
+        )
+        if return_ids:
+            return X_train, X_test, y_train, y_test, id_train, id_test
+        else:
+            return X_train, X_test, y_train, y_test
+    else:
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=test_size, random_state=random_state, stratify=y
+        )
+        return X_train, X_test, y_train, y_test
+
 
 def generate_binary_condition(df, name_of_col, conditions):
     if not conditions:

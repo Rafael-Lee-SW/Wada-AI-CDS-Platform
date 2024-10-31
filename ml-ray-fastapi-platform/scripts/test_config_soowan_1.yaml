@@ -18,6 +18,7 @@ tests:
         - "Salary"
         - "TenureDays"
         - "ManagerID"
+      id_column: "EmpID"
     expected_status: 200
 
   - id: 2
@@ -39,6 +40,7 @@ tests:
         - "Department"
         - "Position"
         - "ManagerID"
+      id_column: "EmpID"
     expected_status: 200
 
   - id: 3
@@ -111,7 +113,24 @@ tests:
     expected_status: 200
 
   - id: 6
-    description: "6. Neural Network Regression"
+    description: "6. K-Means Clustering - Anomaly Detection"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "kmeans_clustering_anomaly_detection"
+      feature_columns:
+        - "Salary"
+        - "TenureDays"
+        - "Absences"
+        - "EngagementSurvey"
+        - "ManagerID"
+      num_clusters: 4
+      threshold: 1.5
+    expected_status: 200
+
+  - id: 7
+    description: "7. Neural Network Regression"
     endpoint: "/predict"
     method: "POST"
     payload:
@@ -133,8 +152,8 @@ tests:
       batch_size: 20
     expected_status: 200
 
-  - id: 7
-    description: "7. Graph Neural Network Analysis"
+  - id: 8
+    description: "8. Graph Neural Network Analysis"
     endpoint: "/predict"
     method: "POST"
     payload:
@@ -163,19 +182,3 @@ tests:
           end_column: "DateofTermination"
     expected_status: 200
 
-  - id: 8
-    description: "8. K-Means Clustering - Anomaly Detection"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
-      model_choice: "kmeans_clustering_anomaly_detection"
-      feature_columns:
-        - "Salary"
-        - "TenureDays"
-        - "Absences"
-        - "EngagementSurvey"
-        - "ManagerID"
-      num_clusters: 4
-      threshold: 1.5
-    expected_status: 200

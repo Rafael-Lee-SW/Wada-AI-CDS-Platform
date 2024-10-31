@@ -254,3 +254,37 @@ ml-ray-fastapi-platform
     - `setup_logging(log_file)`: 로깅 설정.
 
 ---
+
+```
+ml-ray-fastapi-platform
+├─ .gitignore
+├─ app
+│  ├─ main.py
+│  ├─ models_deployments.py
+│  ├─ schemas.py
+│  └─ __init__.py
+├─ dataset
+│  ├─ edges.csv
+│  ├─ Human_Resources_Data_Set.csv
+│  └─ node_features.csv
+├─ generate_graph_data.py
+├─ models
+│  ├─ graph_neural_network.py
+│  ├─ kmeans.py
+│  ├─ logistic_regression.py
+│  ├─ neural_network.py
+│  ├─ random_forest.py
+│  └─ __init__.py
+├─ plots
+│  ├─ binary_logistic_regression_plot.png
+│  └─ multinomial_logistic_regression_plot.png
+├─ README.md
+├─ requirements.txt
+├─ scripts
+│  ├─ run_tests.py
+│  ├─ test_config.yaml
+│  └─ test_config_soowan_1.yaml
+├─ utils.py
+└─ visualization.py
+
+```
