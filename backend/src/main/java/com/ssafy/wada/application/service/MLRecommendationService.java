@@ -39,7 +39,7 @@ public class MLRecommendationService {
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
 
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
-			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest.getId())));
+			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest)));
 
 		CsvResult csvResult = csvParsingService.parse(file);
 		String[] headers = csvResult.headers();
