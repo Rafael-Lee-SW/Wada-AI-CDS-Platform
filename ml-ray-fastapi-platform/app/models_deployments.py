@@ -13,7 +13,7 @@ from models import (
     random_forest_regression,
     random_forest_classification,
     logistic_regression_binary,
-    logistic_regression_attrition,
+    logistic_regression_multinomial,  # Added this line
     kmeans_clustering_segmentation,
     kmeans_clustering_anomaly_detection,
     neural_network_regression,
@@ -102,7 +102,7 @@ async def predict(request: ModelRequest):
         "random_forest_regression": random_forest_regression,
         "random_forest_classification": random_forest_classification,
         "logistic_regression_binary": logistic_regression_binary,
-        "logistic_regression_attrition": logistic_regression_attrition,
+        "logistic_regression_multinomial": logistic_regression_multinomial,  # Added this line
         "kmeans_clustering_segmentation": kmeans_clustering_segmentation,
         "kmeans_clustering_anomaly_detection": kmeans_clustering_anomaly_detection,
         "neural_network_regression": neural_network_regression,
