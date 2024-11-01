@@ -6,6 +6,8 @@ const styles = {
         justifyContent: 'space-between', 
     },
     messageBox: {
+        marginTop: '50px',
+        marginBottom: '50px',
         padding: '20px',
         flex: 1,
         backgroundColor: '#fff',
@@ -20,7 +22,7 @@ const styles = {
         opacity: '0.7'
     },
     message: {
-        fontSize: '18px'
+        fontSize: '20px',
     },
 }
 

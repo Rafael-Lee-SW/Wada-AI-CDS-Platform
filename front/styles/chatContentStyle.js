@@ -5,24 +5,30 @@ const styles = {
         height: "100%",
     },
     fullScreenChat: {
-        width: "100%",
+        width: '100%',
+        transition: "transform 0.5s ease", // 부드러운 전환 효과
+        transformOrigin: "left",         // 왼쪽을 기준으로 확장 및 축소
+        transform: "scaleX(1)",
         height: '100%',
-        overflowY: "auto",
+        overflowY: "hidden",
     },
     leftSection: {
-        width: "30%",             
+        width: '50%',
         borderRight: "1px solid #ddd",
-        overflowY: "auto",
+        overflowY: "hidden",
+        transition: "transform 0.3s ease"
     },
     rightSection: {
+        overflow: 'hidden',
         marginTop: '50px',
-        width: "60%",            
-        transition: "width 0.3s ease",
+        width: "50%",            
+        transition: "width 0.5s ease",
         position: "relative",
     },
     rightSectionExpanded: {
-        width: "100%",           
-        transition: "width 0.3s ease",
+        width: '100%',
+        overflowY: "hidden",           
+        transition: "width 0.5s ease",
     },
     chatWindow: {
         flex: 1,
@@ -66,7 +72,7 @@ const styles = {
         justifyContent: 'flex-start',
         marginBottom: '10px',
         backgroundColor: '#f0f0f0',    
-        padding: '10px',
+        padding: '20px',
         borderRadius: '10px',
         width: 'fit-content',
         cursor: 'pointer',
