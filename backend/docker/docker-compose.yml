@@ -19,8 +19,6 @@ services:
       - "27017:27017"
     environment:
       MONGO_INITDB_DATABASE: wadadb
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 1234
     networks:
       - wada-network
 networks:

@@ -1,6 +1,5 @@
 package com.ssafy.wada.application.service;
 
-import com.ssafy.wada.application.domain.ChatRequestDetails;
 import com.ssafy.wada.application.domain.FastApiService;
 import com.ssafy.wada.application.domain.RecommendedLLM;
 import com.ssafy.wada.application.domain.SubscriptLLMService;
@@ -22,12 +21,12 @@ public class ModelDispatchService {
     private final ChatRequestDetailsManager chatRequestDetailsManager;
 
     public ModelDispatchResponse dispatchModel(String chatRoomId, int selectedModel) {
-        String requestId = chatRequestDetailsManager.getLatestMongoIdByChatRoomId(chatRoomId);
-        ChatRequestDetails chatRequestDetails = chatRequestDetailsManager.getChatRequestDetails(requestId);
+        String requestId = chatRequestDetailsManager.getRequestIdByChatRoomId(chatRoomId);
+        List<RecommendedLLM> chatRequestDetails = chatRequestDetailsManager.getRecommendedLLM(requestId);
         RecommendedLLM selectedModelData = getSelectedModelData(chatRequestDetails, selectedModel);
 
         // FastAPI 호출
-        Map<String, Object> analysisResult = fastApiService.sendToFastApi(chatRequestDetails.getFileUrl(), selectedModelData);
+        Map<String, Object> analysisResult = fastApiService.sendToFastApi(chatRequestDetailsManager.getFileUrl(requestId), selectedModelData);
         Map<String, Object> resultSummary = (Map<String, Object>) analysisResult.get("resultSummary");
         Map<String, Object> resultAll = (Map<String, Object>) analysisResult.get("resultAll");
 
@@ -38,8 +37,7 @@ public class ModelDispatchService {
         return ModelDispatchResponse.of(resultSummary, resultAll, resultLlmDescription);
     }
 
-    private RecommendedLLM getSelectedModelData(ChatRequestDetails chatRequestDetails, int selectedModel) {
-        List<RecommendedLLM> recommendedLLMList = chatRequestDetails.getRecommendedLLM();
-        return recommendedLLMList.get(selectedModel);
+    private RecommendedLLM getSelectedModelData(List<RecommendedLLM> recommendedModel, int selectedModel) {
+        return recommendedModel.get(selectedModel);
     }
 }
