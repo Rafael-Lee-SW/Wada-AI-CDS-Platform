@@ -172,7 +172,7 @@ export default function Home() {
                 'sessionId': sessionId
                 }});
             // 분석 결과
-            const result = await response.json();
+            const result = await response.result();
 
             // 최종 분석 결과 저장
             setResult(result); 
@@ -184,12 +184,6 @@ export default function Home() {
             console.error("모델 선택 중 에러 발생:", error);
         }
     };
-
-    const handleMakeDashBoard = () => {
-        // result 를 받았을 때 어떻게 채팅페이지와 대시보드를 함께 보여줄것인지 고민
-        // 채팅 페이지와 분석 페이지를 한 번에 보여주는 새로운 컴포넌트 생성
-        setPage('dashBoard');
-    }
 
     return (
         <div style={styles.mainContainer}>
@@ -226,7 +220,7 @@ export default function Home() {
             {page === 'default' && <DefaultPage />}
             {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
             {/* 채팅 컴포넌트에서 분석결과 탭을 누르면 왼쪽에는 채팅, 오른쪽에는 대시보드가 나오도록 랜더링 */}
-            {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result} onMakeDashBoard={handleMakeDashBoard}/>}
+            {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result}/>}
 
             <div style={styles.inputWrapper}>
                 {file && (
