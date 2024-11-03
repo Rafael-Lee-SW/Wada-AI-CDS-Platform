@@ -26,10 +26,17 @@ public class ChatRequestDetailsManager {
             .orElseThrow(() -> new BusinessException(ModelDispatchErrorCode.CHATROOM_NOT_FOUND));
     }
 
-    public List<RecommendedLLM> getRecommendedLLM(String requestId) {
-        List<RecommendedLLM> recommendedLLM = chatRequestDetailsRepository.findRecommendedLLMByRequestId(requestId);
+    public  List<Map<String, Object>> getRecommendedLLM(String requestId) {
+        ChatRequestDetails chatRequestDetails = chatRequestDetailsRepository.findById(requestId)
+            .orElseThrow(() -> new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND));
+        if (chatRequestDetails.getRecommendedLLM() == null) {
+            log.warn("No recommendedLLM field found for requestId: {}", requestId);
+        } else {
+            log.info("recommendedLLM field exists with size: {}", chatRequestDetails.getRecommendedLLM().size());
+        }
 
-        log.info("Fetched recommendedLLM for requestId {}: {}", requestId, recommendedLLM.size());
+        List<Map<String, Object>> recommendedLLM = chatRequestDetails.getRecommendedLLM();
+        log.info("Fetched recommendedLLM for requestId {}: {}", requestId, recommendedLLM != null ? recommendedLLM.size() : "null");
 
         if (recommendedLLM == null || recommendedLLM.isEmpty()) {
             throw new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND);
