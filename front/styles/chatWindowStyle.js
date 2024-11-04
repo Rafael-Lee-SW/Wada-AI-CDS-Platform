@@ -63,7 +63,8 @@ const styles = {
         paddingLeft: '270px',
         fontSize: '18px',
         fontWeight: 'bold',
-        color: '#1a4682'
+        color: '#1a4682',
+        cursor: 'pointer'
     },
     contentContainer: {
         display: 'flex',
