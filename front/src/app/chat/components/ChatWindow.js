@@ -1,11 +1,12 @@
 "use client"
 
 import styles from "/styles/chatWindowStyle"; 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 import DefaultPage from "./DefaultPage";
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
+import { fetchModel, createAnalyze } from "@/api";
 
 export default function Home() {
 
@@ -20,6 +21,11 @@ export default function Home() {
     const [result, setResult] = useState(null);
     const [chatRoomId, setChatRoomId] = useState('');
     const [sessionId, setSessionId] = useState('');
+
+    const handlePageChange = (event) => {
+        event.preventDefault();
+        setPage('default');
+    }
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]); 
@@ -41,15 +47,10 @@ export default function Home() {
         formData.append("file", file); 
         formData.append("message", message); 
 
-        // api 연결 필요
         try {
-            const response = await fetch("요청api", {
-                method: "POST",
-                body: formData, 
-                headers: {
-                'sessionId': sessionId
-                }
-            });
+            // const response = await fetchModel(formData, sessionId);
+
+            // const result = response.data;
             
             // 테스트용
             const result = {
@@ -164,15 +165,10 @@ export default function Home() {
                 "chatRoomId": chatRoomId,
                 "selectedModel": index,
             }
-            // 요청 방식 확인 필요
-            const response = await fetch("요청api", { 
-                method: "POST", 
-                body: data, 
-                headers: {
-                'sessionId': sessionId
-                }});
-            // 분석 결과
-            const result = await response.result();
+            
+            const response = await createAnalyze(data, sessionId); 
+            // 분석 결과 (형식확인 필요)
+            const result = response.result();
 
             // 최종 분석 결과 저장
             setResult(result); 
@@ -214,7 +210,7 @@ export default function Home() {
                 </div>
             </div>
             <div style={styles.header}>
-                <span style={styles.headerMessage}>원하는Da로</span>
+                <span style={styles.headerMessage} onClick={handlePageChange}>원하는Da로</span>
             </div>
 
             {page === 'default' && <DefaultPage />}

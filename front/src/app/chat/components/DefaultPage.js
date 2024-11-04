@@ -23,7 +23,7 @@ export default function DefaultPage() {
     return (
         <div style={styles.contentContainer}>
             <div style={styles.messageBox}>
-                <img src="/img/icon.png" style={styles.logoImg} />
+                <img src="/img/motion.gif" style={styles.logoImg} />
                 <span style={styles.message}>{displayText}</span>
             </div>
         </div>
