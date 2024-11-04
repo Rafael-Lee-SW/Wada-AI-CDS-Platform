@@ -39,6 +39,8 @@ dependencies {
 	implementation 'com.opencsv:opencsv:5.7.1'
 	//jackson
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+	//openfeign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
 }
 
 tasks.named('test') {
