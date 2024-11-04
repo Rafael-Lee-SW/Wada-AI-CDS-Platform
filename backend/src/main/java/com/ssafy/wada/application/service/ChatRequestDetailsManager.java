@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -26,35 +25,28 @@ public class ChatRequestDetailsManager {
             .orElseThrow(() -> new BusinessException(ModelDispatchErrorCode.CHATROOM_NOT_FOUND));
     }
 
-    public List<Map<String, Object>> getModelRecommendations(String requestId) {
-        log.info("Initiating fetch for model recommendations with Request ID: {}", requestId);
 
-        // 데이터베이스에서 Request ID로 ChatRequestDetails를 조회
-        Optional<ChatRequestDetails> optionalChatRequestDetails = chatRequestDetailsRepository.findById(requestId);
+    public List<Map<String, Object>> getRecommendedLLM(String requestId) {
+        ChatRequestDetails chatRequestDetails = chatRequestDetailsRepository.findById(requestId)
+            .orElseThrow(
+                () -> new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND));
 
-        // 조회된 데이터가 존재하는지 확인하는 로그 추가
-        if (optionalChatRequestDetails.isPresent()) {
-            log.info("ChatRequestDetails found for Request ID: {}", requestId);
+        if (chatRequestDetails.getRecommendedLLM() == null) {
+            log.warn("No recommended LLM found for request id {}", requestId);
         } else {
-            log.warn("No ChatRequestDetails found for Request ID: {}. It may not exist in the database.", requestId);
-            throw new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND);
+            log.info("Recommended LLM found for request id {}", requestId);
         }
-
-        // ChatRequestDetails에서 recommendedLLM 필드를 가져오기
-        ChatRequestDetails chatRequestDetails = optionalChatRequestDetails.get();
-        log.info("Full ChatRequestDetails document for Request ID {}: {}", requestId, chatRequestDetails);
 
         List<Map<String, Object>> recommendedLLM = chatRequestDetails.getRecommendedLLM();
+        log.info("Recommended LLM found for request id {}: {}", requestId,
+            recommendedLLM != null ? recommendedLLM.size() : "null");
 
-        // recommendedLLM 필드가 null 또는 empty인지 확인
         if (recommendedLLM == null || recommendedLLM.isEmpty()) {
-            log.warn("Recommended LLM data is either null or empty for Request ID: {}", requestId);
             throw new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND);
         }
-
-        log.info("Successfully fetched model recommendations for Request ID: {}. Number of recommendations: {}", requestId, recommendedLLM.size());
         return recommendedLLM;
     }
+
 
 
     public void updateChatRequestDetails(String requestId, Map<String, Object> resultSummary,
@@ -68,8 +60,7 @@ public class ChatRequestDetailsManager {
     }
 
     public String getFileUrl(String requestId) {
-        return chatRequestDetailsRepository.findById(requestId)
-            .map(ChatRequestDetails::getFileUrl)
-            .orElseThrow(() -> new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND));
+        return chatRequestDetailsRepository.findFileUrlByRequestId(requestId);
+
     }
 }

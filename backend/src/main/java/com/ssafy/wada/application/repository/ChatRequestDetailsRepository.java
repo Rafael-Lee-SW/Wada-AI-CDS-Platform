@@ -9,10 +9,9 @@ import org.springframework.data.mongodb.repository.Query;
 
 public interface ChatRequestDetailsRepository extends MongoRepository<ChatRequestDetails, String> {
 
-    @Query(value = "{ '_id': ?0 }", fields = "{ 'recommendedLLM': 1, '_id': 0 }")
-    Map<String, Object> findRecommendedLLMById(String requestId);
+    Optional<ChatRequestDetails> findById(String requestId);
 
+   ChatRequestDetails findByRequestId(String requestId);
 
-    @Query(value = "{ '_id': ?0 }", fields = "{ 'fileUrl': 1 }")
-    Optional<String> findFileUrlByRequestId(String requestId);
+   String findFileUrlByRequestId(String requestId);
 }
