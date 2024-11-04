@@ -1,6 +1,5 @@
 package com.ssafy.wada.application.domain;
 
-import com.ssafy.wada.application.domain.RecommendedLLM;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,7 +19,7 @@ public class FastApiService {
         this.restTemplate = restTemplate;
     }
 
-    public Map<String, Object> sendToFastApi(ChatRequestDetails fileUrl, Map<String, Object> modelData) {
+    public Map<String, Object> sendToFastApi(String fileUrl, Map<String, Object> modelData) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("file_path", fileUrl);
         requestBody.put("model_data", modelData);
