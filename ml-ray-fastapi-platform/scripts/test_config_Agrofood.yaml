@@ -1,0 +1,93 @@
+tests:
+  - id: 1
+    description: "1. Random Forest Regression for Emission Prediction"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Agrofood_co2_emission.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "total_emission"
+      feature_columns:
+        - "Rural population"
+        - "Urban population"
+        - "Total Population - Male"
+        - "Total Population - Female"
+        - "Average Temperature \u00b0C"
+    expected_status: 200
+
+  - id: 2
+    description: "2. K-means Clustering for Country Segmentation"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Agrofood_co2_emission.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "total_emission"
+        - "Rural population"
+        - "Urban population"
+        - "Average Temperature \u00b0C"
+      num_clusters: 4
+    expected_status: 200
+
+  - id: 3
+    description: "3. Neural Network Regression for Complex Emission Patterns"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Agrofood_co2_emission.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "total_emission"
+      feature_columns:
+        - "Savanna fires"
+        - "Forest fires"
+        - "Crop Residues"
+        - "Rice Cultivation"
+        - "Food Transport"
+        - "Rural population"
+        - "Urban population"
+        - "Average Temperature \u00b0C"
+      epochs: 100
+      batch_size: 20
+    expected_status: 200
+
+  - id: 4
+    description: "4. K-means Clustering Anomaly Detection for Unusual Emission Patterns"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Agrofood_co2_emission.csv"
+      model_choice: "kmeans_clustering_anomaly_detection"
+      feature_columns:
+        - "total_emission"
+        - "Rural population"
+        - "Urban population"
+        - "Average Temperature \u00b0C"
+        - "Fertilizers Manufacturing"
+        - "Food Processing"
+      num_clusters: 4
+      threshold: 1.5
+    expected_status: 200
+
+  - id: 5
+    description: "5. Logistic Regression Binary for High Emission Classification"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Agrofood_co2_emission.csv"
+      model_choice: "logistic_regression_binary"
+      target_variable: "high_emission"
+      feature_columns:
+        - "Rural population"
+        - "Urban population"
+        - "Total Population - Male"
+        - "Total Population - Female"
+        - "Average Temperature \u00b0C"
+        - "Fertilizers Manufacturing"
+        - "Food Processing"
+      binary_conditions:
+        - column: "total_emission"
+          operator: ">"
+          value: 20000
+          target_column: "high_emission"
+    expected_status: 200
