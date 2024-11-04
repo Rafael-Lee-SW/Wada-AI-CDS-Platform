@@ -29,28 +29,33 @@ public class ChatRequestDetailsManager {
     public List<Map<String, Object>> getModelRecommendations(String requestId) {
         log.info("Initiating fetch for model recommendations with Request ID: {}", requestId);
 
-        Map<String, Object> data = chatRequestDetailsRepository.findRecommendedLLMById(requestId);
+        // 데이터베이스에서 Request ID로 ChatRequestDetails를 조회
+        Optional<ChatRequestDetails> optionalChatRequestDetails = chatRequestDetailsRepository.findById(requestId);
 
-        // 전체 반환 값 확인
-        log.info("Fetched data: {}", data);
-
-        // recommendedLLM 필드 확인
-        if (data == null || !data.containsKey("recommendedLLM")) {
-            log.warn("No 'recommendedLLM' field found in the document for Request ID: {}", requestId);
+        // 조회된 데이터가 존재하는지 확인하는 로그 추가
+        if (optionalChatRequestDetails.isPresent()) {
+            log.info("ChatRequestDetails found for Request ID: {}", requestId);
+        } else {
+            log.warn("No ChatRequestDetails found for Request ID: {}. It may not exist in the database.", requestId);
             throw new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND);
         }
 
-        List<Map<String, Object>> modelRecommendations = (List<Map<String, Object>>) data.get("recommendedLLM");
+        // ChatRequestDetails에서 recommendedLLM 필드를 가져오기
+        ChatRequestDetails chatRequestDetails = optionalChatRequestDetails.get();
+        log.info("Full ChatRequestDetails document for Request ID {}: {}", requestId, chatRequestDetails);
 
-        // 빈 리스트 또는 null 확인
-        if (modelRecommendations == null || modelRecommendations.isEmpty()) {
-            log.warn("The model recommendations list is either null or empty for Request ID: {}", requestId);
+        List<Map<String, Object>> recommendedLLM = chatRequestDetails.getRecommendedLLM();
+
+        // recommendedLLM 필드가 null 또는 empty인지 확인
+        if (recommendedLLM == null || recommendedLLM.isEmpty()) {
+            log.warn("Recommended LLM data is either null or empty for Request ID: {}", requestId);
             throw new BusinessException(ModelDispatchErrorCode.MODEL_PARAMETER_NOT_FOUND);
         }
 
-        log.info("Successfully fetched model recommendations for Request ID: {}. List size: {}", requestId, modelRecommendations.size());
-        return modelRecommendations;
+        log.info("Successfully fetched model recommendations for Request ID: {}. Number of recommendations: {}", requestId, recommendedLLM.size());
+        return recommendedLLM;
     }
+
 
     public void updateChatRequestDetails(String requestId, Map<String, Object> resultSummary,
         Map<String, Object> resultAll, Map<String, Object> resultLlmDescription) {
