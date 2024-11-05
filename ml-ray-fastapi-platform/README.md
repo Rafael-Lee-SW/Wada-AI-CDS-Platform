@@ -252,9 +252,7 @@ ml-ray-fastapi-platform
     - `preprocess_data(df, feature_columns, target_variable)`: 데이터 전처리 수행.
     - `save_results(data, file_path)`: 결과 데이터를 파일로 저장.
     - `setup_logging(log_file)`: 로깅 설정.
-
 ---
-
 ```
 ml-ray-fastapi-platform
 ├─ .gitignore
@@ -286,7 +284,10 @@ ml-ray-fastapi-platform
 │  ├─ test_config.yaml
 │  ├─ test_config_Agrofood.yaml
 │  └─ test_config_soowan_1.yaml
+├─ tree_visualizations
+│  └─ tree_0.png
 ├─ utils.py
-└─ visualization.py
+├─ visualization_case1.py
+└─ visualization_case2.py
 
 ```
