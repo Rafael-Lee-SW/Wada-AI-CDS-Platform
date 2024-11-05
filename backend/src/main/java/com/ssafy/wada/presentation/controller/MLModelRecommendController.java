@@ -30,4 +30,6 @@ public class MLModelRecommendController {
 		log.info(sessionId);
 		return mlRecommendationService.recommend(sessionId, chatRoomId, file);
 	}
+
+
 }
