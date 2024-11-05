@@ -26,20 +26,17 @@ public class ModelDispatchService {
         log.info("Fetched Request ID: {}", requestId);
 
         // Recommended LLM 데이터 조회
-        List<Map<String, Object>> modelRecommendations = chatRequestDetailsManager.getModelRecommendations(requestId);
+        List<Map<String, Object>> modelRecommendations = chatRequestDetailsManager.getRecommendedLLM(requestId);
         log.info("Fetched model recommendations for Request ID: {}", requestId);
 
-        if (selectedModel >= modelRecommendations.size()) {
-            throw new IndexOutOfBoundsException("Selected model index is out of bounds for model_recommendations list.");
-        }
-
-        Map<String, Object> selectedModelData = modelRecommendations.get(selectedModel);
+        //선택된 모델 데이터 추출
+        Map<String, Object> selectedModelData = getModelRecommendationAtIndex(modelRecommendations, selectedModel);
         log.info("Selected Model Data: {}", selectedModelData);
 
+        //FastApi 호출
         Map<String, Object> analysisResult = fastApiService.sendToFastApi(
-            chatRequestDetailsManager.getFileUrl(requestId), selectedModelData
-        );
-        log.info("Received analysis result from FastAPI");
+            chatRequestDetailsManager.getFileUrl(requestId),selectedModelData);
+        log.info("Sending Analysis Result: {}", analysisResult);
 
         Map<String, Object> resultSummary = (Map<String, Object>) analysisResult.get("resultSummary");
         Map<String, Object> resultAll = (Map<String, Object>) analysisResult.get("resultAll");
