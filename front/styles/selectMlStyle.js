@@ -7,7 +7,8 @@ const styles = {
         justifyContent: 'center',
         textAlign: 'center',
         backgroundColor: 'white',
-        minHeight: '100vh',
+        minHeight: '100%',
+        paddingBottom: '80px'
     },
     h2: {
         fontSize: '20px',
@@ -17,11 +18,13 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingBottom: '10px',
+        paddingRight: '10px'
     },
     iconText: {
         fontSize: '25px',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     icon: {
         width: '60px',
@@ -52,13 +55,13 @@ const styles = {
         fontWeight: 'bold',
         color: '#6c4e82',
         marginTop: 0,
-        paddingBottom: '10px'
+        paddingBottom: '15px'
     },
     card: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '20px',
+        padding: '15px 20px 20px',
         border: '1px solid #9370db',
         borderRadius: '1rem',
         backgroundColor: 'white',
@@ -72,7 +75,6 @@ const styles = {
         color: 'white',
         border: 'none',
         borderRadius: '5px',
-        cursor: 'pointer',
         marginTop: '20px',
     },
     flipCard: {

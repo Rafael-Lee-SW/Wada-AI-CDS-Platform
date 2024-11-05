@@ -1,12 +1,13 @@
 "use client"
 
 import styles from "/styles/chatWindowStyle"; 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 import DefaultPage from "./DefaultPage";
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
 import { fetchModel, createAnalyze } from "@/api";
+import Loading from "./Loading";
 
 export default function Home() {
 
@@ -21,6 +22,9 @@ export default function Home() {
     const [result, setResult] = useState(null);
     const [chatRoomId, setChatRoomId] = useState('');
     const [sessionId, setSessionId] = useState('');
+    const [chatList, setChatList] = useState([]);
+
+    // 새로운 채팅이 시작될 때? 마다 채팅 기록 불러오기
 
     const handlePageChange = (event) => {
         event.preventDefault();
@@ -197,15 +201,15 @@ export default function Home() {
                     </div>
                     <div style={styles.menuItem}>
                         <img style={styles.arrow} src="/img/arrow.png" alt="arrow"/>
-                        <p>분석 기록 1</p>
+                        <p style={styles.chatList}>대화 기록 1</p>
                     </div>
                     <div style={styles.menuItem}>
                         <img style={styles.arrow} src="/img/arrow.png" alt="arrow"/>
-                        <p>분석 기록 2</p>
+                        <p style={styles.chatList}>대화 기록 2</p>
                     </div>
                     <div style={styles.menuItem}>
                         <img style={styles.arrow} src="/img/arrow.png" alt="arrow"/>
-                        <p>분석 기록 3</p>
+                        <p style={styles.chatList}>대화 기록 3</p>
                     </div>
                 </div>
             </div>
@@ -217,6 +221,7 @@ export default function Home() {
             {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
             {/* 채팅 컴포넌트에서 분석결과 탭을 누르면 왼쪽에는 채팅, 오른쪽에는 대시보드가 나오도록 랜더링 */}
             {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result}/>}
+            {page === 'loading' && <Loading/>}
 
             <div style={styles.inputWrapper}>
                 {file && (
@@ -250,13 +255,12 @@ export default function Home() {
                         value={message}
                         onChange={handleMessage}
                     />
-                    <button 
-                        type="submit"
-                        style={styles.inputButton} 
+                    <img
+                        src="/img/inputButton.png"
+                        alt="inputButton"
                         onClick={handleSubmit}
-                    >
-                        전송
-                    </button>
+                        style={styles.inputButton}
+                    />
                 </div>
             </div>
         </div>

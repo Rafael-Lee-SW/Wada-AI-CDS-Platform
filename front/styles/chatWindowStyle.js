@@ -5,21 +5,22 @@ const styles = {
         backgroundColor: 'white',
     },
     sidebar: {
-        width: '250px',
-        backgroundColor: '#fff',
+        width: '180px',
+        backgroundColor: '#fdfaff',
         padding: '5px 10px',
-        boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
+        borderRight: '1px solid #d3d3d3',
         zIndex: '2'
     },
     userInfo: {
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: '20px',
     },
     avatar: {
         display: 'flex',
         alignItems: 'center',
-        marginRight: '10px',
+        paddingRight: '20px'
     },
     profile: {
         width: '30px',
@@ -29,11 +30,11 @@ const styles = {
         marginTop: '20px',
     },
     menuItemTitle: {
-        backgroundColor: '#d3d3d3',
         display: 'flex',
         justifyContent: 'center',
         borderRadius: '12px',
-        padding: '10px',
+        border: '1px solid #9370db',
+        padding: '5px 5px',
         margin: '10px'
     },
     menuItem: {
@@ -44,6 +45,9 @@ const styles = {
     arrow: {
         width: '20px',
         margin: '10px'
+    },
+    chatList: {
+        fontSize: '15px'
     },
     active: {
         backgroundColor: '#e0e0e0',
@@ -57,13 +61,12 @@ const styles = {
         top: 0,
         width: '100%',
         height: '50px',
-        boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
+        borderBottom: '1px solid #d3d3d3'
     },
     headerMessage: {
-        paddingLeft: '270px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        color: '#1a4682',
+        paddingLeft: '200px',
+        fontSize: '16px',
+        color: '#545454',
         cursor: 'pointer'
     },
     contentContainer: {
@@ -96,7 +99,6 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '10px',
     },
     removeButton: {
         background: '#d3d3d3',
@@ -115,7 +117,7 @@ const styles = {
         width: '100%',
         justifyContent: 'center',
         padding: '10px',
-        paddingLeft: '220px',
+        paddingLeft: '160px',
         backgroundColor: 'white',
     },
     inputContainer: {
@@ -131,7 +133,7 @@ const styles = {
         paddingBottom: '10px',
         border: '1px solid #ccc',
         borderRadius: '10px',
-        marginRight: '10px',
+        marginRight: '5px',
     },
     fileInput: {
         display: 'none'
@@ -149,12 +151,10 @@ const styles = {
         paddingLeft: "15px"
     },
     inputButton: {
-        padding: '10px 20px',
-        backgroundColor: '#d3d3d3',
-        color: 'black',
-        border: 'none',
-        borderRadius: '12px',
         cursor: 'pointer',
+        width: '40px',
+        height: '40px',
+        marginTop: '3px'
     },
 };
 
