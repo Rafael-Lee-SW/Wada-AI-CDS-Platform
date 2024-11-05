@@ -3,7 +3,8 @@ import { useState } from "react";
 
 export default function SelectML({ chatRoomId, models, purpose, overview, onModelSelect }) {
     const [hoveredIndex, setHoveredIndex] = useState();
-    const [showModelSelection, setShowModelSelection] = useState(false); // 모델 선택 상태
+    const [showModelSelection, setShowModelSelection] = useState(false); 
+    const [isHovered, setIsHovered] = useState(false);
 
     const handleModelClick = (chatRoomId, index) => {
         onModelSelect(chatRoomId, index); 
@@ -35,8 +36,14 @@ export default function SelectML({ chatRoomId, models, purpose, overview, onMode
                             <h4>{purpose.main_goal}</h4>
                         </div>
                     </div>
-                    <button 
-                        style={styles.button} 
+                    <button
+                        style={{
+                            ...styles.button,
+                            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                            transition: 'transform 0.3s', 
+                        }}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
                         onClick={handleSelectButtonClick}
                     >
                         모델 선택하기

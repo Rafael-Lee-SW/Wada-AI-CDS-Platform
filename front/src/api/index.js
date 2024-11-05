@@ -5,6 +5,15 @@ const instance = axios.create({
     baseURL: 'http://localhost:8080/api/',
 });
 
+// 대화 기록 불러오기
+function fetchChatList(sessionId) {
+  return instance.get('/', {
+    headers: {
+      'sessionId': sessionId 
+    }
+  })
+}
+
 // 모델 추천 받기
 function fetchModel(formData, sessionId) {
   return instance.post('/recommend', formData, {
@@ -17,7 +26,7 @@ function fetchModel(formData, sessionId) {
 
 // 선택된 모델로 분석 요청
 function createAnalyze(data) {
-    return instance.post('/analyzeModel/', data, {
+    return instance.post('/analyze-model/', data, {
         headers: {
             'sessionId': sessionId, 
         }
@@ -26,6 +35,7 @@ function createAnalyze(data) {
 
 export {
     instance,
+    fetchChatList,
     fetchModel,
     createAnalyze
 }
