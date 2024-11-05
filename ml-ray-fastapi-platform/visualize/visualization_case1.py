@@ -1,4 +1,4 @@
-# visualization_case1.py
+# visualize/visualization_case1.py
 
 import json
 import plotly.express as px

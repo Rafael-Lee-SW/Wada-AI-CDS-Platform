@@ -5,10 +5,11 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from utils import load_and_preprocess_data
 import plotly.express as px
-import plotly.graph_objects as go  # 추가: plotly.graph_objects 임포트
+import plotly.graph_objects as go
 import json
-import numpy as np  # 추가: numpy import
-
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.metrics import pairwise_distances
 
 def generate_cluster_distribution(clustered_data, cluster_label):
     """
@@ -49,8 +50,6 @@ def generate_cluster_scatter(clustered_data, scaler, feature_columns, cluster_la
         dict: Plotly 산점도 그래프의 JSON 표현.
     """
     # 주성분 분석(PCA)을 통해 2차원으로 축소
-    from sklearn.decomposition import PCA
-
     pca = PCA(n_components=2)
     principal_components = pca.fit_transform(
         scaler.transform(clustered_data[feature_columns])
@@ -104,7 +103,7 @@ def kmeans_clustering(
         **kwargs: 추가 인자.
 
     Returns:
-        dict: 모델, 클러스터링된 데이터, 스케일러, 그래프 데이터를 포함하는 사전.
+        dict: 클러스터링된 데이터, 스케일러 정보, 클러스터 센터, 그래프 데이터를 포함하는 사전.
     """
     # 데이터 로드 및 전처리
     X, y = load_and_preprocess_data(
@@ -140,17 +139,23 @@ def kmeans_clustering(
         X, scaler, actual_feature_columns, cluster_label
     )
 
+    # Prepare scaler information as separate entries
+    scaler_info = {
+        "with_mean": scaler.with_mean,
+        "with_std": scaler.with_std,
+        "feature_names_in_": list(X.columns),
+        "n_features_in_": scaler.scale_.shape[0],
+        "mean_": scaler.mean_.tolist(),
+        "scale_": scaler.scale_.tolist(),
+    }
+
+    # Include cluster centers
+    cluster_centers = kmeans.cluster_centers_.tolist()
+
     return {
-        "kmeans_model": kmeans,
         "clustered_data": X.to_dict(orient="records"),
-        "scaler": {
-            "with_mean": scaler.with_mean,  # 수정: with_mean_ → with_mean
-            "with_std": scaler.with_std,  # 수정: with_std_ → with_std
-            "feature_names_in_": list(X.columns),
-            "n_features_in_": scaler.scale_.shape[0],
-            "mean_": scaler.mean_.tolist(),
-            "scale_": scaler.scale_.tolist(),
-        },
+        **scaler_info,  # Flatten scaler information into the top-level dictionary
+        "cluster_centers": cluster_centers,  # Include cluster centers
         "graph1": {"graph_type": "bar", "data": cluster_distribution_graph},
         "graph2": {"graph_type": "scatter", "data": cluster_scatter_graph},
         "feature_columns_used": actual_feature_columns,  # 실제 사용된 특성 컬럼 반환
@@ -167,17 +172,23 @@ def kmeans_clustering_segmentation(
         file_path (str): CSV 데이터셋 파일 경로.
         feature_columns (list of str): 사용될 특성 열 이름 리스트.
         num_clusters (int): 클러스터 수.
+        **kwargs: 추가 인자.
 
     Returns:
-        dict: 모델, 클러스터링된 데이터, 스케일러, 그래프 데이터를 포함하는 사전.
+        dict: 모델 유형, 클러스터링된 데이터, 스케일러 정보, 클러스터 센터, 그래프 데이터를 포함하는 사전.
     """
-    return kmeans_clustering(
+    result = kmeans_clustering(
         file_path=file_path,
         feature_columns=feature_columns,
         num_clusters=num_clusters,
         cluster_label="Cluster_Segmentation",
         **kwargs
     )
+
+    # Add model type
+    result["model"] = "KmeansClusteringSegmentation"
+
+    return result
 
 
 def kmeans_clustering_anomaly_detection(
@@ -194,7 +205,7 @@ def kmeans_clustering_anomaly_detection(
         **kwargs: 추가 인자.
 
     Returns:
-        dict: 모델, 클러스터링된 데이터, 스케일러, 이상치 데이터를 포함하는 사전.
+        dict: 모델 유형, 클러스터링된 데이터, 스케일러 정보, 클러스터 센터, 그래프 데이터, 이상치 데이터를 포함하는 사전.
     """
     # 클러스터링 수행
     result = kmeans_clustering(
@@ -210,17 +221,20 @@ def kmeans_clustering_anomaly_detection(
 
     # 스케일링된 특성 데이터 준비
     scaler = StandardScaler(
-        with_mean=result["scaler"]["with_mean"], with_std=result["scaler"]["with_std"]
-    )  # 수정: with_mean_, with_std_ → with_mean, with_std
-    scaler.mean_ = np.array(result["scaler"]["mean_"])
-    scaler.scale_ = np.array(result["scaler"]["scale_"])
+        with_mean=result["with_mean"], with_std=result["with_std"]
+    )
+    scaler.mean_ = np.array(result["mean_"])
+    scaler.scale_ = np.array(result["scale_"])
 
     # 스케일러로 변환된 특성 데이터만 선택
     feature_columns_used = result["feature_columns_used"]
     X_scaled = scaler.transform(clustered_df[feature_columns_used])
 
+    # 클러스터 중심 데이터 준비
+    cluster_centers = np.array(result["cluster_centers"])
+
     # 클러스터 중심까지의 최소 거리 계산
-    distances = result["kmeans_model"].transform(X_scaled).min(axis=1)
+    distances = pairwise_distances(X_scaled, cluster_centers, metric='euclidean').min(axis=1)
     clustered_df["Distance"] = distances
 
     # 이상치 식별
@@ -236,15 +250,18 @@ def kmeans_clustering_anomaly_detection(
         anomalies, scaler, feature_columns_used, "Cluster_Anomaly"
     )
 
-    # 그래프 데이터 추가
-    result["graphs"]["graph3"] = {
+    # 그래프 데이터 추가 directly without 'graphs' key
+    result["graph3"] = {
         "graph_type": "bar",
         "data": anomaly_distribution_graph,
     }
-    result["graphs"]["graph4"] = {
+    result["graph4"] = {
         "graph_type": "scatter",
         "data": anomaly_scatter_graph,
     }
     result["anomalies"] = anomalies.to_dict(orient="records")
+
+    # Add model type
+    result["model"] = "KmeansClusteringAnomalyDetection"
 
     return result

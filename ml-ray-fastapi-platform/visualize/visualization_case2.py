@@ -1,4 +1,4 @@
-# visualization_case2.py
+# visualize/visualization_case2.py
 
 import json
 import os
