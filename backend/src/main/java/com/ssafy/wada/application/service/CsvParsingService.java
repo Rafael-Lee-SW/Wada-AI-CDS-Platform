@@ -13,7 +13,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.ssafy.wada.application.domain.CsvResult;
 import com.ssafy.wada.common.error.BusinessException;
-import com.ssafy.wada.common.error.CsvParsingErrorCode;
+import com.ssafy.wada.common.error.FileErrorCode;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,7 @@ public class CsvParsingService {
 			headers = reader.readNext();
 
 			if (headers == null) {
-				throw new BusinessException(CsvParsingErrorCode.INVALID_CSV_HEADER);
+				throw new BusinessException(FileErrorCode.INVALID_CSV_HEADER);
 			}
 
 			String[] nextLine;
@@ -41,11 +41,11 @@ public class CsvParsingService {
 
 		} catch (IOException | CsvValidationException e) {
 			log.warn("CsvException occurred {} ", e.getMessage());
-			throw new BusinessException(CsvParsingErrorCode.CSV_PARSING_ERROR);
+			throw new BusinessException(FileErrorCode.CSV_PARSING_ERROR);
 		}
 
 		if (filteredRows.isEmpty()) {
-			throw new BusinessException(CsvParsingErrorCode.INVALID_CSV_DATA);
+			throw new BusinessException(FileErrorCode.INVALID_CSV_DATA);
 		}
 		return CsvResult.of(headers, filteredRows);
 	}

@@ -26,7 +26,6 @@ public class MLModelRecommendController {
 		@RequestParam("file") MultipartFile file,
 		@RequestParam("chatRoomId") String chatRoomId,
 		@RequestParam("requirement") String requirement) {
-		log.info(sessionId);
 		return mlRecommendationService.recommend(sessionId, chatRoomId, requirement, file);
 	}
 
