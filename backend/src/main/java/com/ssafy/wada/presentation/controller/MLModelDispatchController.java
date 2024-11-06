@@ -24,6 +24,7 @@ public class MLModelDispatchController {
         String chatRoomId = request.getChatRoomId();
         Object selectedModel = request.getSelectedModel();
 
+
         log.info("Received chatRoomId: {}", chatRoomId);
         log.info("Received selectedModel: {}", selectedModel);
 

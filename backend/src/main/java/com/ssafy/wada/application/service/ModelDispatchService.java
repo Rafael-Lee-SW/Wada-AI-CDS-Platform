@@ -1,5 +1,4 @@
 package com.ssafy.wada.application.service;
-import com.ssafy.wada.application.domain.FastApiService;
 import com.ssafy.wada.application.repository.ChatRoomRepository;
 import com.ssafy.wada.presentation.response.ModelDispatchResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +15,22 @@ import org.springframework.data.mongodb.core.query.Query;
 @RequiredArgsConstructor
 public class ModelDispatchService {
     private final MongoTemplate mongoTemplate;
-    private final FastApiService fastApiService;
     private final ChatRoomRepository chatRoomRepository;
+    private final FastApiService fastApiService;
 //    private final GptPromptingService gptPromptingService;
 
     public ModelDispatchResponse dispatchModel(String chatRoomId, Object selectedModel) {
-        Map<String, Object> modelMap = (Map<String, Object>) selectedModel;
+        //강제 형변환
+
 
         // Step 1: MongoDB에 chatRoomId와 selectedModel 데이터를 SelectedModelFromUser 필드명으로 저장
+        //강제형변환
         Map<String, Object> modelDetail = (Map<String, Object>) selectedModel;
+        //modelDetail뽑기
+        Map<String, Object> selectedModelDetail = (Map<String, Object>) modelDetail.get("modelDetail");
+
         Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
-        Update update = new Update().set("SelectedModelFromUser", modelDetail);
+        Update update = new Update().set("SelectedModelFromUser", selectedModelDetail);
         mongoTemplate.upsert(query, update, "chatRoomCollection");
         log.info("Saved selected model data with chatRoomId: {} under SelectedModelFromUser field", chatRoomId);
 
@@ -36,7 +40,7 @@ public class ModelDispatchService {
         log.info("Using file URL from request for chatRoomId: {}", chatRoomId);
 
         // Step 3: modelDetail의 내용만 추출하여 FastAPI로 전달
-        Map<String, Object> selectedModelDetail = (Map<String, Object>) modelMap.get("modelDetail");
+
 
 
         Map<String, Object> analysisResult = fastApiService.sendToFastApi(fileUrl, selectedModelDetail);
