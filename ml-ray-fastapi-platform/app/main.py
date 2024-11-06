@@ -11,6 +11,10 @@ from logging.handlers import TimedRotatingFileHandler
 # Suppress TensorFlow oneDNN warnings
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
+# Set Ray Serve HTTP host to allow external access
+os.environ["RAY_SERVE_HTTP_HOST"] = "0.0.0.0"  # Bind to all IP addresses
+os.environ["RAY_SERVE_HTTP_KEEP_ALIVE_TIMEOUT_S"] = "10"  # Adjust timeout as needed
+
 # Ensure the 'log' directory exists
 log_directory = 'log'
 if not os.path.exists(log_directory):
