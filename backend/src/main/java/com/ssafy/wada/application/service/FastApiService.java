@@ -19,9 +19,9 @@ public class FastApiService {
         this.restTemplate = restTemplate;
     }
 
-    public Map<String, Object> sendToFastApi(String fileUrl, Map<String, Object> modelData) {
+    public Map<String, Object> sendToFastApi(Map<String, Object> modelData) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("file_path", fileUrl);
+        //requestBody.put("file_path", fileUrl);
         requestBody.put("model_data", modelData);
 
         // FastAPI에 요청 전송

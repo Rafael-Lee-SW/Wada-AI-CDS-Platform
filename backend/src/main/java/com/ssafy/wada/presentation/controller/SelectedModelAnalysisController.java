@@ -13,14 +13,14 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/analyzeModel")
+@RequestMapping("/analyze-model")
 @RequiredArgsConstructor
 public class SelectedModelAnalysisController {
 
     private final ModelDispatchService modelDispatchService;
 
     @PostMapping
-    public ModelDispatchResponse analyzeModel(@RequestBody Map<String, Object> request) {
+    public void analyzeModel(@RequestBody Map<String, Object> request) {
         String chatRoomId = (String) request.remove("chatRoomId"); // chatRoomId 제거
         if (chatRoomId == null) {
             throw new IllegalArgumentException("chatRoomId가 누락되었습니다.");
@@ -29,6 +29,6 @@ public class SelectedModelAnalysisController {
         log.info("chatRoomId: {}", chatRoomId);
 
         // 남은 데이터를 그대로 전달
-        return modelDispatchService.dispatchModel(chatRoomId, request);
+        //return modelDispatchService.dispatchModel(chatRoomId, request);
     }
 }
