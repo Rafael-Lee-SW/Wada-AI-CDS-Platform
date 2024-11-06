@@ -1,4 +1,4 @@
-# /visualize/visualization_case56.py
+# visualize/visualization_case56.py
 
 import json
 import base64
@@ -6,13 +6,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.colors import hex_to_rgb
-
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-
 import shapely.geometry as geometry
 import shapely.affinity
-
 from scipy.spatial import ConvexHull
 import numpy as np
 from dash import Dash, dcc, html, Input, Output, State, dash_table
@@ -56,7 +53,7 @@ app.layout = html.Div(
                 dcc.Graph(id="cluster-distribution"),
                 html.H2("Cluster Scatter Plot"),
                 dcc.Graph(id="cluster-scatter"),
-                html.H2("Clustered Data Overview"),
+                html.H2("Clustered Data Sample"),
                 dash_table.DataTable(
                     id="clustered-data-table",
                     page_size=20,
@@ -106,35 +103,8 @@ app.layout = html.Div(
                             ],
                             style={"width": "50%", "margin": "0 auto"},
                         ),
-                        html.H2("Anomaly Distribution"),
-                        dcc.Graph(id="anomaly-distribution"),
                         html.H2("Anomaly Scatter Plot"),
                         dcc.Graph(id="anomaly-scatter"),
-                        html.H2("Anomalies Overview"),
-                        dash_table.DataTable(
-                            id="anomalies-table",
-                            page_size=20,
-                            style_table={"overflowX": "auto"},
-                            style_cell={
-                                "minWidth": "100px",
-                                "width": "150px",
-                                "maxWidth": "180px",
-                                "overflow": "hidden",
-                                "textOverflow": "ellipsis",
-                                "textAlign": "left",
-                            },
-                            style_header={
-                                "backgroundColor": "paleturquoise",
-                                "fontWeight": "bold",
-                            },
-                            filter_action="native",
-                            sort_action="native",
-                            sort_mode="multi",
-                            column_selectable="single",
-                            row_selectable="multi",
-                            selected_columns=[],
-                            selected_rows=[],
-                        ),
                     ],
                     style={"display": "none"},
                 ),  # Initially hidden
@@ -146,7 +116,6 @@ app.layout = html.Div(
         ),
     ]
 )
-
 
 def parse_contents(contents, filename):
     """
@@ -167,13 +136,11 @@ def parse_contents(contents, filename):
         print(e)
         return None
 
-
 @app.callback(
     Output("num-anomalies-output", "children"), Input("num-anomalies-slider", "value")
 )
 def update_num_anomalies_output(value):
     return f"Number of anomalies to highlight per cluster: {value}"
-
 
 @app.callback(
     Output("output-data-upload", "children"),
@@ -228,7 +195,6 @@ def update_output(contents, filename):
     anomaly_style = {"display": "block"} if is_anomaly else {"display": "none"}
     return None, {"display": "block"}, anomaly_style, ""
 
-
 @app.callback(
     Output("cluster-distribution", "figure"),
     Input("upload-json", "contents"),
@@ -243,25 +209,14 @@ def update_cluster_distribution(contents, filename):
         raise PreventUpdate
 
     result = data.get("result", {})
-    distribution = result.get("graph4", {}).get("clustered_data", [])
-    df_distribution = pd.DataFrame(distribution)
+    cluster_sizes = result.get("graph1", {}).get("cluster_sizes", {})
 
-    # Find the cluster label dynamically
-    cluster_label = None
-    for col in df_distribution.columns:
-        if "Cluster" in col:
-            cluster_label = col
-            break
+    cluster_label = result.get("cluster_label", "Cluster")
 
-    # If no cluster label is found, raise an informative error
-    if cluster_label is None:
-        return (
-            go.Figure(),
-            f"Cluster label not found in data columns: {df_distribution.columns.tolist()}",
-        )
-
-    distribution_counts = df_distribution[cluster_label].value_counts().reset_index()
-    distribution_counts.columns = [cluster_label, "Count"]
+    distribution_counts = pd.DataFrame({
+        cluster_label: list(cluster_sizes.keys()),
+        "Count": list(cluster_sizes.values())
+    })
 
     fig = px.bar(
         distribution_counts,
@@ -271,7 +226,6 @@ def update_cluster_distribution(contents, filename):
         labels={cluster_label: "Cluster", "Count": "Number of Data Points"},
     )
     return fig
-
 
 @app.callback(
     Output("cluster-scatter", "figure"),
@@ -287,24 +241,36 @@ def update_cluster_scatter(contents, filename):
         raise PreventUpdate
 
     result = data.get("result", {})
-    df = pd.DataFrame(result.get("graph4", {}).get("clustered_data", []))
-    cluster_label = None
-    for col in df.columns:
-        if "Cluster" in col:
-            cluster_label = col
-            break
-
-    # Use PCA for 2D representation of features
+    cluster_label = result.get("cluster_label", "Cluster")
     feature_columns = result.get("feature_columns_used", [])
+
+    # Get the sampled data
+    clustered_data_sample = result.get("graph4", {}).get("clustered_data_sample", {})
+    df_sample = pd.DataFrame(clustered_data_sample)
+
+    # Reconstruct scaler
+    scaler_mean = np.array(result.get("scaler_mean", []))
+    scaler_scale = np.array(result.get("scaler_scale", []))
     scaler = StandardScaler()
+    scaler.mean_ = scaler_mean
+    scaler.scale_ = scaler_scale
+
+    # Reconstruct cluster centers
+    cluster_centers = np.array(result.get("cluster_centers", []))
+
+    # Perform PCA
+    X_scaled = scaler.transform(df_sample[feature_columns])
     pca = PCA(n_components=2)
-    pca_components = pca.fit_transform(
-        scaler.fit_transform(df[feature_columns])
-    )
-    df["PC1"], df["PC2"] = pca_components[:, 0], pca_components[:, 1]
+    X_pca = pca.fit_transform(X_scaled)
+
+    df_sample["PC1"] = X_pca[:, 0]
+    df_sample["PC2"] = X_pca[:, 1]
+
+    # Transform cluster centers for plotting
+    centers_pca = pca.transform(cluster_centers)
 
     fig = px.scatter(
-        df,
+        df_sample,
         x="PC1",
         y="PC2",
         color=cluster_label,
@@ -315,14 +281,14 @@ def update_cluster_scatter(contents, filename):
 
     # Extract the color mapping from the figure
     colors = px.colors.qualitative.Plotly  # Default Plotly colors
-    cluster_labels = sorted(df[cluster_label].unique())
+    cluster_labels = sorted(df_sample[cluster_label].unique())
     color_map = {
         label: colors[i % len(colors)] for i, label in enumerate(cluster_labels)
     }
 
     # Enlarge cluster areas
     for cluster in cluster_labels:
-        cluster_points = df[df[cluster_label] == cluster][["PC1", "PC2"]].values
+        cluster_points = df_sample[df_sample[cluster_label] == cluster][["PC1", "PC2"]].values
         if len(cluster_points) > 2:
             hull = ConvexHull(cluster_points)
             hull_points = cluster_points[hull.vertices]
@@ -355,100 +321,48 @@ def update_cluster_scatter(contents, filename):
                     showlegend=False,
                 )
             )
+
+    # Add cluster centers
+    fig.add_trace(
+        go.Scatter(
+            x=centers_pca[:, 0],
+            y=centers_pca[:, 1],
+            mode="markers",
+            marker=dict(size=15, symbol="x", color="black"),
+            name="Cluster Centers",
+        )
+    )
+
     return fig
 
-
 @app.callback(
-    Output("anomaly-distribution", "figure"),
+    Output("clustered-data-table", "data"),
+    Output("clustered-data-table", "columns"),
     Input("upload-json", "contents"),
     State("upload-json", "filename"),
 )
-def update_anomaly_distribution(contents, filename):
-    # This callback is only relevant if anomalies are present
+def update_clustered_data_table(contents, filename):
+    if contents is None:
+        raise PreventUpdate
+
     data = parse_contents(contents, filename)
 
     if data is None or data.get("status", "") != "success":
         raise PreventUpdate
 
     result = data.get("result", {})
-    model = result.get("model", "").lower()
-    if "anomalydetection" not in model:
+    clustered_data_sample = result.get("graph4", {}).get("clustered_data_sample", {})
+
+    if not clustered_data_sample:
         raise PreventUpdate
 
-    # We will compute anomalies within the visualization code
-    # So we need to get the clustered data
-    clustered_data = pd.DataFrame(result.get("graph4", {}).get("clustered_data", []))
+    df_clustered = pd.DataFrame(clustered_data_sample)
 
-    if clustered_data.empty:
-        raise PreventUpdate
+    # Prepare data for Dash DataTable
+    data_table = df_clustered.to_dict("records")
+    columns = [{"name": i, "id": i} for i in df_clustered.columns]
 
-    # Find the cluster label dynamically
-    cluster_label = None
-    for col in clustered_data.columns:
-        if "Cluster" in col:
-            cluster_label = col
-            break
-
-    if cluster_label is None:
-        raise PreventUpdate
-
-    # Compute anomalies
-    anomalies = compute_anomalies(clustered_data, cluster_label)
-
-    if anomalies.empty:
-        raise PreventUpdate
-
-    anomaly_counts = anomalies[cluster_label].value_counts().reset_index()
-    anomaly_counts.columns = [cluster_label, "Count"]
-
-    fig = px.bar(
-        anomaly_counts,
-        x=cluster_label,
-        y="Count",
-        title="Number of Anomalies per Cluster",
-        labels={cluster_label: "Cluster", "Count": "Number of Anomalies"},
-    )
-
-    return fig
-
-
-def compute_anomalies(clustered_data, cluster_label, num_anomalies=3):
-    """
-    Compute anomalies by finding the N farthest points from the centroid in each cluster.
-    """
-    feature_columns = [col for col in clustered_data.columns if col != cluster_label]
-    # Prepare data for PCA
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(clustered_data[feature_columns])
-    pca = PCA(n_components=2)
-    pca_components = pca.fit_transform(X_scaled)
-    clustered_data["PC1"], clustered_data["PC2"] = (
-        pca_components[:, 0],
-        pca_components[:, 1],
-    )
-
-    # Calculate centroids in PCA space
-    centroids = (
-        clustered_data.groupby(cluster_label)[["PC1", "PC2"]].mean().reset_index()
-    )
-
-    # For each cluster, find the N farthest points from the centroid
-    anomalies = pd.DataFrame()
-    for cluster in clustered_data[cluster_label].unique():
-        cluster_points = clustered_data[clustered_data[cluster_label] == cluster]
-        centroid = centroids[centroids[cluster_label] == cluster][
-            ["PC1", "PC2"]
-        ].values[0]
-        distances = np.linalg.norm(
-            cluster_points[["PC1", "PC2"]].values - centroid, axis=1
-        )
-        cluster_points = cluster_points.copy()
-        cluster_points["Distance"] = distances
-        top_anomalies = cluster_points.nlargest(num_anomalies, "Distance")
-        anomalies = pd.concat([anomalies, top_anomalies])
-
-    return anomalies
-
+    return data_table, columns
 
 @app.callback(
     Output("anomaly-scatter", "figure"),
@@ -468,52 +382,41 @@ def update_anomaly_scatter(contents, num_anomalies, filename):
     if "anomalydetection" not in model:
         raise PreventUpdate
 
-    clustered_data = pd.DataFrame(result.get("graph4", {}).get("clustered_data", []))
-
-    # Find the cluster label dynamically
-    cluster_label = None
-    for col in clustered_data.columns:
-        if "Cluster" in col:
-            cluster_label = col
-            break
-
-    if cluster_label is None:
-        raise PreventUpdate
-
+    cluster_label = result.get("cluster_label", "Cluster")
     feature_columns = result.get("feature_columns_used", [])
 
-    # Prepare data for PCA
+    # Get the sampled data
+    clustered_data_sample = result.get("graph4", {}).get("clustered_data_sample", {})
+    df_sample = pd.DataFrame(clustered_data_sample)
+
+    # Reconstruct scaler
+    scaler_mean = np.array(result.get("scaler_mean", []))
+    scaler_scale = np.array(result.get("scaler_scale", []))
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(clustered_data[feature_columns])
+    scaler.mean_ = scaler_mean
+    scaler.scale_ = scaler_scale
+
+    # Reconstruct cluster centers
+    cluster_centers = np.array(result.get("cluster_centers", []))
+
+    # Perform PCA
+    X_scaled = scaler.transform(df_sample[feature_columns])
     pca = PCA(n_components=2)
-    pca_components = pca.fit_transform(X_scaled)
-    clustered_data["PC1"], clustered_data["PC2"] = (
-        pca_components[:, 0],
-        pca_components[:, 1],
-    )
+    X_pca = pca.fit_transform(X_scaled)
+
+    df_sample["PC1"] = X_pca[:, 0]
+    df_sample["PC2"] = X_pca[:, 1]
 
     # Calculate centroids in PCA space
-    centroids = (
-        clustered_data.groupby(cluster_label)[["PC1", "PC2"]].mean().reset_index()
-    )
+    centroids = pca.transform(cluster_centers)
+    centroids_df = pd.DataFrame(centroids, columns=["PC1", "PC2"])
+    centroids_df[cluster_label] = range(len(centroids_df))
 
-    # For each cluster, find the N farthest points from the centroid
-    anomalies = pd.DataFrame()
-    for cluster in clustered_data[cluster_label].unique():
-        cluster_points = clustered_data[clustered_data[cluster_label] == cluster]
-        centroid = centroids[centroids[cluster_label] == cluster][
-            ["PC1", "PC2"]
-        ].values[0]
-        distances = np.linalg.norm(
-            cluster_points[["PC1", "PC2"]].values - centroid, axis=1
-        )
-        cluster_points = cluster_points.copy()
-        cluster_points["Distance"] = distances
-        top_anomalies = cluster_points.nlargest(num_anomalies, "Distance")
-        anomalies = pd.concat([anomalies, top_anomalies])
+    # Compute anomalies
+    anomalies = compute_anomalies(df_sample, centroids_df, cluster_label, num_anomalies)
 
     fig = px.scatter(
-        clustered_data,
+        df_sample,
         x="PC1",
         y="PC2",
         color=cluster_label,
@@ -524,7 +427,7 @@ def update_anomaly_scatter(contents, num_anomalies, filename):
 
     # Extract color mapping
     colors = px.colors.qualitative.Plotly
-    cluster_labels = sorted(clustered_data[cluster_label].unique())
+    cluster_labels = sorted(df_sample[cluster_label].unique())
     color_map = {
         label: colors[i % len(colors)] for i, label in enumerate(cluster_labels)
     }
@@ -544,7 +447,7 @@ def update_anomaly_scatter(contents, num_anomalies, filename):
     # Draw lines from anomalies to centroids
     for cluster in anomalies[cluster_label].unique():
         cluster_anomalies = anomalies[anomalies[cluster_label] == cluster]
-        centroid = centroids[centroids[cluster_label] == cluster][
+        centroid = centroids_df[centroids_df[cluster_label] == cluster][
             ["PC1", "PC2"]
         ].values[0]
         for _, row in cluster_anomalies.iterrows():
@@ -561,8 +464,8 @@ def update_anomaly_scatter(contents, num_anomalies, filename):
     # Plot centroids
     fig.add_trace(
         go.Scatter(
-            x=centroids["PC1"],
-            y=centroids["PC2"],
+            x=centroids_df["PC1"],
+            y=centroids_df["PC2"],
             mode="markers",
             marker=dict(size=15, color="black", symbol="diamond"),
             name="Centroids",
@@ -572,7 +475,7 @@ def update_anomaly_scatter(contents, num_anomalies, filename):
 
     # Enlarge cluster areas
     for cluster in cluster_labels:
-        cluster_points = clustered_data[clustered_data[cluster_label] == cluster][
+        cluster_points = df_sample[df_sample[cluster_label] == cluster][
             ["PC1", "PC2"]
         ].values
         if len(cluster_points) > 2:
@@ -607,81 +510,24 @@ def update_anomaly_scatter(contents, num_anomalies, filename):
             )
     return fig
 
-
-@app.callback(
-    Output("clustered-data-table", "data"),
-    Output("clustered-data-table", "columns"),
-    Input("upload-json", "contents"),
-    State("upload-json", "filename"),
-)
-def update_clustered_data_table(contents, filename):
-    if contents is None:
-        raise PreventUpdate
-
-    data = parse_contents(contents, filename)
-
-    if data is None or data.get("status", "") != "success":
-        raise PreventUpdate
-
-    result = data.get("result", {})
-    clustered_data = result.get("graph4", {}).get("clustered_data", [])
-
-    if not clustered_data:
-        raise PreventUpdate
-
-    df_clustered = pd.DataFrame(clustered_data)
-
-    # Prepare data for Dash DataTable
-    data_table = df_clustered.head(100).to_dict("records")  # Display first 100 records
-    columns = [{"name": i, "id": i} for i in df_clustered.columns]
-
-    return data_table, columns
-
-
-@app.callback(
-    Output("anomalies-table", "data"),
-    Output("anomalies-table", "columns"),
-    [Input("upload-json", "contents"), Input("num-anomalies-slider", "value")],
-    State("upload-json", "filename"),
-)
-def update_anomalies_table(contents, num_anomalies, filename):
-    # This callback is relevant if anomalies are present
-    if contents is None:
-        raise PreventUpdate
-
-    data = parse_contents(contents, filename)
-
-    if data is None or data.get("status", "") != "success":
-        raise PreventUpdate
-
-    result = data.get("result", {})
-    model = result.get("model", "").lower()
-    if "anomalydetection" not in model:
-        raise PreventUpdate
-
-    clustered_data = pd.DataFrame(result.get("graph4", {}).get("clustered_data", []))
-    # Find the cluster label dynamically
-    cluster_label = None
-    for col in clustered_data.columns:
-        if "Cluster" in col:
-            cluster_label = col
-            break
-
-    if cluster_label is None:
-        raise PreventUpdate
-
-    # Compute anomalies
-    anomalies = compute_anomalies(clustered_data, cluster_label, num_anomalies)
-
-    if anomalies.empty:
-        raise PreventUpdate
-
-    # Prepare data for Dash DataTable
-    data_table = anomalies.to_dict("records")
-    columns = [{"name": i, "id": i} for i in anomalies.columns]
-
-    return data_table, columns
-
+def compute_anomalies(df_sample, centroids_df, cluster_label, num_anomalies):
+    """
+    Compute anomalies by finding the N farthest points from the centroid in each cluster.
+    """
+    anomalies = pd.DataFrame()
+    for cluster in df_sample[cluster_label].unique():
+        cluster_points = df_sample[df_sample[cluster_label] == cluster]
+        centroid = centroids_df[centroids_df[cluster_label] == cluster][
+            ["PC1", "PC2"]
+        ].values[0]
+        distances = np.linalg.norm(
+            cluster_points[["PC1", "PC2"]].values - centroid, axis=1
+        )
+        cluster_points = cluster_points.copy()
+        cluster_points["Distance"] = distances
+        top_anomalies = cluster_points.nlargest(num_anomalies, "Distance")
+        anomalies = pd.concat([anomalies, top_anomalies])
+    return anomalies
 
 # Run the Dash app
 if __name__ == "__main__":
