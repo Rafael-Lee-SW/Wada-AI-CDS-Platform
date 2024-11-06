@@ -19,4 +19,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
 	Optional<String> findRequestIdByChatRoomId(@Param("chatRoomId") String chatRoomId);
 
 	ChatRoom findByRequestId(String requestId);
+
+	@Query("SELECT c.fileUrl FROM ChatRoom c WHERE c.id = :chatRoomId")
+	Optional<String> findFileUrlByChatRoomId(@Param("chatRoomId") String chatRoomId);
 }

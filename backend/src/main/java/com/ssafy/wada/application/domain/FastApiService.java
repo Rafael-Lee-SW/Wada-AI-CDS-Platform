@@ -1,4 +1,4 @@
-package com.ssafy.wada.application.domain;
+package com.ssafy.wada.application.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,26 +12,28 @@ public class FastApiService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${app.fastApiUrl}")
+    @Value("${external.fast-api}")
     private String apiUrl;
 
     public FastApiService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public Map<String, Object> sendToFastApi(String fileUrl, Map<String, Object> modelData) {
+    public Map<String, Object> sendToFastApi(String fileUrl, Object modelData) {
+
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("file_path", fileUrl);
-        requestBody.put("model_data", modelData);
+
+        // fileUrl과 modelData의 필드를 requestBody에 추가
+        requestBody.put("fileUrl", fileUrl);
+
+        if (modelData instanceof Map) {
+            Map<String, Object> modelMap = (Map<String, Object>) modelData;
+            requestBody.putAll(modelMap);
+        }
 
         // FastAPI에 요청 전송
         Map<String, Object> response = restTemplate.postForObject(apiUrl, requestBody, Map.class);
 
-        // FastAPI의 응답을 resultSummary와 resultAll로 나눠서 리턴
-        Map<String, Object> result = new HashMap<>();
-        result.put("resultSummary", response.get("resultSummary"));
-        result.put("resultAll", response.get("resultAll"));
-
-        return result;
+        return response;
     }
 }

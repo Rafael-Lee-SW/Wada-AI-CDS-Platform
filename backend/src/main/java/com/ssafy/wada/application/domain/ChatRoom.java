@@ -28,6 +28,8 @@ public class ChatRoom extends BaseTimeEntity {
 
 	private String requestId;
 
+	private String fileUrl;
+
 	@ManyToOne
 	@JoinColumn(name = "guest_id" , nullable = false)
 	private Guest guest;  // N:1 관계 - Guest와 연관
