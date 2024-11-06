@@ -53,7 +53,7 @@ export default function SelectML({ chatRoomId, models, purpose, overview, onMode
 
             {/* 모델 선택 화면 */}
             {showModelSelection && (
-                <div>
+                <div style={styles.modelSelectContainer}>
                     <div style={styles.iconContainer}>
                         <img 
                             src="/img/cursor.gif" 
@@ -64,10 +64,8 @@ export default function SelectML({ chatRoomId, models, purpose, overview, onMode
                     </div>
                     <div style={styles.cardContainer}>
                         {models.map((model, index) => {
-                            const reasons = model.selection_reasoning
-                                .split(/[0-9]\)/)  
-                                .slice(1, 4)      
-                                .map(reason => reason.trim());  
+                            const reason = model.selection_reasoning
+                                 
                             return (
                                 <div 
                                     key={index} 
@@ -81,13 +79,11 @@ export default function SelectML({ chatRoomId, models, purpose, overview, onMode
                                         transform: hoveredIndex === index ? 'rotateY(180deg)' : 'none',
                                     }}>
                                         <div style={styles.flipCardFront}>
-                                            <p style={styles.title}>{model.model_name}</p>
+                                            <p style={styles.title}>{model.analysis_name}</p>
                                         </div>
                                         <div style={styles.flipCardBack}>
                                             <p style={styles.title}>기대 결과</p>
-                                            {reasons.map((reason, reasonIndex) => (
-                                                <p key={reasonIndex} style={styles.reason}>{reasonIndex + 1}) {reason}</p>
-                                            ))}
+                                            <p style={styles.reason}>{reason}</p>
                                         </div>
                                     </div>
                                 </div>

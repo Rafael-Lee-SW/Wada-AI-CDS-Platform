@@ -23,6 +23,7 @@ export default function Home() {
     const [chatRoomId, setChatRoomId] = useState('');
     const [sessionId, setSessionId] = useState('');
     const [chatList, setChatList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     // 새로운 채팅이 시작될 때? 마다 채팅 기록 불러오기
 
@@ -42,14 +43,23 @@ export default function Home() {
     const handleSubmit = async (event) => {
         event.preventDefault(); 
 
+        if (!file && !message) {
+            return;
+        }
+
+
         setSubmittedFile(file);
         setSubmittedMessage(message);
-        setChatRoomId(uuidv4())
+        setChatRoomId(uuidv4());
         setSessionId(uuidv4());
         const formData = new FormData();
 
+        formData.append("chatRoomId", chatRoomId);
         formData.append("file", file); 
-        formData.append("message", message); 
+        formData.append("requirement", message); 
+
+        setIsLoading(true);  
+        setPage('loading');
 
         try {
             // const response = await fetchModel(formData, sessionId);
@@ -59,72 +69,76 @@ export default function Home() {
             // 테스트용
             const result = {
                 "purpose_understanding": {
-                    "main_goal": "환경 데이터를 통한 온실가스 배출량에 영향을 미치는 주요 요인을 파악하고, 국가별 특성을 고려한 의미있는 인사이트를 도출하고자 합니다.",
+                    "main_goal": "회사의 인원을 30% 감축하여 인건비를 줄이고자 합니다.",
                     "specific_requirements": [
-                        "국가별 총 배출량(total_emission)에 영향을 미치는 주요 요인 파악",
-                        "인구 구조와 배출량의 상관관계 분석",
-                        "농업 활동과 산업 활동이 배출량에 미치는 영향 분석",
-                        "유사한 특성을 가진 국가들의 그룹화"
+                        "어떤 직원들이 유지되어야 하는지와 감축될 수 있는지를 확인하기 위한 해고 위험 예측 모델",
+                        "현재 고용된 직원들 중, 이직 가능성이 높은 직원들을 선별"
                     ],
                     "expected_outcomes": [
-                        "배출량 예측 모델을 통한 주요 영향 요인 식별",
-                        "국가별 특성에 따른 군집화 결과와 각 군집의 특징",
-                        "배출량 감소를 위한 실질적인 정책 제안 근거 도출"
+                        "해고하거나 유지할 직원들을 식별하는 데 도움이 되는 분석 결과",
+                        "이직 가능성이 높은 직원들에 대한 예측을 바탕으로 인원 감축 전략 수립"
                     ]
                 },
                 "data_overview": {
-                    "structure_summary": "이 데이터셋은 다양한 국가의 연간 온실가스 배출 관련 지표를 포함하고 있으며, 인구 통계, 농업 활동, 산업 활동, 그리고 환경 관련 변수들로 구성되어 있습니다.",
+                    "structure_summary": "총 37개의 칼럼으로 구성된 직원 데이터이며, 주로 인구 통계, 직무, 성과, 고용 상태 데이터로 이루어져 있습니다.",
                     "key_characteristics": [
-                        "다양한 배출원별 세부 데이터 포함 (농업, 산업, 생활 등)",
-                        "인구 구조 데이터 포함 (도시/농촌, 성별)",
-                        "온도 데이터를 통한 환경 요인 고려",
-                        "국가별, 연도별 데이터 구조"
+                        "다양한 인구 통계 칼럼: 'GenderID', 'MaritalStatusID', 'RaceDesc' 등이 포함됨",
+                        "고용 상태 관련 데이터: 'DeptID', 'PositionID', 'EmpStatusID'",
+                        "성과 평가 및 참여도 관련 칼럼: 'PerfScoreID', 'EngagementSurvey', 'EmpSatisfaction'"
                     ],
                     "relevant_columns": [
-                        "total_emission - 총 배출량으로 주요 분석 대상",
-                        "Rural population, Urban population - 인구 구조 특성",
-                        "Food Processing, Fertilizers Manufacturing, IPPU - 산업 활동 지표",
-                        "Forest fires, Savanna fires, Crop Residues - 농업 및 산림 관련 지표"
+                        "EmpStatusID",
+                        "PerfScoreID",
+                        "Salary",
+                        "DaysLateLast30",
+                        "Absences",
+                        "EngagementSurvey",
+                        "EmpSatisfaction"
                     ]
                 },
                 "model_recommendations": [
                     {
-                        "model_name": "배출량 예측을 위한 랜덤 포레스트 회귀 모델",
-                        "selection_reasoning": "랜덤 포레스트 회귀 모델을 선택한 이유는 다음과 같습니다: 1) 다양한 변수들 간의 복잡한 상호작용을 잘 포착할 수 있습니다. 2) 변수 중요도를 통해 배출량에 영향을 미치는 주요 요인을 파악할 수 있습니다. 3) 이상치에 강건하며 비선형적 관계도 잘 모델링할 수 있습니다.",
+                        "analysis_name": "Random Forest Classification for Termination Prediction",
+                        "selection_reasoning": "임직원 해고 예측을 위해 가장 적합하며, 다양한 입력 데이터와 복잡한 상호작용을 처리할 수 있습니다. 또, 피처 중요도를 통해 어떤 변수가 해고에 큰 영향을 미치는지 알 수 있습니다.",
                         "implementation_request": {
-                            "model_choice": "random_forest_regression",
+                            "model_choice": "random_forest_classification",
                             "feature_columns": [
-                                "Rural population",
-                                "Urban population",
-                                "Food Processing",
-                                "Fertilizers Manufacturing",
-                                "IPPU",
-                                "Forest fires",
-                                "Savanna fires",
-                                "Crop Residues",
-                                "Average Temperature °C"
+                                "GenderID",
+                                "MaritalStatusID",
+                                "DeptID",
+                                "PositionID",
+                                "PerfScoreID",
+                                "Salary",
+                                "DaysLateLast30",
+                                "Absences",
+                                "EngagementSurvey",
+                                "EmpSatisfaction"
                             ],
-                            "target_variable": "total_emission"
+                            "target_variable": "Termd"
                         }
                     },
                     {
-                        "model_name": "국가 특성 기반 군집 분석",
-                        "selection_reasoning": "K-means 군집화를 통해 다음과 같은 인사이트를 얻을 수 있습니다: 1) 유사한 배출 패턴을 가진 국가들을 그룹화할 수 있습니다. 2) 각 군집의 특성을 파악하여 맞춤형 정책 수립의 근거를 마련할 수 있습니다. 3) 벤치마킹할 수 있는 참조 국가군을 식별할 수 있습니다.",
+                        "analysis_name": "Logistic Regression for Attrition Risk Prediction",
+                        "selection_reasoning": "이직 가능성이 높은 직원을 식별하는 데 좋은 해석력을 제공하는 모델입니다. 확률 점수를 통해 이직 위험을 수치로 제시할 수 있습니다.",
                         "implementation_request": {
-                            "model_choice": "kmeans_clustering",
+                            "model_choice": "logistic_regression_attrition",
                             "feature_columns": [
-                                "total_emission",
-                                "Rural population",
-                                "Urban population",
-                                "Food Processing",
-                                "Fertilizers Manufacturing",
-                                "IPPU"
+                                "GenderID",
+                                "MaritalStatusID",
+                                "PerfScoreID",
+                                "Salary",
+                                "DaysLateLast30",
+                                "Absences",
+                                "EngagementSurvey",
+                                "EmpSatisfaction",
+                                "SpecialProjectsCount"
                             ],
-                            "num_clusters": 4
+                            "target_variable": "Termd"
                         }
                     }
                 ]
             }
+
             console.log("업로드 성공:", result);
 
             // 추천 모델들, 목적, 요약 저장
@@ -135,7 +149,7 @@ export default function Home() {
             setMessage('');
             setFile(null);
 
-            if (!response.ok) {
+            if (response.status != 200) {
                 throw new Error("업로드 실패");
             }
 
@@ -147,6 +161,7 @@ export default function Home() {
             setPurpose(result.purpose_understanding);
             setOverview(result.data_overview);
             setPage('selectML');
+            // 파일, 메세지 초기화
             setMessage('');
             setFile(null);
 
@@ -155,7 +170,11 @@ export default function Home() {
 
             setMessage(''); 
             setFile(null);
+
+        } finally {
+            setIsLoading(false);  // 요청이 완료되면 로딩 상태를 false로 설정
         }
+
     };
 
     const handleFileRemove = () => {
@@ -164,6 +183,10 @@ export default function Home() {
 
     // selectMl 에서 선택된 모델로 분석 요청
     const handleModelSelect = async (chatRoomId, index) => {
+
+        setIsLoading(true);  
+        setPage('loading');
+
         try {
             const data = {
                 "chatRoomId": chatRoomId,
@@ -182,6 +205,9 @@ export default function Home() {
             // 테스트용 
             setPage('chatContent'); 
             console.error("모델 선택 중 에러 발생:", error);
+
+        } finally {
+            setIsLoading('false');
         }
     };
 
