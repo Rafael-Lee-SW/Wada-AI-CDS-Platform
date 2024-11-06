@@ -4,7 +4,8 @@ const styles = {
         flex: 1,
         width: "100%",
         height: "100%",
-        justifyContent: 'center'
+        justifyContent: 'center',
+        transition: 'transform 0.5s ease'
     },
     fullScreenChat: {
         width: '70%',

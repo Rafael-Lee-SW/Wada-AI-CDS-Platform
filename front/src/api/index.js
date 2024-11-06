@@ -14,12 +14,20 @@ function fetchChatList(sessionId) {
   })
 }
 
+// 채팅방 조회
+function fetchChatRoom(sessionId, data) {
+  return instance.get('/chatrooms', data, {
+    headers: {
+      'sessionId': sessionId,
+    }
+  })
+}
+
 // 모델 추천 받기
 function fetchModel(formData, sessionId) {
   return instance.post('/recommend', formData, {
     headers: {
       'sessionId': sessionId, 
-      'Content-Type': 'multipart/form-data',
     },
   });
 }
@@ -36,6 +44,7 @@ function createAnalyze(data) {
 export {
     instance,
     fetchChatList,
+    fetchChatRoom,
     fetchModel,
     createAnalyze
 }

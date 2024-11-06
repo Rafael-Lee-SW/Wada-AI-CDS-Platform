@@ -8,7 +8,8 @@ const styles = {
         textAlign: 'center',
         backgroundColor: 'white',
         minHeight: '100%',
-        paddingBottom: '80px'
+        paddingBottom: '80px',
+        transition: 'transform 0.5s ease'
     },
     h2: {
         fontSize: '20px',
@@ -67,6 +68,9 @@ const styles = {
         backgroundColor: 'white',
         width: '300px',
         textAlign: 'center',
+        overflowY: 'auto',
+        scrollbarWidth: 'none',
+        maxHeight: '220px'
     },
     button: {
         padding: '10px 20px',
