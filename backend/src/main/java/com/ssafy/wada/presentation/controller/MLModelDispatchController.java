@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MLModelDispatchController {
 
     private final ModelDispatchService modelDispatchService;
-
+/*
     @PostMapping
     public ModelDispatchResponse analyzeModel(@RequestBody SelectedModelFromNextToSpringRequest request) {
         String chatRoomId = request.getChatRoomId();
@@ -31,4 +31,5 @@ public class MLModelDispatchController {
 
         return modelDispatchService.dispatchModel(chatRoomId, selectedModel);
     }
+    **/
 }
