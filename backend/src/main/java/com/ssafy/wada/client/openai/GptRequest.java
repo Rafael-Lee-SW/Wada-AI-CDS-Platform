@@ -1,4 +1,4 @@
-package com.ssafy.wada.client;
+package com.ssafy.wada.client.openai;
 
 import java.util.List;
 import java.util.Map;

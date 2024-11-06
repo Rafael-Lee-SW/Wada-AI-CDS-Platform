@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/analyzeModel")
+@RequestMapping("/analyze-model")
 @RequiredArgsConstructor
 public class MLModelDispatchController {
 

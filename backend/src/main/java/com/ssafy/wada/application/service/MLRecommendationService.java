@@ -1,11 +1,14 @@
 package com.ssafy.wada.application.service;
 
+import static com.ssafy.wada.application.domain.AttachedFile.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +24,13 @@ import com.ssafy.wada.application.domain.CsvResult;
 import com.ssafy.wada.application.domain.Guest;
 import com.ssafy.wada.application.repository.ChatRoomRepository;
 import com.ssafy.wada.application.repository.GuestRepository;
-import com.ssafy.wada.client.GptClient;
-import com.ssafy.wada.client.GptRequest;
+import com.ssafy.wada.client.openai.GptClient;
+import com.ssafy.wada.client.openai.GptRequest;
+import com.ssafy.wada.client.s3.S3Client;
 import com.ssafy.wada.common.error.BusinessException;
-import com.ssafy.wada.common.error.CsvParsingErrorCode;
+import com.ssafy.wada.common.error.FileErrorCode;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,10 +46,12 @@ public class MLRecommendationService {
 	private final ChatRoomRepository chatRoomRepository;
 	private final ObjectMapper objectMapper;
 	private final GptClient gptClient;
+	private final S3Client s3Client;
 
 	@Value("${openai.api.key}")
 	private String apiKey;
 
+	@Transactional
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, MultipartFile file) {
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
@@ -52,11 +59,12 @@ public class MLRecommendationService {
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
 			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest)));
 
+		CompletableFuture.supplyAsync(() -> s3Client.upload(toAttachedFile(file)));
+
 		CsvResult csvResult = csvParsingService.parse(file);
 		String[] headers = csvResult.headers();
 		List<String[]> rows = csvResult.rows();
 		List<String[]> randomRows = getRandomRows(rows, RANDOM_SELECT_ROWS);
-
 		String jsonData = convertToJson(headers, randomRows);
 
 		log.info("rows {} ", Arrays.toString(headers));
@@ -293,7 +301,7 @@ public class MLRecommendationService {
 			}
 			return objectMapper.writeValueAsString(result);
 		} catch (JsonProcessingException e) {
-			throw new BusinessException(CsvParsingErrorCode.JSON_PROCESSING_ERROR);
+			throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
 		}
 	}
 

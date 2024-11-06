@@ -1,4 +1,4 @@
-package com.ssafy.wada.application.domain;
+package com.ssafy.wada.application.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ public class SubscriptLLMService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${app.llmApiUrl}")
+    @Value("${openai.api.url}")
     private String llmApiUrl;
 
     public SubscriptLLMService(RestTemplate restTemplate) {

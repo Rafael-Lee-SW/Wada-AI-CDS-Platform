@@ -1,7 +1,5 @@
 package com.ssafy.wada.application.service;
 
-import com.ssafy.wada.application.domain.FastApiService;
-import com.ssafy.wada.application.domain.SubscriptLLMService;
 import com.ssafy.wada.presentation.response.ModelDispatchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
