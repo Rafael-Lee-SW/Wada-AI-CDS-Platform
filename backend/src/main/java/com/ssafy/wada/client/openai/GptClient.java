@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface GptClient {
 
 	@PostMapping("/chat/completions")
-	String callFunction(
-		@RequestHeader("Authorization") String authorization,
-		@RequestBody GptRequest request);
+	String callFunction(@RequestHeader("Authorization") String authorization, @RequestBody GptRequest request);
+
+	@PostMapping("/chat/completions")
+	String callFunctionWithResultRequest(@RequestHeader("Authorization") String authorization, @RequestBody GptRequest.GptResultRequest request);
 }
