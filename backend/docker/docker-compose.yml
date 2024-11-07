@@ -1,0 +1,26 @@
+services:
+  mysql:
+    container_name: wada-mysql
+    image: mysql:8.0.33
+    ports:
+      - "3306:3306"
+    command:
+      - '--character-set-server=utf8mb4'
+      - '--collation-server=utf8mb4_unicode_ci'
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: wadadb
+    networks:
+      - wada-network
+  mongo:
+    container_name: wada-mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: wadadb
+    networks:
+      - wada-network
+networks:
+  wada-network:
+    driver: bridge
