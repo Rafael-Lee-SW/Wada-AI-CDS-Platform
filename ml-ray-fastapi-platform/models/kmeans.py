@@ -1,38 +1,25 @@
 # models/kmeans.py
 
+import numpy as np
+import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-import pandas as pd
 from utils import load_and_preprocess_data
 
 def kmeans_clustering(
-    file_path, 
-    feature_columns=None, 
-    num_clusters=3, 
-    cluster_label="Cluster", 
-    **kwargs
+    file_path, feature_columns=None, num_clusters=3, cluster_label="Cluster", **kwargs
 ):
-    """
-    Generalized K-Means clustering function.
-
-    Parameters:
-        file_path (str): Path to the CSV dataset file.
-        feature_columns (list of str): List of feature column names.
-        num_clusters (int): Number of clusters.
-        cluster_label (str): Label name for the cluster assignments.
-        **kwargs: Additional arguments.
-
-    Returns:
-        dict: Contains the model, clustered data, and scaler.
-    """
     # Load and preprocess data
-    X, _ = load_and_preprocess_data(
-        file_path,
+    X, y = load_and_preprocess_data(
+        data=file_path,
         target_variable=None,
         feature_columns=feature_columns,
         encode_categorical=True,
         fill_missing=True,
     )
+
+    # Feature columns after preprocessing
+    actual_feature_columns = X.columns.tolist()
 
     # Feature scaling
     scaler = StandardScaler()
@@ -42,89 +29,81 @@ def kmeans_clustering(
     kmeans = KMeans(n_clusters=num_clusters, random_state=42)
     kmeans.fit(X_scaled)
 
-    # Add cluster labels
+    # Add cluster labels to original data
     X[cluster_label] = kmeans.labels_
 
-    return {
-        "kmeans_model": kmeans,
-        "clustered_data": X,
-        "scaler": scaler
+    # Limit the number of data points for visualization
+    max_points = 1000
+    if len(X) > max_points:
+        sampled_indices = np.random.choice(X.index, size=max_points, replace=False)
+        X_sampled = X.loc[sampled_indices]
+    else:
+        X_sampled = X.copy()
+
+    # Prepare data for visualization
+    graph4 = {
+        "graph_type": "data_sample",
+        "clustered_data_sample": X_sampled.to_dict(orient="list"),
     }
 
+    # Send essential model parameters
+    result = {
+        "model": "KmeansClusteringSegmentation",
+        "n_clusters": num_clusters,
+        "cluster_centers": kmeans.cluster_centers_.tolist(),
+        "scaler_mean": scaler.mean_.tolist(),
+        "scaler_scale": scaler.scale_.tolist(),
+        "feature_columns_used": actual_feature_columns,
+        "cluster_label": cluster_label,
+        # Graphs
+        "graph1": {
+            "graph_type": "bar",
+            # We can send cluster sizes instead of full data
+            "cluster_sizes": X[cluster_label].value_counts().to_dict(),
+        },
+        "graph2": {
+            "graph_type": "scatter",
+            # Data will be computed in visualization code
+        },
+        "graph3": {
+            "graph_type": "table",
+            "cluster_centers": kmeans.cluster_centers_.tolist(),
+            "feature_names": actual_feature_columns,
+        },
+        "graph4": graph4,
+    }
+
+    return result
+
 def kmeans_clustering_segmentation(
-    file_path, 
-    feature_columns=None, 
-    num_clusters=3, 
-    **kwargs
+    file_path, feature_columns=None, num_clusters=3, **kwargs
 ):
-    """
-    K-Means clustering for segmentation.
-
-    Parameters:
-        file_path (str): Path to the CSV dataset file.
-        feature_columns (list of str): List of feature column names.
-        num_clusters (int): Number of clusters.
-
-    Returns:
-        dict: Contains the model, clustered data, and scaler.
-    """
-    return kmeans_clustering(
+    result = kmeans_clustering(
         file_path=file_path,
         feature_columns=feature_columns,
         num_clusters=num_clusters,
         cluster_label="Cluster_Segmentation",
         **kwargs
     )
+    return result
 
 def kmeans_clustering_anomaly_detection(
-    file_path, 
-    feature_columns=None, 
-    num_clusters=3, 
-    threshold=1.5, 
-    **kwargs
+    file_path, feature_columns=None, num_clusters=3, **kwargs
 ):
-    """
-    K-Means clustering for anomaly detection.
-
-    Parameters:
-        file_path (str): Path to the CSV dataset file.
-        feature_columns (list of str): List of feature column names.
-        num_clusters (int): Number of clusters.
-        threshold (float): Threshold for considering a data point as an anomaly.
-
-    Returns:
-        dict: Contains the model, clustered data, scaler, and anomalies.
-    """
-    # Load and preprocess data
-    X, _ = load_and_preprocess_data(
-        file_path,
-        target_variable=None,
+    result = kmeans_clustering(
+        file_path=file_path,
         feature_columns=feature_columns,
-        encode_categorical=True,
-        fill_missing=True,
+        num_clusters=num_clusters,
+        cluster_label="Cluster_Anomaly",
+        **kwargs
     )
 
-    # Feature scaling
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    # For anomalies, we only send the necessary parameters
+    # Anomalies will be computed in visualization code
 
-    # K-Means clustering
-    kmeans = KMeans(n_clusters=num_clusters, random_state=42)
-    kmeans.fit(X_scaled)
+    result.update({
+        "model": "KmeansClusteringAnomalyDetection",
+        # Additional graphs will be computed in visualization code
+    })
 
-    # Add cluster labels
-    X["Cluster_Anomaly"] = kmeans.labels_
-
-    # Calculate distances to cluster centers
-    distances = kmeans.transform(X_scaled).min(axis=1)
-
-    # Identify anomalies
-    X["Distance"] = distances
-    anomalies = X[distances > threshold]
-
-    return {
-        "kmeans_model": kmeans,
-        "clustered_data": X,
-        "scaler": scaler,
-        "anomalies": anomalies
-    }
+    return result

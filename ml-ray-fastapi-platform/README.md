@@ -11,13 +11,11 @@ ml-ray-fastapi-platform
 │  ├─ schemas.py
 │  └─ __init__.py
 ├─ dataset
+│  ├─ Agrofood_co2_emission.csv
 │  ├─ edges.csv
 │  ├─ Human_Resources_Data_Set.csv
 │  └─ node_features.csv
 ├─ generate_graph_data.py
-├─ log
-│  ├─ 2024-10-29-test-log
-│  └─ 2024-10-30-test-log
 ├─ models
 │  ├─ graph_neural_network.py
 │  ├─ kmeans.py
@@ -25,18 +23,21 @@ ml-ray-fastapi-platform
 │  ├─ neural_network.py
 │  ├─ random_forest.py
 │  └─ __init__.py
+├─ plots
+│  ├─ binary_logistic_regression_plot.png
+│  └─ multinomial_logistic_regression_plot.png
 ├─ README.md
 ├─ requirements.txt
-├─ result
-│  ├─ 2024-10-30
-│  │  ├─ test_6_20241030_134636.json
-│  │  ├─ test_6_20241030_135759.json
-│  │  ├─ test_6_20241030_135943.json
-│  │  └─ test_6_20241030_140227.json
 ├─ scripts
 │  ├─ run_tests.py
-│  └─ test_config.yaml
-└─ utils.py
+│  ├─ test_config.yaml
+│  ├─ test_config_Agrofood.yaml
+│  └─ test_config_soowan_1.yaml
+├─ tree_visualizations
+│  └─ tree_0.png
+├─ utils.py
+├─ visualization_case1.py
+└─ visualization_case2.py
 
 ```
 
@@ -252,39 +253,4 @@ ml-ray-fastapi-platform
     - `preprocess_data(df, feature_columns, target_variable)`: 데이터 전처리 수행.
     - `save_results(data, file_path)`: 결과 데이터를 파일로 저장.
     - `setup_logging(log_file)`: 로깅 설정.
-
 ---
-
-```
-ml-ray-fastapi-platform
-├─ .gitignore
-├─ app
-│  ├─ main.py
-│  ├─ models_deployments.py
-│  ├─ schemas.py
-│  └─ __init__.py
-├─ dataset
-│  ├─ edges.csv
-│  ├─ Human_Resources_Data_Set.csv
-│  └─ node_features.csv
-├─ generate_graph_data.py
-├─ models
-│  ├─ graph_neural_network.py
-│  ├─ kmeans.py
-│  ├─ logistic_regression.py
-│  ├─ neural_network.py
-│  ├─ random_forest.py
-│  └─ __init__.py
-├─ plots
-│  ├─ binary_logistic_regression_plot.png
-│  └─ multinomial_logistic_regression_plot.png
-├─ README.md
-├─ requirements.txt
-├─ scripts
-│  ├─ run_tests.py
-│  ├─ test_config.yaml
-│  └─ test_config_soowan_1.yaml
-├─ utils.py
-└─ visualization.py
-
-```
