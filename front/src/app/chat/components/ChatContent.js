@@ -4,6 +4,7 @@ import Bar from "./graphs/Bar";
 import Line from "./graphs/Line";
 import Pie from "./graphs/Pie";
 import Scatter from "./graphs/Scatter";
+import Table from "./graphs/Table";
 
 export default function ChatContent({ file, message, result }) {
     const [showResult, setShowResult] = useState(false);
@@ -152,14 +153,17 @@ export default function ChatContent({ file, message, result }) {
 
             {/* 오른쪽 분석 결과 창 */}
             {showResult && (
-                <div style={isExpanded ? styles.rightSectionExpanded : styles.rightSection}>
+                <div style={styles.rightSection}>
                     <button onClick={handleCloseDashBoard} style={styles.closeButton}>X</button>
                     <div style={styles.resultContent}>
                         {/* 그래프 타입에 따른 컴포넌트 */}
-                        {graph.graph_type === 'bar' && <Bar graph={graph}/>}
+                        <Scatter/>
+                        <Bar/>
+                        <Table/>
+                        {/* {graph.graph_type === 'bar' && <Bar graph={graph}/>}
                         {graph.graph_type === 'line' && <Line graph={graph}/>}
                         {graph.graph_type === 'pie' && <Pie graph={graph}/>}
-                        {graph.graph_type === 'scatter' && <Scatter graph={graph}/>}
+                        {graph.graph_type === 'scatter' && <Scatter graph={graph}/>} */}
                     </div>
                 </div>
             )}

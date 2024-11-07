@@ -47,16 +47,23 @@ export default function Home() {
             return;
         }
 
-
+        const newChatRoomId = uuidv4();
+        const newSessionId = uuidv4();
+        
         setSubmittedFile(file);
         setSubmittedMessage(message);
-        setChatRoomId(uuidv4());
-        setSessionId(uuidv4());
-        const formData = new FormData();
+        setChatRoomId(newChatRoomId);
+        setSessionId(newSessionId);
 
-        formData.append("chatRoomId", chatRoomId);
+        const formData = new FormData();
+        formData.append("chatRoomId", newChatRoomId);  
         formData.append("file", file); 
-        formData.append("requirement", message); 
+        formData.append("requirement", message);
+
+        console.log("FormData 내용:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
 
         setIsLoading(true);  
         setPage('loading');
@@ -182,7 +189,7 @@ export default function Home() {
     }
 
     // selectMl 에서 선택된 모델로 분석 요청
-    const handleModelSelect = async (chatRoomId, index) => {
+    const handleModelSelect = async (chatRoomId, model) => {
 
         setIsLoading(true);  
         setPage('loading');
@@ -190,7 +197,7 @@ export default function Home() {
         try {
             const data = {
                 "chatRoomId": chatRoomId,
-                "selectedModel": index,
+                "modelDetail": model.implementation_request
             }
             
             const response = await createAnalyze(data, sessionId); 
@@ -245,7 +252,6 @@ export default function Home() {
 
             {page === 'default' && <DefaultPage />}
             {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
-            {/* 채팅 컴포넌트에서 분석결과 탭을 누르면 왼쪽에는 채팅, 오른쪽에는 대시보드가 나오도록 랜더링 */}
             {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result}/>}
             {page === 'loading' && <Loading/>}
 
