@@ -64,8 +64,6 @@ public class ModelDispatchService {
  * chatRoomId를 키로 ResultDescriptionFromLLM의 이름으로 gptResultResponse를 저장
  *
  */
-
-
         Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
         Update update = new Update()
             .set("SelectedModelFromUser", selectedModelDetail)

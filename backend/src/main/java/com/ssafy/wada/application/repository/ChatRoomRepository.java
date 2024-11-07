@@ -1,6 +1,5 @@
 package com.ssafy.wada.application.repository;
 
-import com.ssafy.wada.application.domain.ChatRequestDetails;
 import java.util.List;
 import java.util.Optional;
 
