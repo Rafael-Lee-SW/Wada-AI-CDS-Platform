@@ -56,6 +56,7 @@ public class ModelDispatchService {
         log.info("step 4 Fetch GPT");
         String systemPrompt = promptGenerator.createSystemPromptForResult(selectedModel);
         String userPrompt = promptGenerator.createUserPromptForResult(fastApiResult);
+
         GptResultRequest gptRequest = new GptResultRequest(systemPrompt, userPrompt);
         String gptResponseContent = gptClient.callFunctionWithResultRequest("Bearer " + apiKey, gptRequest);
         Map<String, Object> gptResultResponse = gptResponseParser.parseGptResponse(gptResponseContent);
