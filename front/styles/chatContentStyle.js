@@ -16,7 +16,7 @@ const styles = {
         overflowY: "hidden",
     },
     leftSection: {
-        width: '50%',
+        width: '40%',
         borderRight: "1px solid #ddd",
         overflowY: "hidden",
         transition: "width 0.5s ease",
@@ -24,7 +24,7 @@ const styles = {
     rightSection: {
         overflow: 'hidden',
         marginTop: '50px',
-        width: "50%",            
+        width: "60%",            
         transition: "width 0.5s ease",
         position: "relative",
     },
@@ -85,17 +85,6 @@ const styles = {
         fontWeight: 'bold',
         margin: 0
     },
-    expandButton: {
-        position: "absolute",
-        top: 10,
-        right: 45,
-        padding: '5px 10px',
-        backgroundColor: '#d3d3d3',
-        color: 'black',
-        border: 'none',
-        borderRadius: '12px',
-        cursor: 'pointer'
-    },
     closeButton: {
         position: "absolute",
         top: 10,
@@ -108,9 +97,15 @@ const styles = {
         cursor: 'pointer'
     },
     resultContent: {
-        padding: "20px",
-        height: "100%",
+        width: '100%',
         textAlign: "center",
+        overflowY: 'auto',
+        maxHeight: '500px',
+        scrollbarWidth: 'none', 
+        '&::-webkit-scrollbar': {
+            display: 'none', 
+        },
+        paddingBottom: '10px'
     },
 }
 

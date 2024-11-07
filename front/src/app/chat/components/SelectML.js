@@ -6,8 +6,8 @@ export default function SelectML({ chatRoomId, models, purpose, overview, onMode
     const [showModelSelection, setShowModelSelection] = useState(false); 
     const [isHovered, setIsHovered] = useState(false);
 
-    const handleModelClick = (chatRoomId, index) => {
-        onModelSelect(chatRoomId, index); 
+    const handleModelClick = (chatRoomId, model) => {
+        onModelSelect(chatRoomId, model); 
     };
 
     const handleSelectButtonClick = () => {
@@ -72,7 +72,7 @@ export default function SelectML({ chatRoomId, models, purpose, overview, onMode
                                     style={styles.flipCard}
                                     onMouseEnter={() => setHoveredIndex(index)}
                                     onMouseLeave={() => setHoveredIndex(null)}
-                                    onClick={() => handleModelClick(chatRoomId, index)}
+                                    onClick={() => handleModelClick(chatRoomId, model)}
                                 >
                                     <div style={{
                                         ...styles.flipCardInner,
