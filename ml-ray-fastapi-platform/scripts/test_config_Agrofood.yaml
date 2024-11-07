@@ -6,7 +6,7 @@ tests:
     payload:
       file_path: "./dataset/Agrofood_co2_emission.csv"
       model_choice: "random_forest_regression"
-      target_variable: "total_emission"
+      # Remove the target_variable line
       feature_columns:
         - "Rural population"
         - "Urban population"
@@ -37,7 +37,7 @@ tests:
     payload:
       file_path: "./dataset/Agrofood_co2_emission.csv"
       model_choice: "neural_network_regression"
-      target_variable: "total_emission"
+      # Remove the target_variable line
       feature_columns:
         - "Savanna fires"
         - "Forest fires"
