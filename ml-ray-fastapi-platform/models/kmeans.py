@@ -6,8 +6,15 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from utils import load_and_preprocess_data
 
+
 def kmeans_clustering(
-    file_path, feature_columns=None, num_clusters=3, cluster_label="Cluster", **kwargs
+    file_path,
+    feature_columns=None,
+    num_clusters=3,
+    cluster_label="Cluster",
+    sample_size=10,  # Added sample_size for summary
+    random_state=42,
+    **kwargs
 ):
     # Load and preprocess data
     X, y = load_and_preprocess_data(
@@ -26,7 +33,7 @@ def kmeans_clustering(
     X_scaled = scaler.fit_transform(X)
 
     # K-Means clustering
-    kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+    kmeans = KMeans(n_clusters=num_clusters, random_state=random_state)
     kmeans.fit(X_scaled)
 
     # Add cluster labels to original data
@@ -73,37 +80,81 @@ def kmeans_clustering(
         "graph4": graph4,
     }
 
-    return result
+    # Prepare summary data
+    # For summary, sample a smaller subset for visualization
+    actual_sample_size = min(sample_size, len(X))
+    sampled_indices_summary = np.random.choice(
+        X.index, size=actual_sample_size, replace=False
+    )
+    X_sampled_summary = X.loc[sampled_indices_summary]
+
+    # Prepare data for visualization in summary
+    graph4_summary = {
+        "graph_type": "data_sample",
+        "clustered_data_sample": X_sampled_summary.to_dict(orient="list"),
+    }
+
+    # Build summary
+    summary = {
+        "model": "KMeansClustering",
+        "n_clusters": num_clusters,
+        "cluster_label": cluster_label,
+        # Graphs
+        "graph1": result["graph1"],  # Reuse graph1 from result
+        "graph3": result["graph3"],  # Reuse graph3 from result
+        "graph4": graph4_summary,  # Use the reduced data sample
+    }
+
+    return {
+        "status": "success",
+        "result": result,
+        "summary": summary,
+    }
+
 
 def kmeans_clustering_segmentation(
-    file_path, feature_columns=None, num_clusters=3, **kwargs
+    file_path,
+    feature_columns=None,
+    num_clusters=3,
+    sample_size=10,  # Added sample_size for summary
+    random_state=42,
+    **kwargs
 ):
     result = kmeans_clustering(
         file_path=file_path,
         feature_columns=feature_columns,
         num_clusters=num_clusters,
         cluster_label="Cluster_Segmentation",
+        sample_size=sample_size,
+        random_state=random_state,
         **kwargs
     )
     return result
 
+
 def kmeans_clustering_anomaly_detection(
-    file_path, feature_columns=None, num_clusters=3, **kwargs
+    file_path,
+    feature_columns=None,
+    num_clusters=3,
+    sample_size=10,  # Added sample_size for summary
+    random_state=42,
+    **kwargs
 ):
-    result = kmeans_clustering(
+    clustering_result  = kmeans_clustering(
         file_path=file_path,
         feature_columns=feature_columns,
         num_clusters=num_clusters,
         cluster_label="Cluster_Anomaly",
+        sample_size=sample_size,
+        random_state=random_state,
         **kwargs
     )
 
     # For anomalies, we only send the necessary parameters
     # Anomalies will be computed in visualization code
 
-    result.update({
-        "model": "KmeansClusteringAnomalyDetection",
-        # Additional graphs will be computed in visualization code
-    })
+    # Update the model name
+    clustering_result["result"]["model"] = "KMeansClusteringAnomalyDetection"
+    clustering_result["summary"]["model"] = "KMeansClusteringAnomalyDetection"
 
-    return result
+    return clustering_result

@@ -168,7 +168,8 @@ async def predict(request: ModelRequest):
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
     serializable_results = make_serializable(results)
-    return JSONResponse(content={"status": "success", "result": serializable_results})
+    # return JSONResponse(content={"status": "success", "result": serializable_results})
+    return JSONResponse(content=serializable_results)
 
 # Ray Serve deployment
 @serve.deployment

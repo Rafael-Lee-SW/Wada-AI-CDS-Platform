@@ -22,6 +22,8 @@ def logistic_regression_binary(
     target_variable=None,
     feature_columns=None,
     binary_conditions=None,
+    sample_size=30,  # Added sample_size for summary
+    random_state=42,
     **kwargs,
 ):
     """
@@ -65,7 +67,7 @@ def logistic_regression_binary(
     X_train, X_test, y_train, y_test = split_data(X_pca, y)
 
     # Initialize the model
-    model = LogisticRegression(max_iter=2000)
+    model = LogisticRegression(max_iter=2000, random_state=random_state)
 
     # Train the model
     model.fit(X_train, y_train)
@@ -120,14 +122,47 @@ def logistic_regression_binary(
         "graph3": graph3,
         "graph4": graph4,
     }
+    # Prepare summary data
+    # For summary, sample a smaller subset for visualization
+    actual_sample_size = min(sample_size, len(X_pca))
+    indices_summary = np.random.choice(len(X_pca), actual_sample_size, replace=False)
+    X_pca_sample_summary = X_pca[indices_summary]
+    y_sample_summary = y.iloc[indices_summary]
 
-    return result
+    # Prepare data for visualization in summary
+    graph1_summary = {
+        "graph_type": "decision_boundary",
+        "X_pca": X_pca_sample_summary.tolist(),
+        "y": y_sample_summary.tolist(),
+        "coefficients": model.coef_.tolist(),
+        "intercept": model.intercept_.tolist(),
+        "classes": model.classes_.tolist(),
+    }
+    # Build summary
+    summary = {
+        "model": "LogisticRegressionBinary",
+        "accuracy": accuracy,
+        "coefficients": model.coef_.tolist(),
+        "intercept": model.intercept_.tolist(),
+        "classes": model.classes_.tolist(),
+        "graph1": graph1_summary,
+        "graph3": graph3,  # Reuse the classification report
+        "graph4": graph4,  # Reuse the confusion matrix
+    }
+
+    return {
+        "status": "success",
+        "result": result,
+        "summary": summary,
+    }
 
 
 def logistic_regression_multinomial(
     file_path=None,
     target_variable=None,
     feature_columns=None,
+    sample_size=30,  # Added sample_size for summary
+    random_state=42,
     **kwargs,
 ):
     """
@@ -135,11 +170,16 @@ def logistic_regression_multinomial(
     Prepares data for interactive visualization.
     """
     if not target_variable:
-        raise ValueError("Target variable must be specified for multinomial classification.")
+        raise ValueError(
+            "Target variable must be specified for multinomial classification."
+        )
+
+    # Load the dataset
+    df = pd.read_csv(file_path)
 
     # Load and preprocess data
     X, y = load_and_preprocess_data(
-        file_path,
+        df,
         target_variable=target_variable,
         feature_columns=feature_columns,
         task_type="classification",
@@ -148,20 +188,26 @@ def logistic_regression_multinomial(
     # Perform PCA for visualization
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=2, random_state=random_state)
     X_pca = pca.fit_transform(X_scaled)
 
     # Split the data
     X_train, X_test, y_train, y_test = split_data(X_pca, y)
 
     # Initialize the model with multinomial option
-    model = LogisticRegression(multi_class='multinomial', solver='lbfgs', max_iter=2000)
+    model = LogisticRegression(
+        multi_class="multinomial",
+        solver="lbfgs",
+        max_iter=2000,
+        random_state=random_state,
+    )
 
     # Train the model
     model.fit(X_train, y_train)
 
     # Predict on test data
     y_pred = model.predict(X_test)
+    y_proba = model.predict_proba(X_test)
 
     # Evaluate the model
     accuracy = accuracy_score(y_test, y_pred)
@@ -210,4 +256,37 @@ def logistic_regression_multinomial(
         "graph4": graph4,
     }
 
-    return result
+    # Prepare summary data
+    # For summary, sample a smaller subset for visualization
+    actual_sample_size = min(sample_size, len(X_pca))
+    indices_summary = np.random.choice(len(X_pca), actual_sample_size, replace=False)
+    X_pca_sample_summary = X_pca[indices_summary]
+    y_sample_summary = y.iloc[indices_summary]
+
+    # Prepare data for visualization in summary
+    graph1_summary = {
+        "graph_type": "decision_boundary",
+        "X_pca": X_pca_sample_summary.tolist(),
+        "y": y_sample_summary.tolist(),
+        "coefficients": model.coef_.tolist(),
+        "intercept": model.intercept_.tolist(),
+        "classes": model.classes_.tolist(),
+    }
+
+    # Build summary
+    summary = {
+        "model": "LogisticRegressionMultinomial",
+        "accuracy": accuracy,
+        "coefficients": model.coef_.tolist(),
+        "intercept": model.intercept_.tolist(),
+        "classes": model.classes_.tolist(),
+        "graph1": graph1_summary,
+        "graph3": graph3,  # Reuse the classification report
+        "graph4": graph4,  # Reuse the confusion matrix
+    }
+
+    return {
+        "status": "success",
+        "result": result,
+        "summary": summary,
+    }

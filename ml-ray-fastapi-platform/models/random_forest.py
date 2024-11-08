@@ -293,4 +293,8 @@ def random_forest_classification(
         },
     }
 
-    return {"status": "success", "result": result, "summary": summary}
+    return {
+        "status": "success",
+        "result": result,
+        "summary": summary
+    }
