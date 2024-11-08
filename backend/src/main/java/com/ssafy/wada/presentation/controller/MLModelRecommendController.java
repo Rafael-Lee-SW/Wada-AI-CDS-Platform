@@ -29,6 +29,4 @@ public class MLModelRecommendController {
 		@RequestParam("requirement") String requirement) {
 		return ResponseEntity.ok(mlRecommendationService.recommend(sessionId, chatRoomId, requirement, file));
 	}
-
-
 }

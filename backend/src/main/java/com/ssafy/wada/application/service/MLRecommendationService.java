@@ -59,7 +59,9 @@ public class MLRecommendationService {
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
 			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest)));
 
-		CompletableFuture.supplyAsync(() -> s3Client.upload(toAttachedFile(file)));
+
+		CompletableFuture.supplyAsync(() -> s3Client.upload(toAttachedFile(file)))
+			.thenAccept(chatRoom::setFileUrl);
 
 		CsvResult csvResult = csvParsingService.parse(file);
 		String[] headers = csvResult.headers();
