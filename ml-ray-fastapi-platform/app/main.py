@@ -141,7 +141,7 @@ def make_serializable(obj: Any) -> Any:
 @app.post("/predict")
 async def predict(request: ModelRequest):
     model_choice = request.model_choice
-
+    
     # Map model_choice to the corresponding function
     model_functions = {
         "random_forest_regression": random_forest_regression,
@@ -168,7 +168,8 @@ async def predict(request: ModelRequest):
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
     serializable_results = make_serializable(results)
-    return JSONResponse(content={"status": "success", "result": serializable_results})
+    # return JSONResponse(content={"status": "success", "result": serializable_results})
+    return JSONResponse(content=serializable_results)
 
 # Ray Serve deployment
 @serve.deployment

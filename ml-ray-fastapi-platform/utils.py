@@ -1,5 +1,3 @@
-# utils.py
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -68,8 +66,12 @@ def load_and_preprocess_data(
 
     return X, y
 
+def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False, task_type='classification'):
+    if task_type == 'classification':
+        stratify_param = y
+    else:
+        stratify_param = None
 
-def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False):
     if ids is not None:
         # Convert ids to a Series if it's not already
         if not isinstance(ids, pd.Series):
@@ -79,7 +81,7 @@ def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False)
         ids = ids.loc[X.index]
 
         X_train, X_test, y_train, y_test, id_train, id_test = train_test_split(
-            X, y, ids, test_size=test_size, random_state=random_state, stratify=y
+            X, y, ids, test_size=test_size, random_state=random_state, stratify=stratify_param
         )
         if return_ids:
             return X_train, X_test, y_train, y_test, id_train, id_test
@@ -87,10 +89,9 @@ def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False)
             return X_train, X_test, y_train, y_test
     else:
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=random_state, stratify=y
+            X, y, test_size=test_size, random_state=random_state, stratify=stratify_param
         )
         return X_train, X_test, y_train, y_test
-
 
 def generate_binary_condition(df, name_of_col, conditions):
     if not conditions:
