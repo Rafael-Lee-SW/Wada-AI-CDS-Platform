@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    // baseURL: 'https://k11a104.p.ssafy.io/api/',
-    baseURL: 'http://localhost:8080/api/',
+    baseURL: 'https://k11a104.p.ssafy.io/api/',
 });
 
 // 대화 기록 불러오기

@@ -8,6 +8,7 @@ import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
 import { fetchModel, createAnalyze } from "@/api";
 import Loading from "./Loading";
+import FileUploader from "./FileUploader";
 
 export default function Home() {
 
@@ -24,8 +25,44 @@ export default function Home() {
     const [sessionId, setSessionId] = useState('');
     const [chatList, setChatList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [files, setFiles] = useState([]);
 
     // 새로운 채팅이 시작될 때? 마다 채팅 기록 불러오기
+
+    const [dragActive, setDragActive] = useState(false);
+
+  // 파일 추가 핸들러
+    const handleFiles = (newFiles) => {
+        const fileArray = Array.from(newFiles);
+        setFiles((prevFiles) => [...prevFiles, ...fileArray]);
+    };
+
+    // 드래그 앤 드롭 영역에서 파일을 드롭할 때
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+        e.dataTransfer.clearData();
+        }
+    };
+
+    // 파일 선택 핸들러 (input type="file" 사용)
+    const handleFileSelect = (e) => {
+        handleFiles(e.target.files);
+    };
+
+    // 드래그 상태 핸들러
+    const handleDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') {
+        setDragActive(true);
+        } else if (e.type === 'dragleave') {
+        setDragActive(false);
+        }
+    };
 
     const handlePageChange = (event) => {
         event.preventDefault();
@@ -254,6 +291,7 @@ export default function Home() {
             {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
             {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result}/>}
             {page === 'loading' && <Loading/>}
+            {page === 'fileUploader' && <FileUploader/>}
 
             <div style={styles.inputWrapper}>
                 {file && (
@@ -268,7 +306,6 @@ export default function Home() {
                         </button>
                     </div>
                 )}
-
                 <div style={styles.inputContainer}>
                     <label htmlFor="file-upload">
                         <img src="/img/fileupload.png" style={styles.fileImg} alt="파일 업로드"/>
