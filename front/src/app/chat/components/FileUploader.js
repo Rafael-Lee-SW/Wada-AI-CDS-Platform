@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styles from '/styles/fileUploaderStyle';
+import { v4 as uuidv4 } from "uuid"
 
-export default function FileUploader() {
+export default function FileUploader({onChangePage}) {
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(''); 
@@ -16,6 +17,10 @@ export default function FileUploader() {
     setFiles((prevFiles) => [...prevFiles, ...fileArray]);
     setError('');
   };
+
+  const handleChangePage = () => {
+    onChangePage();
+  }
 
   // 드래그 앤 드롭 영역에서 파일을 드롭할 때
   const handleDrop = (e) => {
@@ -50,6 +55,11 @@ export default function FileUploader() {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
+  const handleFileSubmit = async (files) => {
+    setFiles(files);
+    handleChangePage();
+  }
+
   return (
     <div style={styles.container}>
         <div>
@@ -80,9 +90,9 @@ export default function FileUploader() {
             />
             <label htmlFor="file-input" style={styles.label}>
             {dragActive ? (
-                <p>여기에 놓아주세요.</p>
+                <p style={styles.text}>여기에 놓아주세요.</p>
             ) : (
-                <p>분석할 파일을 드래그하거나 선택해주세요.</p>
+                <p style={styles.text}>분석할 파일을 드래그하거나 선택해주세요.</p>
             )}
             </label>
             {files.length > 0 && (
@@ -107,7 +117,7 @@ export default function FileUploader() {
 
         {files.length > 0 && (
             <div style={styles.buttonContainer}>
-                <button style={styles.button}>
+                <button style={styles.button} onClick={() => handleFileSubmit(files)}>
                     선택 완료
                 </button>
             </div>

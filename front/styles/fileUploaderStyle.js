@@ -23,6 +23,9 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center'
     },
+    text: {
+        fontWeight: 'bold'
+    },
     removeButton: {
         background: '#d3d3d3',
         color: 'white',
