@@ -1,26 +1,35 @@
 package com.ssafy.wada.application.service;
 
-import static com.ssafy.wada.application.domain.AttachedFile.*;
+import static com.ssafy.wada.application.domain.util.AttachedFile.*;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ssafy.wada.application.domain.File;
+import com.ssafy.wada.application.repository.FileRepository;
+import com.ssafy.wada.client.openai.PromptGenerator;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.mongodb.core.query.Query;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.ssafy.wada.application.domain.ChatRoom;
-import com.ssafy.wada.application.domain.CsvResult;
+import com.ssafy.wada.application.domain.util.CsvResult;
 import com.ssafy.wada.application.domain.Guest;
 import com.ssafy.wada.application.repository.ChatRoomRepository;
 import com.ssafy.wada.application.repository.GuestRepository;
@@ -44,246 +53,128 @@ public class MLRecommendationService {
 	private final CsvParsingService csvParsingService;
 	private final GuestRepository guestRepository;
 	private final ChatRoomRepository chatRoomRepository;
+	private final FileRepository fileRepository;
 	private final ObjectMapper objectMapper;
 	private final GptClient gptClient;
 	private final S3Client s3Client;
+	private final MongoTemplate mongoTemplate;
 
 	@Value("${openai.api.key}")
 	private String apiKey;
 
 	@Transactional
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, MultipartFile file) {
+		log.info("Step 1: Start recommendation process");
+
+		// Step 1-1: Guest 조회 또는 생성
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
+		log.info("Step 1-1: Guest retrieved or created with sessionId={}", sessionId);
 
+		// Step 1-2: ChatRoom 조회 또는 생성
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
 			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest)));
+		log.info("Step 1-2: ChatRoom retrieved or created with chatRoomId={}", chatRoomId);
 
+		// Step 2: 파일 업로드 및 URL 저장
+		log.info("Step 2: Uploading file to S3 and preparing for MongoDB save");
+		String fileUrl = CompletableFuture.supplyAsync(() -> s3Client.upload(toAttachedFile(file))).join();
+		File fileEntity = File.create(UUID.randomUUID().toString(), chatRoom, fileUrl);
+		fileRepository.save(fileEntity);
+		log.info("Step 2: File uploaded to S3 with URL={}", fileUrl);
 
-		CompletableFuture.supplyAsync(() -> s3Client.upload(toAttachedFile(file)))
-			.thenAccept(chatRoom::setFileUrl);
-
+		// Step 3: CSV 파일 파싱
+		log.info("Step 3: Parsing CSV file");
 		CsvResult csvResult = csvParsingService.parse(file);
 		String[] headers = csvResult.headers();
 		List<String[]> rows = csvResult.rows();
 		List<String[]> randomRows = getRandomRows(rows, RANDOM_SELECT_ROWS);
 		String jsonData = convertToJson(headers, randomRows);
+		log.info("Step 3: Parsed CSV file with headers={} and random rows={}", Arrays.toString(headers), jsonData);
 
-		log.info("rows {} ", Arrays.toString(headers));
-		log.info("randomRows {} ", jsonData);
+		// Step 4: Prompt 생성
 		String header = "Bearer " + apiKey;
+		Map<String, Object> modelParams = new HashMap<>();
+		modelParams.put("columns", Arrays.toString(headers));
+		modelParams.put("random_10_rows", jsonData);
+		modelParams.put("analysisPurpose", analysisPurpose);
+		String body = PromptGenerator.createRecommendedModelFromLLM(modelParams);
+		log.info("Step 4: Generated prompt for GPT model");
 
-		String body = String.format("""
-			# Role and Context
-			You are an expert data scientist responsible for analyzing data and recommending the most appropriate machine learning models. Your recommendations should be directly applicable to the Ray ML server implementation.
-
-			# Input Data
-			   {
-			     "columns": %s,
-			     "random_10_rows": %s
-			   }
-
-			2. User's Analysis Purpose:
-			   %s
-
-			3. Available Models:
-			   1. random_forest_regression
-			      - For numerical target prediction
-			      - Handles both numerical and categorical features
-			      - Provides feature importance
-			      - Required: feature_columns, target_variable
-			      - Example: Performance score prediction, salary forecasting
-
-			   2. random_forest_classification
-			      - For categorical outcome prediction
-			      - Handles both numerical and categorical features
-			      - Provides feature importance
-			      - Required: feature_columns, target_variable
-			      - Example: Employee termination prediction
-
-			   3. logistic_regression_binary
-			      - For binary classification with custom conditions
-			      - Highly interpretable results
-			      - Provides probability scores
-			      - Required: feature_columns, target_variable
-			      - Optional: binary_conditions[{
-			        column, operator, value, target_column
-			      }]
-			      - Example: Overpaid employee identification
-
-			   4. logistic_regression_attrition
-			      - For attrition risk prediction
-			      - Highly interpretable results
-			      - Provides probability scores
-			      - Required: feature_columns, target_variable
-			      - Example: Employee attrition risk prediction
-
-			   5. kmeans_clustering_segmentation
-			      - For identifying employee segments
-			      - Unsupervised learning
-			      - Pattern discovery
-			      - Required: feature_columns
-			      - Optional: num_clusters(default=3)
-			      - Example: Employee segmentation analysis
-
-			   6. kmeans_clustering_anomaly_detection
-			      - For detecting unusual patterns
-			      - Unsupervised learning
-			      - Anomaly discovery
-			      - Required: feature_columns
-			      - Optional: num_clusters(default=3), threshold
-			      - Example: Unusual behavior pattern detection
-
-			   7. neural_network_regression
-			      - For complex regression tasks
-			      - Handles non-linear relationships
-			      - Requires sufficient data volume
-			      - Required: feature_columns, target_variable
-			      - Optional: epochs(default=100), batch_size(default=20)
-			      - Example: Performance score prediction
-
-			   8. graph_neural_network_analysis
-			      - For analyzing network relationships
-			      - Identifies complex patterns
-			      - Network structure analysis
-			      - Required:\s
-			        - node_features_path
-			        - edges_path
-			        - id_column
-			        - edge_source_column
-			        - edge_target_column
-			      - Optional:\s
-			        - additional_features
-			        - feature_generations[{
-			            type: "period",
-			            new_column: string,
-			            start_column: string,
-			            end_column: string
-			          }]
-			      - Example: Organizational network analysis
-
-			# Response Format and Style Guidelines
-			1. Format Requirements:
-			   - Response must be in valid JSON format only
-			   - No additional text or explanations outside the JSON structure
-			   - All JSON fields must be present exactly as specified
-
-			2. Korean Language Style:
-			   - Use polite and professional language (합니다/습니다 style)
-			   - Provide detailed explanations that non-technical users can understand
-			   - Include specific examples and implications where appropriate
-			   - Maintain a helpful and supportive tone
-
-			3. Content Guidelines for Korean Sections:
-			   purpose_understanding:
-			     - main_goal: 분석의 궁극적인 목표를 구체적으로 설명
-			     - specific_requirements: 각 요구사항을 단계별로 상세히 설명
-			     - expected_outcomes: 기대되는 결과와 그 활용방안을 자세히 기술
-
-			   data_overview:
-			     - structure_summary: 데이터의 전반적인 구조와 특징을 종합적으로 설명
-			     - key_characteristics: 중요한 데이터 특성을 bullet point로 명확하게 나열
-			     - relevant_columns: 각 칼럼이 분석에 어떻게 기여하는지 설명
-
-			   model_recommendations:
-			     - analysis_name: 선택한 모델의 이름, 역할과 분석을 통해 달성하려는 목적
-			     - selection_reasoning:\s
-			       • 모델 선택의 이유
-			       • 해당 모델의 장점
-			       • 예상되는 분석 결과
-			       • 실제 비즈니스 관점에서의 가치
-			       • 주의사항이나 고려사항
-
-			4. Examples of Appropriate Korean Explanations:
-			   "main_goal": "고객님의 매출 데이터를 활용하여 향후 3개월 간의 매출을 예측하고, 이를 통해 재고 관리 및 마케팅 전략 수립에 도움을 드리고자 합니다.",
-			  \s
-			   "structure_summary": "제공해 주신 데이터는 총 12개월 간의 일별 매출 기록으로, 제품별 판매량과 관련 마케팅 활동이 상세히 기록되어 있습니다. 특히 계절성이 뚜렷하게 나타나는 특징을 보이고 있습니다.",
-			  \s
-			   "selection_reasoning": "RandomForestRegressor 모델을 추천 드리는 주된 이유는 다음과 같습니다: 1) 고객님의 매출 데이터가 가진 계절성과 트렌드를 정확히 포착할 수 있습니다. 2) 각 변수의 중요도를 파악하여 어떤 요소가 매출에 가장 큰 영향을 미치는지 확인하실 수 있습니다. 3) 과적합 위험이 적어 안정적인 예측이 가능합니다."
-
-			5. Response Format
-			{
-			    "purpose_understanding": {
-			        "main_goal": "Primary analysis objective",
-			        "specific_requirements": ["Specific analysis requirements"],
-			        "expected_outcomes": ["Expected insights or predictions"]
-			    },
-			    "data_overview": {
-			        "structure_summary": "Overview of the data structure",
-			        "key_characteristics": ["Important data characteristics"],
-			        "relevant_columns": ["Columns relevant to the analysis goal"]
-			    },
-			    "model_recommendations": [
-			        {
-			            "analysis_name": "Human readable name of the model and short description of analysis from model",
-			            "selection_reasoning": "Detailed justification for this model selection",
-			            "implementation_request": {
-			                "model_choice": "exact_model_choice_from_enum",
-			                "feature_columns": ["required_feature1", "required_feature2", ...],
-			               \s
-			                // Required for supervised learning models:
-			                "target_variable": "target_column_name",
-			               \s
-			                // Optional parameters based on model_choice:
-			                "num_clusters": 3,  // For kmeans_clustering
-			                "epochs": 50,       // For neural_network_regression
-			                "batch_size": 10,   // For neural_network_regression
-			               \s
-			                // For logistic_regression with binary target creation:
-			                "binary_conditions": [
-			                    {
-			                        "column": "column_name",
-			                        "operator": ">",  // >, <, ==, >=, <=, !=
-			                        "value": 100000,
-			                        "target_column": "new_binary_column"
-			                    }
-			                ],
-
-			                // For graph_neural_network_analysis:
-			                "node_features_path": "path/to/nodes.csv",
-			                "edges_path": "path/to/edges.csv",
-			                "id_column": "id_col",
-			                "manager_column": "manager_col"
-			            }
-			        }
-			    ]
-			}
-
-			# Guidelines
-			1. Model Selection:
-			   - Recommend 2-3 most suitable models
-			   - Consider data characteristics and analysis goals
-			   - Ensure implementation_request matches exactly with server requirements
-			   - Always include feature_columns for all models
-
-			2. Parameter Specification:
-			   - Include all required parameters for the chosen model
-			   - Add optional parameters only when necessary
-			   - Use exact parameter names as shown in the model requirements
-
-			# Constraints
-			- All model_choice values must exactly match the server enum
-			- feature_columns is mandatory for all models
-			- Include target_variable for all supervised learning models
-			- Only include model-specific optional parameters when needed
-
-			# Additional Output Requirements
-			1. Strict JSON Compliance:
-			   - Must be parseable by standard JSON parsers
-			   - No comments in the final JSON output
-			   - No trailing commas
-			   - All string values must be in double quotes
-
-			2. Language and Format Preservation:
-			   - Original column names must be preserved exactly as input
-			   - Model choice enums must match exactly as specified
-			   - Technical parameters must remain in English
-""", Arrays.toString(headers), jsonData, analysisPurpose);
+		// Step 5: GPT 호출 및 응답 처리
+		log.info("Step 5: Calling GPT model");
 		GptRequest.Message message = GptRequest.Message.roleUserMessage(body);
 		GptRequest request = new GptRequest(List.of(message));
-		String s = gptClient.callFunction(header, request);
-		return createResponse(s);
+		String gptResponse = gptClient.callFunction(header, request);
+		log.info("Step 5: GPT model response received");
+
+		// Step 6: GPT 응답과 파일 URL을 MongoDB에 저장
+		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrl,analysisPurpose);
+		log.info("Step 6: GPT response and file path saved to MongoDB with requestId={}", requestId);
+
+		// 결과 반환
+		return createResponse(gptResponse, requestId);
 	}
+	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, String fileUrl, String requirement) {
+		try {
+			// GPT 응답의 content 추출
+			JsonNode rootNode = objectMapper.readTree(gptResponse);
+			JsonNode contentNode = rootNode.at("/choices/0/message/content");
+
+			if (contentNode.isMissingNode()) {
+				log.error("GPT response does not contain 'choices[0].message.content' field. Response: {}", gptResponse);
+				throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
+			}
+
+			// `contentNode`를 JSON으로 다시 파싱하여 `RecommendedModelFromLLM` 데이터 추출
+			JsonNode parsedContent = objectMapper.readTree(contentNode.asText());
+			JsonNode modelRecommendationsNode = parsedContent.get("model_recommendations");
+
+			if (modelRecommendationsNode == null) {
+				log.error("Parsed content does not contain 'model_recommendations' field. Content: {}", contentNode.asText());
+				throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
+			}
+
+			// 각 모델에 "isSelected": false 추가하고 전체 정보를 `RecommendedModelFromLLM`로 설정
+			List<Map<String, Object>> modelRecommendations = new ArrayList<>();
+			modelRecommendationsNode.forEach(model -> {
+				Map<String, Object> modelMap = objectMapper.convertValue(model, Map.class);
+				modelMap.put("isSelected", false);
+				modelRecommendations.add(modelMap);
+			});
+
+			// `RecommendedModelFromLLM`에 추가 정보를 포함하도록 구성
+			Map<String, Object> recommendedModelData = new HashMap<>();
+			recommendedModelData.put("purpose_understanding", parsedContent.get("purpose_understanding"));
+			recommendedModelData.put("data_overview", parsedContent.get("data_overview"));
+			recommendedModelData.put("model_recommendations", modelRecommendations);  // 모델 추천 정보 포함
+
+			// `chatRoomId`에 대한 기존 요청 수를 확인하여 새로운 `requestId` 생성
+			Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
+			long requestCount = mongoTemplate.count(query, "MongoDB");
+
+			int newRequestId = (int) (requestCount + 1); // 새 requestId는 현재 요청 수 + 1로 설정
+
+			// MongoDB에 저장할 데이터 구성
+			Map<String, Object> analysisRequest = new HashMap<>();
+			analysisRequest.put("chatRoomId", chatRoomId);
+			analysisRequest.put("requestId", newRequestId);
+			analysisRequest.put("fileUrl", fileUrl);
+			analysisRequest.put("requirement", requirement);
+			analysisRequest.put("RecommendedModelFromLLM", recommendedModelData); // 모든 정보가 포함된 RecommendedModelFromLLM
+			analysisRequest.put("createdTime", LocalDateTime.now());
+			// MongoDB에 저장
+			mongoTemplate.save(analysisRequest, "MongoDB");
+			log.info("Step 6: GPT response with all data in RecommendedModelFromLLM processed and saved to MongoDB with requestId={}", newRequestId);
+
+			return newRequestId;
+
+		} catch (Exception e) {
+			log.error("Error processing GPT response", e);
+			throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
+		}
+	}
+
 
 	private List<String[]> getRandomRows(List<String[]> rows, int n) {
 		Collections.shuffle(rows);
@@ -307,25 +198,21 @@ public class MLRecommendationService {
 		}
 	}
 
-	private String createResponse(String jsonResponse) {
+	private String createResponse(String jsonResponse, int requestId) {
 		log.info("jsonResponse " + jsonResponse);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 
-			// 전체 JSON 응답을 Java 객체로 파싱
 			JsonNode rootNode = mapper.readTree(jsonResponse);
-
-			// `message.content`에서 JSON 문자열 추출
 			String messageContent = rootNode.get("choices").get(0).get("message").get("content").asText();
 			log.info("message: " + messageContent);
 			JsonNode jsonNode = mapper.readTree(messageContent);
 
-			// 예쁘게 포맷된 JSON 문자열로 변환
-			ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
-			String formattedJson = writer.writeValueAsString(jsonNode);
+			((ObjectNode) jsonNode).put("requestId", requestId);
 
-			// 결과 출력
-			return formattedJson;
+			ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+			return writer.writeValueAsString(jsonNode);
+
 		} catch (Exception e) {
 			log.error("parse error");
 			e.printStackTrace();

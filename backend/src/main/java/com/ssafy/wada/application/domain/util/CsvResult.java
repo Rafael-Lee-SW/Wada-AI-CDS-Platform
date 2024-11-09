@@ -1,4 +1,4 @@
-package com.ssafy.wada.application.domain;
+package com.ssafy.wada.application.domain.util;
 
 import java.util.List;
 

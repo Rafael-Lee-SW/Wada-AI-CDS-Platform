@@ -6,5 +6,6 @@ import lombok.Data;
 @Data
 public class SelectedModelFromNextToSpringRequest {
     private String chatRoomId; //UUID v4
+    private int requestId;
     private Map<String,Object> modelDetail;
 }

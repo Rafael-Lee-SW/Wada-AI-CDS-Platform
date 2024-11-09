@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-import com.ssafy.wada.application.domain.CsvResult;
+import com.ssafy.wada.application.domain.util.CsvResult;
 import com.ssafy.wada.common.error.BusinessException;
 import com.ssafy.wada.common.error.FileErrorCode;
 

@@ -22,12 +22,14 @@ public class SelectedModelDispatchController {
     @PostMapping
     public ModelDispatchResponse analyzeModel(@RequestBody SelectedModelFromNextToSpringRequest request) {
         String chatRoomId = request.getChatRoomId();  // chatRoomId 추출
+        int requestId = request.getRequestId();
         Map<String, Object> selectedModel = request.getModelDetail();  // selectedModel 추출
 
         log.info("Received chatRoomId: {}", chatRoomId);
+        log.info("Received requestId: {}", requestId);
         log.info("Received selectedModel: {}", selectedModel);
 
         // ModelDispatchService에 chatRoomId와 selectedModel 전달
-        return modelDispatchService.dispatchModel(chatRoomId, selectedModel);
+        return modelDispatchService.dispatchModel(chatRoomId,requestId, selectedModel);
     }
 }

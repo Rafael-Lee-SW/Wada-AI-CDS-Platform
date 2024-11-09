@@ -1,4 +1,4 @@
-package com.ssafy.wada.application.domain;
+package com.ssafy.wada.application.domain.util;
 
 import static org.apache.commons.io.FilenameUtils.*;
 import static org.apache.commons.lang3.StringUtils.*;
