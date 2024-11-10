@@ -7,7 +7,7 @@ const instance = axios.create({
 
 // 대화 기록 불러오기
 function fetchChatList(sessionId) {
-  return instance.get('/', {
+  return instance.get('/history/all', {
     headers: {
       'sessionId': sessionId 
     }
@@ -15,8 +15,8 @@ function fetchChatList(sessionId) {
 }
 
 // 채팅방 조회
-function fetchChatRoom(sessionId, data) {
-  return instance.get('/chatrooms', data, {
+function fetchChatRoom(sessionId, chatRoomId) {
+  return instance.get(`/history?chatRoomId=${chatRoomId}`, {
     headers: {
       'sessionId': sessionId,
     }
