@@ -1,47 +1,48 @@
-import React, { useState } from 'react';
-import styles from '/styles/chatWindowStyle'; // Assuming you have some styles defined.
+import React, { useEffect, useState } from 'react';
+import styles from '/styles/requirementUploaderStyle'; 
 
-export default function RequirementUploader({ onChangePage }) {
-    // State to manage the message input
-    const [message, setMessage] = useState('');
+export default function RequirementUploader({ onSubmitRequirement, onSubmit }) {
+    
+    const [requirement, setRequirement] = useState('');
+    const [submitted, setSubmitted] = useState(false);
 
-    // Handle the input change
     const handleMessageChange = (event) => {
-        setMessage(event.target.value);
+        setRequirement(event.target.value);
     };
 
-    // Handle the submit action (for sending the message)
-    const handleSubmit = (event) => {
-        event.preventDefault(); // Prevent form refresh
-        if (message.trim() === '') {
-            return; // Don't do anything if the input is empty
+    const handleSubmit = async (event) => {
+        event.preventDefault(); 
+        if (requirement.trim() === '') {
+            return; 
         }
-        // Implement the logic to send the message
-        console.log("Message sent:", message);
-
-        // Optionally, reset the input field after sending
-        setMessage('');
+        
+        onSubmitRequirement(requirement);
+        setSubmitted(true);
     };
+
+    useEffect(() => {
+        if (submitted) {
+            onSubmit();
+            setSubmitted(false);
+        }
+    }, [submitted])
 
     return (
-        <div style={styles.inputWrapper}>
+        <div style={styles.container}>
             <div style={styles.inputContainer}>
-                {/* Text input for the message */}
                 <input
                     type="text"
                     style={styles.input}
-                    placeholder="메시지를 입력해주세요."
-                    value={message}
-                    onChange={handleMessageChange} // Update state on change
+                    placeholder="분석을 원하는 내용을 입력해주세요."
+                    value={requirement}
+                    onChange={handleMessageChange} 
                 />
-                
-                {/* Send Button */}
                 <button
                     type="submit"
-                    onClick={handleSubmit} // Trigger the submit action on click
+                    onClick={handleSubmit} 
                     style={styles.inputButton}
                 >
-                    전송
+                    입력 완료
                 </button>
             </div>
         </div>

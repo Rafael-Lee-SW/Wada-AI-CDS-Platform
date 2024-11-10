@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import styles from '/styles/fileUploaderStyle';
-import { v4 as uuidv4 } from "uuid"
 
-export default function FileUploader({onChangePage}) {
+export default function FileUploader({ onChangePage, onSubmitFiles }) {
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(''); 
@@ -17,10 +16,6 @@ export default function FileUploader({onChangePage}) {
     setFiles((prevFiles) => [...prevFiles, ...fileArray]);
     setError('');
   };
-
-  const handleChangePage = () => {
-    onChangePage();
-  }
 
   // 드래그 앤 드롭 영역에서 파일을 드롭할 때
   const handleDrop = (e) => {
@@ -55,9 +50,11 @@ export default function FileUploader({onChangePage}) {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleFileSubmit = async (files) => {
-    setFiles(files);
-    handleChangePage();
+  const handleFileSubmit = (files) => {
+    if (files.length > 0) {
+      onSubmitFiles(files); 
+      onChangePage('requirementUploader'); 
+    }
   }
 
   return (
