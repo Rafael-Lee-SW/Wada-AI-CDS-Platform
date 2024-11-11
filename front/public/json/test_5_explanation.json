@@ -1,0 +1,111 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "데이터 세분화를 통해 그룹별로 특성화된 집단을 찾기 위해 KMeans Clustering을 사용하였습니다. 이를 통해 각 그룹의 특성에 맞춘 전략적 접근을 가능하게 하려는 목적입니다.",
+      "data_description": "데이터는 직무, 부서, 연봉 및 근무 일수 등 다양한 직무 관련 정보를 포함하고 있으며, 각 특성에 따라 서로 다른 그룹으로 구분될 가능성을 분석하였습니다.",
+      "models_used": {
+        "model_name": "KMeansClustering",
+        "model_description": "KMeans Clustering 모델은 데이터를 여러 그룹으로 나누어 각 그룹의 특성을 파악할 수 있게 해주는 모델입니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "클러스터 수 (n_clusters)",
+          "metric_value": "4",
+          "interpretation": "4개의 클러스터로 데이터를 나누어 각 클러스터가 서로 다른 특성을 가지고 있음을 의미합니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "분석 결과 4개의 주요 클러스터가 생성되었으며, 각 클러스터의 특성이 잘 구분되었습니다.",
+        "notable_patterns": [
+          "대다수의 데이터가 하나의 큰 클러스터(288개)에 집중되어 있음",
+          "다른 클러스터(14개, 8개, 1개)는 상대적으로 작음"
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "Salary",
+          "importance_score": null,
+          "business_impact": "급여는 각 클러스터 간의 차이를 나타내는 주요 요인 중 하나로, 고급 인력과 일반 인력을 구분하는 데 도움이 됩니다."
+        },
+        {
+          "feature_name": "TenureDays",
+          "importance_score": null,
+          "business_impact": "근속 일수는 직원의 경험과 숙련도를 나타내며, 클러스터별로 경력 차이를 확인할 수 있는 요소입니다."
+        },
+        {
+          "feature_name": "ManagerID",
+          "importance_score": null,
+          "business_impact": "매니저 ID는 직원의 관리 계층에 따른 구분에 도움이 되며, 이를 통해 관리층과 일반 직원 간의 구분이 가능합니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "급여와 근속 일수 간의 관계를 통해 고급 인력과 신규 인력 간의 경력 차이 및 급여 수준을 비교할 수 있습니다.",
+          "business_insight": "각 클러스터의 인력 구성이 다르기 때문에 이에 맞춘 급여 정책 및 경력 개발 계획을 수립하는 데 유용한 정보를 제공합니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "클러스터 크기 비교",
+        "type": "bar",
+        "description": "각 클러스터에 포함된 데이터 포인트 수를 나타냅니다.",
+        "insights": "대다수의 데이터가 특정 클러스터에 몰려 있어, 주요 그룹을 중심으로 분석할 필요가 있음을 보여줍니다."
+      },
+      {
+        "title": "클러스터 중심 비교",
+        "type": "table",
+        "description": "각 클러스터의 중심 좌표(중심값)를 통해 클러스터 간 주요 특성 차이를 보여줍니다.",
+        "insights": "클러스터별로 급여, 근속 일수 등의 주요 특성 차이를 파악할 수 있습니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "대다수의 직원이 한 클러스터에 집중되어 있음",
+        "impact": "집중된 클러스터의 특성에 맞춘 전략 수립이 필요함",
+        "recommendation": "중요한 클러스터에 대한 추가 분석을 통해 맞춤형 정책 개발을 권장합니다."
+      },
+      {
+        "finding": "특정 클러스터에서 급여와 경력이 유의미한 차이를 보임",
+        "impact": "고급 인력에 대한 차별화된 보상 정책 필요",
+        "recommendation": "급여 및 경력 차이에 따른 보상 및 경력 개발 프로그램 제안을 고려해볼 수 있습니다."
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "중요한 클러스터에 대한 추가적인 심층 분석 진행",
+        "고급 인력 대상 차별화된 인재 관리 방안 수립"
+      ],
+      "further_analysis": [
+        "각 클러스터별 경향성과 장기적 변화 분석",
+        "추가적인 비즈니스 성과 지표와의 연관성 조사"
+      ]
+    },
+    "report_title": "직무 및 부서 특성에 따른 그룹화 분석 보고서",
+    "x-axis_title": "주요 특성 1",
+    "x-axis_description": "분석된 주요 특성 1을 나타내며, 직무와 관련된 특정 특성을 반영합니다.",
+    "y-axis_title": "주요 특성 2",
+    "y-axis_description": "분석된 주요 특성 2를 나타내며, 주로 급여와 경력에 대한 차이를 반영합니다.",
+    "cluster_title": "직무 특성 기반 클러스터",
+    "cluster_description": "직무와 부서 특성에 따라 나뉜 그룹으로, 각 그룹의 특성이 다르게 나타납니다.",
+    "cluster": {
+      "cluster_title": [
+        "대규모 일반 직원 그룹",
+        "중간 관리직 그룹",
+        "상위 관리직 그룹",
+        "고급 기술 인력 그룹"
+      ],
+      "cluster_description": [
+        "주로 일반직과 중간 수준의 직원을 포함하며, 규모가 큰 그룹입니다.",
+        "관리직에 속한 직원을 포함하여, 근속 연수가 평균 이상입니다.",
+        "상위 관리직으로, 높은 급여와 긴 근속 기간을 보입니다.",
+        "고급 기술 인력으로, 특정 전문성을 가진 직무에 속합니다."
+      ]
+    }
+  }
+}
