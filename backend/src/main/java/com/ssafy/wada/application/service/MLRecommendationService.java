@@ -154,11 +154,13 @@ public class MLRecommendationService {
 			recommendedModelData.put("data_overview", parsedContent.get("data_overview"));
 			recommendedModelData.put("model_recommendations", modelRecommendations);
 
-			// `chatRoomId`에 대한 기존 요청 수를 확인하여 새로운 `requestId` 생성
+			// 전체 chatRoomId에 해당하는 요청 수를 계산하여 새로운 requestId 생성
 			Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
-			Document existingData = mongoTemplate.findOne(query, Document.class, "MongoDB");
-			int newRequestId = existingData != null ? existingData.getInteger("requestId") + 1 : 1;
+			long requestCount = mongoTemplate.count(query, "MongoDB");
+			int newRequestId = (int) requestCount + 1; // 새 requestId는 현재 요청 수 + 1로 설정
+
 			// 기존 requestTokenUsage 및 responseTokenUsage가 있다면 가져와서 더함
+			Document existingData = mongoTemplate.findOne(query, Document.class, "MongoDB");
 			int existingRequestTokenUsage = existingData != null && existingData.getInteger("requestTokenUsage") != null
 				? existingData.getInteger("requestTokenUsage") : 0;
 			int existingResponseTokenUsage = existingData != null && existingData.getInteger("responseTokenUsage") != null
@@ -178,7 +180,7 @@ public class MLRecommendationService {
 			// MongoDB에 저장할 데이터 구성
 			Map<String, Object> analysisRequest = new HashMap<>();
 			analysisRequest.put("chatRoomId", chatRoomId);
-			analysisRequest.put("requestId", newRequestId );
+			analysisRequest.put("requestId", newRequestId);
 			analysisRequest.put("fileUrl", fileUrl);
 			analysisRequest.put("requirement", requirement);
 			analysisRequest.put("RecommendedModelFromLLM", recommendedModelData);
@@ -188,9 +190,9 @@ public class MLRecommendationService {
 			analysisRequest.put("totalPrice", totalPrice);
 
 			mongoTemplate.save(new Document(analysisRequest), "MongoDB");
-			log.info("Saved data with chatRoomId: {} and requestId: {}", chatRoomId, analysisRequest.get("requestId"));
+			log.info("Saved data with chatRoomId: {} and requestId: {}", chatRoomId, newRequestId);
 
-			return (int) analysisRequest.get("requestId");
+			return newRequestId;
 
 		} catch (Exception e) {
 			log.error("Error processing GPT response", e);
