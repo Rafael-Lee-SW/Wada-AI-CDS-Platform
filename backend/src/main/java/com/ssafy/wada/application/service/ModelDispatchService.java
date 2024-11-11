@@ -58,8 +58,12 @@ public class ModelDispatchService {
         log.info("chatRoomData : {}", chatRoomData);
 
         // fileUrl 추출
-        String fileUrl = (String) chatRoomData.get("fileUrl");
-        if (fileUrl == null) {
+
+        List<String> fileUrlList = (List<String>) chatRoomData.get("fileUrls");
+        String fileUrl = null;
+        if (fileUrlList != null && !fileUrlList.isEmpty()) {
+            fileUrl = fileUrlList.get(0); // 첫 번째 URL을 추출
+        } else {
             throw new IllegalArgumentException("fileUrl not found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
         }
 

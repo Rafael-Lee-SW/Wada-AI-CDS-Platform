@@ -63,7 +63,7 @@ public class MLRecommendationService {
 	@Value("${openai.api.key}")
 	private String apiKey;
 
-	@Transactional
+
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, List<MultipartFile> files) {
 		log.info("Step 1: Start recommendation process");
 
@@ -78,8 +78,10 @@ public class MLRecommendationService {
 		log.info("Step 1-2: ChatRoom retrieved or created with chatRoomId={}", chatRoomId);
 
 		List<Map<String, Object>> inputDataList = new ArrayList<>();
-		// Step 3: CSV 파일 파싱
-		log.info("Step 3: Parsing CSV file");
+		List<String> fileUrls = new ArrayList<>(); // 파일 URL 저장 리스트
+
+		// Step 3: CSV 파일 파싱 및 S3 업로드
+		log.info("Step 3: Parsing CSV file and uploading to S3");
 		List<CompletableFuture<Void>> futures = files.stream().map(file ->
 			CompletableFuture.runAsync(() -> {
 				try {
@@ -91,8 +93,11 @@ public class MLRecommendationService {
 					log.info("Step 3: Parsed CSV file with headers={} and random rows={}", Arrays.toString(headers), jsonData);
 
 					// Step 2: 파일 업로드 및 URL 저장
-					log.info("Step 2: Uploading file to S3 and preparing for MongoDB save");
+					log.info("Step 2: Uploading file to S3");
 					String fileUrl = s3Client.upload(toAttachedFile(file));
+					synchronized (fileUrls) {
+						fileUrls.add(fileUrl); // 업로드된 파일 URL 추가
+					}
 					File fileEntity = File.create(UUID.randomUUID().toString(), chatRoom, fileUrl);
 					fileRepository.save(fileEntity);
 					log.info("Step 2: File uploaded to S3 with URL={}", fileUrl);
@@ -100,9 +105,9 @@ public class MLRecommendationService {
 					// Step 4: Prompt 생성
 					Map<String, Object> modelParams = new HashMap<>();
 					modelParams.put("fileName", file.getOriginalFilename());
-					modelParams.put("columns", Arrays.asList(headers)); // Arrays.toString() 대신 List로 변환
+					modelParams.put("columns", Arrays.asList(headers));
 					modelParams.put("random_10_rows", jsonData);
-					synchronized(inputDataList) {
+					synchronized (inputDataList) {
 						inputDataList.add(modelParams);
 					}
 					log.info("Step 4: Generated prompt for GPT model");
@@ -124,18 +129,17 @@ public class MLRecommendationService {
 		String gptResponse = gptClient.callFunction(header, request);
 		log.info("Step 5: GPT model response received");
 
-		int requestToken = calculateTokens(body); // body에 사용된 토큰 수 계산
-		int responseToken = calculateTokens(gptResponse); // gptResponse에 사용된 토큰 수 계산
+		int requestToken = calculateTokens(body);
+		int responseToken = calculateTokens(gptResponse);
 
-		// Step 6: GPT 응답과 파일 URL을 MongoDB에 저장
-		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, null, analysisPurpose, requestToken, responseToken);
-		log.info("Step 6: GPT response and file path saved to MongoDB with requestId={}", requestId);
+		// Step 6: MongoDB에 GPT 응답 및 파일 URL 리스트 저장
+		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, analysisPurpose, requestToken, responseToken);
+		log.info("Step 6: GPT response and file paths saved to MongoDB with requestId={}", requestId);
 
-		// 결과 반환
 		return createResponse(gptResponse, requestId);
 	}
 
-	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, String fileUrl, String requirement, int requestToken, int responseToken) {
+	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, List<String> fileUrls, String requirement, int requestToken, int responseToken) {
 		try {
 			// GPT 응답의 content 추출 및 Map으로 변환
 			JsonNode rootNode = objectMapper.readTree(gptResponse);
@@ -146,10 +150,7 @@ public class MLRecommendationService {
 				throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
 			}
 
-			// contentNode를 Map으로 직접 변환
 			Map<String, Object> parsedContent = objectMapper.readValue(contentNode.asText(), Map.class);
-
-			// 모델 추천 데이터 설정 및 "isSelected": false 추가
 			List<Map<String, Object>> modelRecommendations = (List<Map<String, Object>>) parsedContent.get("model_recommendations");
 			if (modelRecommendations == null) {
 				log.error("Parsed content does not contain 'model_recommendations' field. Content: {}", contentNode.asText());
@@ -157,24 +158,20 @@ public class MLRecommendationService {
 			}
 			modelRecommendations.forEach(model -> model.put("isSelected", false));
 
-			// 전체 chatRoomId에 해당하는 요청 수를 계산하여 새로운 requestId 생성
 			Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
 			long requestCount = mongoTemplate.count(query, "MongoDB");
 			int newRequestId = (int) requestCount + 1;
 
-			// 기존 토큰 사용량 불러와 계산
 			Document existingData = mongoTemplate.findOne(query, Document.class, "MongoDB");
 			int totalRequestTokenUsage = (existingData != null ? existingData.getInteger("requestTokenUsage", 0) : 0) + requestToken;
 			int totalResponseTokenUsage = (existingData != null ? existingData.getInteger("responseTokenUsage", 0) : 0) + responseToken;
-
-			// 토큰 가격 계산
 			double totalPrice = (totalRequestTokenUsage * 0.00006) + (totalResponseTokenUsage * 0.00012);
 
-			// MongoDB에 저장할 데이터 구성
 			Map<String, Object> analysisRequest = new HashMap<>();
 			analysisRequest.put("chatRoomId", chatRoomId);
 			analysisRequest.put("requestId", newRequestId);
 			analysisRequest.put("requirement", requirement);
+			analysisRequest.put("fileUrls", fileUrls);  // 파일 URL 리스트 추가
 			analysisRequest.put("RecommendedModelFromLLM", parsedContent);
 			analysisRequest.put("createdTime", LocalDateTime.now());
 			analysisRequest.put("requestTokenUsage", totalRequestTokenUsage);

@@ -31,7 +31,7 @@ public class Guest extends BaseTimeEntity implements Serializable {
 	@Id
 	private String id;
 
-	@OneToMany(mappedBy = "guest", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "guest", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<ChatRoom> chatRooms;
 
 	public void addChatRoom(ChatRoom chatRoom) {
