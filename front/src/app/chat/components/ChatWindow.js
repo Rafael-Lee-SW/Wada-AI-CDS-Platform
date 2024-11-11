@@ -60,10 +60,10 @@ export default function Home({ sessionId }) {
 
             const fileUrl = response.data.fileUrl;
             console.log(response.data);
-            const modelResult = response.data.resultFromModel.result;
+            // const modelResult = response.data.resultFromModel.result;
 
             setSubmittedFile([fileUrl]);  
-            setResult(modelResult);
+            // setResult(modelResult);
 
             setPage('chatContent');
         } catch (error) {
@@ -232,9 +232,7 @@ export default function Home({ sessionId }) {
                 "modelDetail": model.implementation_request
             }
 
-            const jsonData = JSON.stringify(data);
-
-            const response = await createAnalyze(jsonData, sessionId); 
+            const response = await createAnalyze(data, sessionId); 
             const result = response.data;
 
             // 최종 분석 결과 저장
