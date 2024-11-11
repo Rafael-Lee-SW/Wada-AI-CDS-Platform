@@ -96,8 +96,12 @@ def kmeans_clustering(
 
     # Build summary
     summary = {
-        "model": "KMeansClustering",
+        "model": "KmeansClusteringSegmentation",
         "n_clusters": num_clusters,
+        "cluster_centers": kmeans.cluster_centers_.tolist(),
+        "scaler_mean": scaler.mean_.tolist(),
+        "scaler_scale": scaler.scale_.tolist(),
+        "feature_columns_used": actual_feature_columns,
         "cluster_label": cluster_label,
         # Graphs
         "graph1": result["graph1"],  # Reuse graph1 from result
@@ -140,7 +144,7 @@ def kmeans_clustering_anomaly_detection(
     random_state=42,
     **kwargs
 ):
-    clustering_result  = kmeans_clustering(
+    clustering_result = kmeans_clustering(
         file_path=file_path,
         feature_columns=feature_columns,
         num_clusters=num_clusters,

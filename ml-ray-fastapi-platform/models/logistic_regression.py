@@ -122,6 +122,7 @@ def logistic_regression_binary(
         "graph3": graph3,
         "graph4": graph4,
     }
+
     # Prepare summary data
     # For summary, sample a smaller subset for visualization
     actual_sample_size = min(sample_size, len(X_pca))
@@ -256,6 +257,34 @@ def logistic_regression_multinomial(
         "graph4": graph4,
     }
 
+    # 모든 클래스 쌍의 결정 경계 라인 계산
+    lines = []
+    n_classes = len(model.classes_)
+    for i in range(n_classes):
+        for j in range(i + 1, n_classes):
+            # 클래스 i와 클래스 j의 계수 차이 계산
+            w_diff = np.array(model.coef_[i]) - np.array(model.coef_[j])
+            b_diff = model.intercept_[i] - model.intercept_[j]
+            if w_diff[1] != 0:
+                slope = -w_diff[0] / w_diff[1]
+                intercept_line = -b_diff / w_diff[1]
+                lines.append(
+                    {
+                        "class_pair": [model.classes_[i], model.classes_[j]],
+                        "slope": slope,
+                        "intercept": intercept_line,
+                    }
+                )
+            else:
+                # 기울기가 무한대인 경우 (수직선)
+                lines.append(
+                    {
+                        "class_pair": [model.classes_[i], model.classes_[j]],
+                        "slope": np.inf,
+                        "intercept": -b_diff / w_diff[0] if w_diff[0] != 0 else None,
+                    }
+                )
+
     # Prepare summary data
     # For summary, sample a smaller subset for visualization
     actual_sample_size = min(sample_size, len(X_pca))
@@ -280,6 +309,7 @@ def logistic_regression_multinomial(
         "coefficients": model.coef_.tolist(),
         "intercept": model.intercept_.tolist(),
         "classes": model.classes_.tolist(),
+        "decision_boundaries": lines,  # 모든 결정 경계 라인 포함
         "graph1": graph1_summary,
         "graph3": graph3,  # Reuse the classification report
         "graph4": graph4,  # Reuse the confusion matrix
