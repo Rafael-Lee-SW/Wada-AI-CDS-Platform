@@ -1,0 +1,120 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "이 분석의 목적은 현재 인력의 효율성을 평가하고, 성과가 낮은 30% 인력을 선별하여 향후 조직 구조를 개선하는 데 있습니다.",
+      "data_description": "분석된 데이터는 인력의 성과를 평가하기 위한 데이터로, LogisticRegressionBinary 모델을 사용하여 분류 및 예측을 수행했습니다.",
+      "models_used": {
+        "model_name": "LogisticRegressionBinary",
+        "model_description": "이 모델은 데이터가 두 개의 클래스로 분류될 수 있도록 예측하는 이진 분류 모델로, 특정 특성을 기반으로 인력이 고성과와 저성과로 나뉘는 것을 목표로 합니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "Accuracy",
+          "metric_value": "0.9841",
+          "interpretation": "모델의 정확도는 98.41%로 매우 높은 성능을 보입니다. 이는 모델이 대부분의 사례에서 올바르게 예측한다는 것을 의미합니다."
+        },
+        {
+          "metric_name": "Precision for Class 0",
+          "metric_value": "0.9841",
+          "interpretation": "Class 0에 대한 Precision이 높아 해당 클래스를 매우 정확하게 예측하고 있음을 의미합니다."
+        },
+        {
+          "metric_name": "Recall for Class 0",
+          "metric_value": "1.0",
+          "interpretation": "Class 0의 경우 모든 실제 사례를 완벽하게 예측했음을 나타냅니다."
+        },
+        {
+          "metric_name": "Confusion Matrix",
+          "metric_value": "[[62, 0], [1, 0]]",
+          "interpretation": "62건의 Class 0이 정확하게 예측되었으며, Class 1의 경우 1건을 놓친 것으로 나타납니다. 이는 Class 1 데이터가 매우 드물거나, 모델이 Class 1을 식별하는 데 어려움이 있을 수 있음을 시사합니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "모델은 전반적으로 98.41%의 높은 예측 정확도를 보여주고 있습니다.",
+        "notable_patterns": [
+          "Class 0에 대한 예측 성능이 매우 우수합니다.",
+          "Class 1의 데이터가 매우 적어 모델이 Class 1을 제대로 학습하지 못했을 가능성이 있습니다."
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "특성 1",
+          "importance_score": "0.3504",
+          "business_impact": "특성 1은 성과에 대한 중요한 예측 요소로, 인력 성과에 영향을 미치는 요인을 평가하는 데 유용할 수 있습니다."
+        },
+        {
+          "feature_name": "특성 2",
+          "importance_score": "0.5405",
+          "business_impact": "특성 2 역시 중요한 변수로, 이를 통해 인력의 효율성을 분석하여 적절한 조치를 취할 수 있습니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "특성 1과 특성 2는 서로 양의 상관 관계를 가지며, 함께 인력 성과에 긍정적인 영향을 미칠 수 있습니다.",
+          "business_insight": "이 관계를 통해 인력이 갖추어야 할 주요 능력과 효율성을 판단할 수 있습니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "결정 경계 시각화",
+        "type": "decision_boundary",
+        "description": "PC1과 PC2의 분포를 통해 각 클래스 간 경계를 보여주는 시각화입니다.",
+        "insights": "Class 0과 Class 1의 경계가 명확하게 구분되어, 모델이 두 클래스를 잘 분류하고 있음을 시사합니다."
+      },
+      {
+        "title": "혼동 행렬",
+        "type": "heatmap",
+        "description": "모델 예측의 정확도와 오차를 시각화하여 Class 0과 Class 1에 대한 예측 성능을 보여줍니다.",
+        "insights": "Class 0에서 오차가 없고, Class 1에서 일부 오차가 발생하였습니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "모델의 예측 정확도가 매우 높습니다.",
+        "impact": "예측 정확도가 높기 때문에 인력 효율성 평가에 신뢰성 있는 지표로 사용될 수 있습니다.",
+        "recommendation": "높은 성과를 유지하기 위해 성과 평가 기준을 명확히 하고, 성과가 낮은 인력에 대해 개선 조치를 권장합니다."
+      },
+      {
+        "finding": "Class 1에 대한 예측 성능이 낮습니다.",
+        "impact": "저성과 인력(또는 성과가 낮은 군)에 대한 예측력이 낮기 때문에 개선이 필요합니다.",
+        "recommendation": "Class 1 데이터를 추가로 수집하여 모델 성능을 높이는 것이 좋습니다."
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "현재 모델을 활용하여 성과가 낮은 30% 인력을 식별",
+        "저성과 인력에 대해 추가적인 교육 또는 역할 재조정"
+      ],
+      "further_analysis": [
+        "Class 1의 데이터가 더 많아질 경우 모델 성능 개선을 위한 재학습",
+        "성능 지표에 기반한 피드백 시스템 구축"
+      ]
+    },
+    "LogisticRegression_Case": {
+      "report_title": "인력 성과 평가 및 개선 방안 보고서",
+      "classes": {
+        "classTitle": ["고성과 인력", "저성과 인력"],
+        "classDescription": [
+          "고성과 인력은 높은 기여도를 가진 직원으로서 조직의 주요 성과에 기여하고 있습니다.",
+          "저성과 인력은 추가적인 개선이 필요한 직원으로 분류됩니다."
+        ]
+      },
+      "x-axis_title": "PC1 (주성분 1)",
+      "x-axis_description": "PC1은 데이터의 첫 번째 주성분으로, 인력 성과의 주요 요인을 대표합니다.",
+      "y-axis_title": "PC2 (주성분 2)",
+      "y-axis_description": "PC2는 데이터의 두 번째 주성분으로, 인력 성과와의 추가적인 변동성을 설명합니다.",
+      "boundary_lines": {
+        "boundary_line_title": ["고성과와 저성과 경계선"],
+        "boundary_line_description": [
+          "이 경계선은 모델이 고성과와 저성과 인력을 분리하는 기준을 보여줍니다."
+        ]
+      }
+    }
+  }
+}
