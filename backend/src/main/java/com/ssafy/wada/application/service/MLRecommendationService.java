@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.wada.application.domain.File;
 import com.ssafy.wada.application.repository.FileRepository;
 import com.ssafy.wada.client.openai.PromptGenerator;
+import com.ssafy.wada.common.error.SessionErrorCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -234,5 +235,39 @@ public class MLRecommendationService {
 
 	private int calculateTokens(String content) {
 		return content.length() / 4; // 간단한 추정치로 1 토큰 ≈ 4자
+	}
+
+	public Object mlRecommendationExceptChosenService(String chatRoomId, int requestId) {
+		log.info("Fetching data for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
+		Document document = mongoTemplate.findOne(query, Document.class, "MongoDB");
+
+		if (document == null) {
+			log.error("Data not found for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
+		}
+
+		// RecommendedModelFromLLM 필드가 있는지 확인하고, 가져온 데이터가 Document 형식인지 확인
+		Object recommendedModelFromLLMObj = document.get("RecommendedModelFromLLM");
+		if (!(recommendedModelFromLLMObj instanceof Document)) {
+			log.error("RecommendedModelFromLLM field is missing or invalid in MongoDB data for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
+		}
+
+		Document recommendedModelFromLLM = (Document) recommendedModelFromLLMObj;
+		List<Map<String, Object>> modelRecommendations;
+
+		try {
+			modelRecommendations = (List<Map<String, Object>>) recommendedModelFromLLM.get("model_recommendations");
+		} catch (ClassCastException e) {
+			log.error("model_recommendations is not in expected format in RecommendedModelFromLLM for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
+		}
+
+		// isSelected가 true인 항목 제외 후 반환
+		return modelRecommendations.stream()
+			.filter(model -> !(Boolean.TRUE.equals(model.get("isSelected"))))
+			.collect(Collectors.toList());
 	}
 }

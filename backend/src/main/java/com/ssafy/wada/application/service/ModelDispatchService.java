@@ -109,24 +109,27 @@ public class ModelDispatchService {
     private void updateModelSelection(List<Map<String, Object>> recommendedModels, String selectedModelName) {
         boolean modelFound = false;
 
-        // selectedModelName을 소문자로 변환하고, `_`와 공백을 제거하여 비교 형식을 통일합니다.
+        // Normalize `selectedModelName` for comparison
         selectedModelName = selectedModelName.toLowerCase().replace("_", " ").replace(" ", "");
 
         for (Map<String, Object> model : recommendedModels) {
-            String analysisName = ((String) model.get("analysis_name")).toLowerCase().replace("_", " ").replace(" ", "");
+            // Retrieve and normalize `model_choice` within `implementation_request` for comparison
+            Map<String, Object> implementationRequest = (Map<String, Object>) model.get("implementation_request");
+            String modelChoice = ((String) implementationRequest.get("model_choice")).toLowerCase().replace("_", " ").replace(" ", "");
 
-            log.info("Comparing model_choice: '{}' with analysis_name: '{}'", selectedModelName, analysisName);
+            log.info("Comparing model_choice: '{}' with implementation_request.model_choice: '{}'", selectedModelName, modelChoice);
 
-            if (selectedModelName.equals(analysisName)) {
+            if (selectedModelName.equals(modelChoice)) {
                 log.info("Match found for model_choice: {}", selectedModelName);
                 model.put("isSelected", true);
                 modelFound = true;
                 break;
             }
         }
+
         if (!modelFound) {
-            log.error("Model with analysis_name '{}' not found in RecommendedModelFromLLM.", selectedModelName);
-            throw new IllegalArgumentException("Model with analysis_name " + selectedModelName + " not found in RecommendedModelFromLLM.");
+            log.error("Model with model_choice '{}' not found in RecommendedModelFromLLM.", selectedModelName);
+            throw new IllegalArgumentException("Model with model_choice " + selectedModelName + " not found in RecommendedModelFromLLM.");
         }
     }
 
