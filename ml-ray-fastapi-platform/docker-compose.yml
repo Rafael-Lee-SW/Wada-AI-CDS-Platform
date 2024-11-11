@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  ray_fastapi:
+    build:
+      context: .
+    ports:
+      - "8282:8282"  # FastAPI 서비스 포트 매핑
+      - "8000:8000"  # Ray Serve 포트
+      - "8265:8265"  # Ray Dashboard 포트
+    environment:
+      - RAY_SERVE_HTTP_HOST=0.0.0.0
+      - RAY_SERVE_HTTP_PORT=8000
+      - RAY_METRICS_EXPORT_PORT=8080  # Prometheus 메트릭 노출 포트
+    volumes:
+      - ray_shared:/tmp/ray  # Ray 메트릭 디렉터리 공유
+    command: ["python", "app/main.py"]
+    networks:
+      - ray_network
+
+  prometheus:
+    image: prom/prometheus
+    depends_on:
+      - ray_fastapi  # ray_fastapi가 먼저 시작되도록 설정
+    volumes:
+      - ray_shared:/tmp/ray  # Ray 컨테이너의 설정 파일 공유
+    ports:
+      - "9090:9090"  # Prometheus 웹 인터페이스 포트
+    command:
+      - "--config.file=/tmp/ray/session_latest/metrics/prometheus/prometheus.yml"
+    restart: on-failure  # 파일이 생성되면 자동 재시작
+    networks:
+      - ray_network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"  # Grafana 웹 인터페이스 포트
+    volumes:
+      - ray_shared:/tmp/ray  # Ray의 설정 파일 공유
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Grafana 로그인 비밀번호
+    command:
+      - "grafana-server"
+      - "--config=/tmp/ray/session_latest/metrics/grafana/grafana.ini"  # Ray가 생성한 Grafana 설정 파일 사용
+    restart: on-failure  # 파일이 생성되면 자동 재시작
+    networks:
+      - ray_network
+
+volumes:
+  ray_shared:
+
+networks:
+  ray_network:
+    driver: bridge
