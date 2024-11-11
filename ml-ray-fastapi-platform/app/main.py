@@ -40,6 +40,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 # Set Ray Serve HTTP host and port to allow external access
 os.environ["RAY_SERVE_HTTP_HOST"] = "0.0.0.0"  # Bind to all IP addresses
+os.environ["RAY_SERVE_DASHBOARD_HOST"] = "0.0.0.0"  # Bind to all IP addresses
 os.environ["RAY_SERVE_HTTP_PORT"] = "8000"  # Use port 8000
 os.environ["RAY_SERVE_HTTP_KEEP_ALIVE_TIMEOUT_S"] = "10"  # Adjust timeout as needed
 
@@ -182,11 +183,12 @@ if __name__ == "__main__":
     
     # Ray 및 Ray Serve 초기화
     if not ray.is_initialized():
-        ray.init(ignore_reinit_error=True)
+        context = ray.init(ignore_reinit_error=True, include_dashboard=True, dashboard_host="0.0.0.0", dashboard_port=8265)
         logging.info("Ray has been initialized.")
+        logging.info(context.dashboard_url)
     
     # Ray Serve에서 FastAPI 배포 (8000 포트)
     serve.run(ModelService.bind(), route_prefix="/")
 
     # Uvicorn으로 FastAPI 실행 (8080 포트)
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8081)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8282)
