@@ -1,0 +1,115 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "조직 내 인력 효율성 최적화와 관련된 데이터를 바탕으로 성과를 분석하고, 하위 성과자들을 식별하기 위한 분석입니다.",
+      "data_description": "현재 직원의 성과 데이터를 사용하여 각 개인의 업무 성과를 예측하기 위한 데이터입니다.",
+      "models_used": {
+        "model_name": "LogisticRegressionBinary",
+        "model_description": "이진 로지스틱 회귀 모델은 주어진 데이터에 따라 두 가지 분류(예: 상위 성과자와 하위 성과자)를 예측하는 모델입니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "Accuracy",
+          "metric_value": 0.9841269841269841,
+          "interpretation": "모델의 예측이 전체 데이터에서 약 98%의 정확도를 보였으며, 이는 예측이 매우 신뢰할 수 있음을 나타냅니다."
+        },
+        {
+          "metric_name": "Precision (Class 0)",
+          "metric_value": 0.9841269841269841,
+          "interpretation": "Class 0, 즉 상위 성과자에 대해 모델이 예측한 정확도는 98%로, 실제 상위 성과자 중에서 모델이 정확히 상위 성과자로 예측한 비율을 의미합니다."
+        },
+        {
+          "metric_name": "Recall (Class 0)",
+          "metric_value": 1.0,
+          "interpretation": "Class 0에 대해 모델이 놓치지 않고 정확히 상위 성과자를 예측한 비율입니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "모델은 전반적으로 매우 높은 정확도로 상위 성과자를 예측하였으며, 하위 성과자의 경우 예측에 다소 한계가 있음을 보여줍니다.",
+        "notable_patterns": [
+          "상위 성과자 (Class 0)의 예측에서 높은 정확도를 기록했습니다.",
+          "하위 성과자 (Class 1)의 예측에서 일부 오류가 발생했습니다."
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "Feature 1",
+          "importance_score": 0.3504157444856453,
+          "business_impact": "Feature 1이 높을수록 상위 성과자로 분류될 가능성이 높아지며, 이를 통해 성과에 영향을 미치는 주요 요소로 작용할 수 있습니다."
+        },
+        {
+          "feature_name": "Feature 2",
+          "importance_score": 0.5405070655048495,
+          "business_impact": "Feature 2의 영향력이 높아질수록 상위 성과자로 분류될 가능성이 높아지며, 성과 개선 요소로 고려될 수 있습니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "Feature 1과 Feature 2는 상위 성과자와 하위 성과자 예측에 중요한 역할을 하며, 둘의 조합이 예측 결과에 큰 영향을 미칩니다.",
+          "business_insight": "이를 통해 조직에서는 Feature 1과 Feature 2에 대한 개선과 조정을 통해 성과 향상을 기대할 수 있습니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "의사 결정 경계",
+        "type": "decision_boundary",
+        "description": "각 데이터 포인트가 상위 성과자 또는 하위 성과자로 예측되는 경계를 시각적으로 표현한 그래프입니다.",
+        "insights": "대부분의 데이터 포인트가 올바르게 분류된 것을 보여주며, 이는 모델이 전반적으로 높은 예측 정확도를 보임을 의미합니다."
+      },
+      {
+        "title": "분류 리포트",
+        "type": "table",
+        "description": "각 클래스에 대한 정밀도, 재현율, F1 점수를 보여주는 테이블입니다.",
+        "insights": "Class 0에 대한 높은 정확도와 재현율을 통해 상위 성과자 예측에 신뢰성이 높음을 확인할 수 있습니다."
+      },
+      {
+        "title": "혼동 행렬",
+        "type": "heatmap",
+        "description": "모델이 상위 및 하위 성과자를 얼마나 정확하게 예측했는지를 나타냅니다.",
+        "insights": "하위 성과자 예측의 오차가 다소 있지만, 전반적인 정확도는 매우 높습니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "상위 성과자에 대한 높은 예측 정확도",
+        "impact": "모델이 상위 성과자를 잘 예측하므로, 조직은 이 데이터를 바탕으로 최적화된 성과관리를 수행할 수 있습니다.",
+        "recommendation": "성과가 낮은 직원들에 대한 개선 또는 교체를 고려하여 전반적인 조직 효율성을 높일 수 있습니다."
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "하위 성과자 예측 결과를 기반으로 최저 성과자 30%를 식별하여 개선 조치를 시행합니다."
+      ],
+      "further_analysis": [
+        "하위 성과자 예측 정확도를 높이기 위해 추가적인 데이터와 다양한 특성을 포함하여 모델 개선을 고려합니다."
+      ]
+    },
+    "LogisticRegression_Case": {
+      "report_title": "조직 인력 성과 분석 결과",
+      "classes": {
+        "classTitle": ["상위 성과자", "하위 성과자"],
+        "classDescription": [
+          "상위 성과자로 분류된 직원",
+          "하위 성과자로 분류된 직원"
+        ]
+      },
+      "x-axis_title": "PC1 성과 요소",
+      "x-axis_description": "PC1은 주요 성과 요소로서 직원의 상위 성과 여부에 영향을 미치는 요인입니다.",
+      "y-axis_title": "PC2 성과 요소",
+      "y-axis_description": "PC2는 추가 성과 요소로서 직원의 성과 수준에 영향을 미칩니다.",
+      "boundary_lines": {
+        "boundary_line_title": ["상위 성과자 경계선", "하위 성과자 경계선"],
+        "boundary_line_description": [
+          "상위 성과자와 하위 성과자를 구분하는 기준선",
+          "하위 성과자를 식별하는 경계선"
+        ]
+      }
+    }
+  }
+}
