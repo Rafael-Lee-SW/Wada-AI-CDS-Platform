@@ -35,7 +35,7 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                     <div style={styles.preCardContainer}>
                         <div style={styles.card}>
                             <p style={styles.cardText}>데이터 요약</p>
-                            <h3 style={styles.cardContent}>{overview.structure_summary}</h3>
+                            <h3 style={styles.cardContent}>{overview[0].structure_summary}</h3>
                         </div>
                         <div style={styles.card}>
                             <p style={styles.cardText}>예상 분석 목적</p>

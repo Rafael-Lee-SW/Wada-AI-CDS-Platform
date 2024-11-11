@@ -8,13 +8,14 @@ import { fetchChatRoom, fetchChatList, fetchModel, createAnalyze } from "@/api";
 import Loading from "./Loading";
 import FileUploader from "./FileUploader";
 import RequirementUploader from "./RequirementUploader";
+import NewChat from "./NewChat";
 
 export default function Home({ sessionId }) {
 
     const [submittedFile, setSubmittedFile] = useState([]);
     const [submittedRequirement, setSubmittedRequirement] = useState('');   
     const [requirement, setRequirement] = useState('');
-    const [page, setPage] = useState('fileUploader');
+    const [page, setPage] = useState('newChat');
     const [models, setModels] = useState([]);
     const [purpose, setPurpose] = useState();
     const [overview, setOverview] = useState();
@@ -33,6 +34,7 @@ export default function Home({ sessionId }) {
                 const chats = response.data.slice(0,10); 
 
                 setChatList(chats); 
+
             } catch (error) {
                 console.error("대화 기록 불러오기 실패:", error);
             } 
@@ -40,6 +42,13 @@ export default function Home({ sessionId }) {
 
         getChatList(); 
     }, [sessionId]);
+
+    const handleChatRoomId = () => {
+
+        const newChatRoomId = uuidv4();
+        setChatRoomId(newChatRoomId);
+        setPage('fileUploader');
+    }
 
     const handleMenuItemClick = async (chatRoomId) => {
         
@@ -50,9 +59,10 @@ export default function Home({ sessionId }) {
             const response = await fetchChatRoom(chatRoomId, sessionId);
 
             const fileUrl = response.data.fileUrl;
+            console.log(response.data);
             const modelResult = response.data.resultFromModel.result;
 
-            setFiles([fileUrl]);  
+            setSubmittedFile([fileUrl]);  
             setResult(modelResult);
 
             setPage('chatContent');
@@ -88,23 +98,23 @@ export default function Home({ sessionId }) {
             return;
         }
 
-        const newChatRoomId = uuidv4();
-        
-        setChatRoomId(newChatRoomId);
+        console.log("파일, 요청사항 업로드 확인");
+        console.log(chatRoomId);
+        console.log(files);
+        console.log(requirement);
 
         const formData = new FormData();
 
-        formData.append("chatRoomId", newChatRoomId);  
+        formData.append("chatRoomId", chatRoomId);  
 
         if (Array.isArray(submittedFile)) {
-            files.forEach((file) => {
-                formData.append('file', file);  
+            submittedFile.forEach((file) => {
+                formData.append('files', file);  
             });
         } else {
-        formData.append("file", submittedFile);  
+            formData.append('files', submittedFile);  
         } 
-
-        formData.append("requirement", submittedRequirement);
+            formData.append("requirement", submittedRequirement);
         
 
         console.log("FormData 내용:");
@@ -225,7 +235,7 @@ export default function Home({ sessionId }) {
             const jsonData = JSON.stringify(data);
 
             const response = await createAnalyze(jsonData, sessionId); 
-            const result = response.data.result;
+            const result = response.data;
 
             // 최종 분석 결과 저장
             setResult(result); 
@@ -262,7 +272,10 @@ export default function Home({ sessionId }) {
                             <p style={styles.chatList}>{chat.requirement}</p> 
                         </div>
                     ))
-                ): '' }
+                ): null }
+                <div style={styles.newButtonContainer}>
+                    <button style={styles.newButton} onClick={handleChatRoomId}>+ 새 채팅</button>
+                </div>
             </div>
         </div>
         <div style={styles.header}>
@@ -277,6 +290,7 @@ export default function Home({ sessionId }) {
         {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles}/>}
         {page === 'requirementUploader' && <RequirementUploader onChangePage={handleChangePage} onSubmitRequirement={handleSubmitRequirement} onSubmit={handleSubmit}/>} 
         {page === 'loading2' && <Loading/>}
+        {page === 'newChat' && <NewChat/>}
     </div>
 );
 
