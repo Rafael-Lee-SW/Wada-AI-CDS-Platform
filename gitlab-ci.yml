@@ -1,0 +1,19 @@
+stages:
+  - build
+
+variables:
+  DOCKER_IMAGE_NAME: "ml-fastapi"
+  DOCKER_IMAGE_TAG: "latest"
+  DOCKER_REGISTRY: "docker.io"
+  SSH_KEY_PATH: "/home/ubuntu/MLAL.pem"
+  EC2_IP: "3.34.133.111"
+
+build:
+  stage: build
+  script:
+  - scp -i $SSH_KEY_PATH -r ml-ray-fastapi-platform ec2-user@$EC2_IP:/home/ec2-user/
+  - ssh -i $SSH_KEY_PATH ec2-user@$EC2_IP "
+        sh /home/ec2-user/ml.sh
+      "  
+  tags:
+    - build
