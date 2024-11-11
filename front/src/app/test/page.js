@@ -18,6 +18,17 @@ const LogisticRegressionVisualization = dynamic(
   { ssr: false, loading: () => <p>Loading visualization...</p> }
 );
 
+// Dynamically import the visualization components
+const ClassifierVisualization = dynamic(
+  () => import("../chat/components/analyzeReport/ClassifierVisualization.js"),
+  { ssr: false, loading: () => <p>Loading regression visualization...</p> }
+);
+
+const RandomForestVisualization = dynamic(
+  () => import("../chat/components/analyzeReport/RandomForestVisualization.js"),
+  { ssr: false, loading: () => <p>Loading classification visualization...</p> }
+);
+
 export default function Test() {
   const [jsonResult, setJsonResult] = useState(null);
   const [jsonExplanation, setJsonExplanation] = useState(null);
@@ -74,7 +85,15 @@ export default function Test() {
         //     result={jsonResult.result}
         //     explanation={jsonExplanation.result}
         // />
-        <LogisticRegressionVisualization
+        // <LogisticRegressionVisualization
+        //   result={jsonResult.result}
+        //   explanation={jsonExplanation.result}
+        // />
+        //   <ClassifierVisualization
+        //   result={jsonResult.result}
+        //   explanation={jsonExplanation.result}
+        // />
+        <RandomForestVisualization
           result={jsonResult.result}
           explanation={jsonExplanation.result}
         />
