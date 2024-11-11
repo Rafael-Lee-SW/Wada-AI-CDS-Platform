@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.bson.Document; // MongoDB Document import
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -108,14 +109,18 @@ public class MLRecommendationService {
 		String gptResponse = gptClient.callFunction(header, request);
 		log.info("Step 5: GPT model response received");
 
+		int requestToken = calculateTokens(body); // body에 사용된 토큰 수 계산
+		int responseToken = calculateTokens(gptResponse); // gptResponse에 사용된 토큰 수 계산
+
 		// Step 6: GPT 응답과 파일 URL을 MongoDB에 저장
-		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrl,analysisPurpose);
+		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrl, analysisPurpose, requestToken, responseToken);
 		log.info("Step 6: GPT response and file path saved to MongoDB with requestId={}", requestId);
 
 		// 결과 반환
 		return createResponse(gptResponse, requestId);
 	}
-	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, String fileUrl, String requirement) {
+
+	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, String fileUrl, String requirement, int requestToken, int responseToken) {
 		try {
 			// GPT 응답의 content 추출
 			JsonNode rootNode = objectMapper.readTree(gptResponse);
@@ -147,34 +152,51 @@ public class MLRecommendationService {
 			Map<String, Object> recommendedModelData = new HashMap<>();
 			recommendedModelData.put("purpose_understanding", parsedContent.get("purpose_understanding"));
 			recommendedModelData.put("data_overview", parsedContent.get("data_overview"));
-			recommendedModelData.put("model_recommendations", modelRecommendations);  // 모델 추천 정보 포함
+			recommendedModelData.put("model_recommendations", modelRecommendations);
 
 			// `chatRoomId`에 대한 기존 요청 수를 확인하여 새로운 `requestId` 생성
 			Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
-			long requestCount = mongoTemplate.count(query, "MongoDB");
+			Document existingData = mongoTemplate.findOne(query, Document.class, "MongoDB");
+			int newRequestId = existingData != null ? existingData.getInteger("requestId") + 1 : 1;
+			// 기존 requestTokenUsage 및 responseTokenUsage가 있다면 가져와서 더함
+			int existingRequestTokenUsage = existingData != null && existingData.getInteger("requestTokenUsage") != null
+				? existingData.getInteger("requestTokenUsage") : 0;
+			int existingResponseTokenUsage = existingData != null && existingData.getInteger("responseTokenUsage") != null
+				? existingData.getInteger("responseTokenUsage") : 0;
 
-			int newRequestId = (int) (requestCount + 1); // 새 requestId는 현재 요청 수 + 1로 설정
+			// 새로운 토큰 사용량 계산
+			int totalRequestTokenUsage = existingRequestTokenUsage + requestToken;
+			int totalResponseTokenUsage = existingResponseTokenUsage + responseToken;
+
+			// 토큰 사용량에 따른 가격 계산
+			double requestPricePerToken = 0.00006; // 요청 토큰당 가격
+			double responsePricePerToken = 0.00012; // 응답 토큰당 가격
+			double requestPrice = totalRequestTokenUsage * requestPricePerToken;
+			double responsePrice = totalResponseTokenUsage * responsePricePerToken;
+			double totalPrice = requestPrice + responsePrice;
 
 			// MongoDB에 저장할 데이터 구성
 			Map<String, Object> analysisRequest = new HashMap<>();
 			analysisRequest.put("chatRoomId", chatRoomId);
-			analysisRequest.put("requestId", newRequestId);
+			analysisRequest.put("requestId", newRequestId );
 			analysisRequest.put("fileUrl", fileUrl);
 			analysisRequest.put("requirement", requirement);
-			analysisRequest.put("RecommendedModelFromLLM", recommendedModelData); // 모든 정보가 포함된 RecommendedModelFromLLM
+			analysisRequest.put("RecommendedModelFromLLM", recommendedModelData);
 			analysisRequest.put("createdTime", LocalDateTime.now());
-			// MongoDB에 저장
-			mongoTemplate.save(analysisRequest, "MongoDB");
-			log.info("Step 6: GPT response with all data in RecommendedModelFromLLM processed and saved to MongoDB with requestId={}", newRequestId);
+			analysisRequest.put("requestTokenUsage", totalRequestTokenUsage);
+			analysisRequest.put("responseTokenUsage", totalResponseTokenUsage);
+			analysisRequest.put("totalPrice", totalPrice);
 
-			return newRequestId;
+			mongoTemplate.save(new Document(analysisRequest), "MongoDB");
+			log.info("Saved data with chatRoomId: {} and requestId: {}", chatRoomId, analysisRequest.get("requestId"));
+
+			return (int) analysisRequest.get("requestId");
 
 		} catch (Exception e) {
 			log.error("Error processing GPT response", e);
 			throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
 		}
 	}
-
 
 	private List<String[]> getRandomRows(List<String[]> rows, int n) {
 		Collections.shuffle(rows);
@@ -202,7 +224,6 @@ public class MLRecommendationService {
 		log.info("jsonResponse " + jsonResponse);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-
 			JsonNode rootNode = mapper.readTree(jsonResponse);
 			String messageContent = rootNode.get("choices").get(0).get("message").get("content").asText();
 			log.info("message: " + messageContent);
@@ -218,5 +239,9 @@ public class MLRecommendationService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private int calculateTokens(String content) {
+		return content.length() / 4; // 간단한 추정치로 1 토큰 ≈ 4자
 	}
 }
