@@ -11,7 +11,6 @@ const steps = [
 ];
 
 const ProgressBar = ({ currentStep }) => {
-
     const renderMessage = () => {
         switch (currentStep) {
             case 1:
@@ -30,21 +29,20 @@ const ProgressBar = ({ currentStep }) => {
                     {steps.map((step, index) => (
                         <StepContainer key={index}>
                             <Circle
-                                isActive={index === currentStep}
-                                isCompleted={index < currentStep}
+                                $isActive={index === currentStep}
+                                $isCompleted={index < currentStep}
                             >
                                 {index < currentStep ? <FaCheck /> : index + 1}
                             </Circle>
-                            <StepLabel isActive={index === currentStep}>
+                            <StepLabel $isActive={index === currentStep}>
                                 {step.label}
                             </StepLabel>
                             {index < steps.length - 1 && (
-                                <Line isCompleted={index < currentStep} />
+                                <Line $isCompleted={index < currentStep} />
                             )}
                         </StepContainer>
                     ))}
                 </StepsWrapper>
-                {/* currentStep에 따른 메시지 표시 */}
                 {renderMessage() && <Message>{renderMessage()}</Message>}
             </Container>
         </Overlay>
@@ -64,7 +62,6 @@ const Overlay = styled.div`
     width: 100vw;
     height: 100vh;
     display: flex;
-    flex: 1;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(3px);
@@ -103,18 +100,18 @@ const Circle = styled.div`
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    background-color: ${({ isActive, isCompleted }) =>
-        isCompleted ? '#4caf50' : isActive ? '#9370db' : '#e0e0e0'};
+    background-color: ${({ $isActive, $isCompleted }) =>
+        $isCompleted ? '#4caf50' : $isActive ? '#9370db' : '#e0e0e0'};
     color: white;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    animation: ${({ isActive }) => (isActive ? pulse : 'none')} 1.5s infinite;
+    animation: ${({ $isActive }) => ($isActive ? pulse : 'none')} 1.5s infinite;
 `;
 
 const Line = styled.div`
     position: absolute;
     width: 100%;
     height: 4px;
-    background-color: ${({ isCompleted }) => (isCompleted ? '#4caf50' : '#e0e0e0')};
+    background-color: ${({ $isCompleted }) => ($isCompleted ? '#4caf50' : '#e0e0e0')};
     top: 18px;
     left: 50%;
     transform: translateX(-50%);
@@ -124,8 +121,8 @@ const Line = styled.div`
 const StepLabel = styled.div`
     margin-top: 10px;
     font-size: 0.9rem;
-    font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
-    color: ${({ isActive }) => (isActive ? '#9370db' : '#555')};
+    font-weight: ${({ $isActive }) => ($isActive ? 'bold' : 'normal')};
+    color: ${({ $isActive }) => ($isActive ? '#9370db' : '#555')};
     transition: color 0.3s ease;
 `;
 

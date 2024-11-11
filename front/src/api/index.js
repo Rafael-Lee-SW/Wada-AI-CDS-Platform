@@ -33,8 +33,8 @@ function fetchModel(formData, sessionId) {
 }
 
 // 선택된 모델로 분석 요청
-function createAnalyze(jsonData, sessionId) {
-    return instance.post('/analyzeModel', jsonData, {
+function createAnalyze(data, sessionId) {
+    return instance.post('/analyzeModel', data, {
         headers: {
             'sessionId': sessionId, 
         }

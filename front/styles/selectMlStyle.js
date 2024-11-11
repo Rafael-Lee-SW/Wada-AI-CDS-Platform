@@ -148,9 +148,6 @@ const styles = {
         maxHeight: '250px', 
         justifyContent: 'flex-start',
         scrollbarWidth: 'none', 
-        '&::-webkit-scrollbar': {
-            display: 'none', 
-        },
     },
     reason: {
         padding: '5px',
