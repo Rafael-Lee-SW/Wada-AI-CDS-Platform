@@ -28,6 +28,8 @@ const styles = {
     },
     menu: {
         marginTop: '20px',
+        display: 'flex',
+        flexDirection: 'column'
     },
     menuItemTitle: {
         display: 'flex',
@@ -36,6 +38,15 @@ const styles = {
         border: '1px solid #9370db',
         padding: '5px 5px',
         margin: '10px'
+    },
+    newButtonContainer: {
+        display: 'flex',
+        justifyContent: 'flex-end'
+    },
+    newButton: {
+        fontSize: '14px',
+        padding: '10px',
+        fontWeight: 'bold'
     },
     menuItem: {
         cursor: 'pointer',
