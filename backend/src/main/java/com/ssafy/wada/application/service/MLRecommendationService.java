@@ -99,7 +99,7 @@ public class MLRecommendationService {
 
 					// Step 4: Prompt 생성
 					Map<String, Object> modelParams = new HashMap<>();
-					modelParams.put("fileName", fileUrl);
+					modelParams.put("fileName", file.getOriginalFilename());
 					modelParams.put("columns", Arrays.asList(headers)); // Arrays.toString() 대신 List로 변환
 					modelParams.put("random_10_rows", jsonData);
 					synchronized(inputDataList) {
@@ -137,7 +137,7 @@ public class MLRecommendationService {
 
 	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, String fileUrl, String requirement, int requestToken, int responseToken) {
 		try {
-			// GPT 응답의 content 추출
+			// GPT 응답의 content 추출 및 Map으로 변환
 			JsonNode rootNode = objectMapper.readTree(gptResponse);
 			JsonNode contentNode = rootNode.at("/choices/0/message/content");
 
@@ -146,59 +146,36 @@ public class MLRecommendationService {
 				throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
 			}
 
-			// `contentNode`를 JSON으로 다시 파싱하여 `RecommendedModelFromLLM` 데이터 추출
-			JsonNode parsedContent = objectMapper.readTree(contentNode.asText());
-			JsonNode modelRecommendationsNode = parsedContent.get("model_recommendations");
+			// contentNode를 Map으로 직접 변환
+			Map<String, Object> parsedContent = objectMapper.readValue(contentNode.asText(), Map.class);
 
-			if (modelRecommendationsNode == null) {
+			// 모델 추천 데이터 설정 및 "isSelected": false 추가
+			List<Map<String, Object>> modelRecommendations = (List<Map<String, Object>>) parsedContent.get("model_recommendations");
+			if (modelRecommendations == null) {
 				log.error("Parsed content does not contain 'model_recommendations' field. Content: {}", contentNode.asText());
 				throw new BusinessException(FileErrorCode.JSON_PROCESSING_ERROR);
 			}
-
-			// 각 모델에 "isSelected": false 추가하고 전체 정보를 `RecommendedModelFromLLM`로 설정
-			List<Map<String, Object>> modelRecommendations = new ArrayList<>();
-			modelRecommendationsNode.forEach(model -> {
-				Map<String, Object> modelMap = objectMapper.convertValue(model, Map.class);
-				modelMap.put("isSelected", false);
-				modelRecommendations.add(modelMap);
-			});
-
-			// `RecommendedModelFromLLM`에 추가 정보를 포함하도록 구성
-			Map<String, Object> recommendedModelData = new HashMap<>();
-			recommendedModelData.put("purpose_understanding", parsedContent.get("purpose_understanding"));
-			recommendedModelData.put("data_overview", parsedContent.get("data_overview"));
-			recommendedModelData.put("model_recommendations", modelRecommendations);
+			modelRecommendations.forEach(model -> model.put("isSelected", false));
 
 			// 전체 chatRoomId에 해당하는 요청 수를 계산하여 새로운 requestId 생성
 			Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
 			long requestCount = mongoTemplate.count(query, "MongoDB");
-			int newRequestId = (int) requestCount + 1; // 새 requestId는 현재 요청 수 + 1로 설정
+			int newRequestId = (int) requestCount + 1;
 
-			// 기존 requestTokenUsage 및 responseTokenUsage가 있다면 가져와서 더함
+			// 기존 토큰 사용량 불러와 계산
 			Document existingData = mongoTemplate.findOne(query, Document.class, "MongoDB");
-			int existingRequestTokenUsage = existingData != null && existingData.getInteger("requestTokenUsage") != null
-				? existingData.getInteger("requestTokenUsage") : 0;
-			int existingResponseTokenUsage = existingData != null && existingData.getInteger("responseTokenUsage") != null
-				? existingData.getInteger("responseTokenUsage") : 0;
+			int totalRequestTokenUsage = (existingData != null ? existingData.getInteger("requestTokenUsage", 0) : 0) + requestToken;
+			int totalResponseTokenUsage = (existingData != null ? existingData.getInteger("responseTokenUsage", 0) : 0) + responseToken;
 
-			// 새로운 토큰 사용량 계산
-			int totalRequestTokenUsage = existingRequestTokenUsage + requestToken;
-			int totalResponseTokenUsage = existingResponseTokenUsage + responseToken;
-
-			// 토큰 사용량에 따른 가격 계산
-			double requestPricePerToken = 0.00006; // 요청 토큰당 가격
-			double responsePricePerToken = 0.00012; // 응답 토큰당 가격
-			double requestPrice = totalRequestTokenUsage * requestPricePerToken;
-			double responsePrice = totalResponseTokenUsage * responsePricePerToken;
-			double totalPrice = requestPrice + responsePrice;
+			// 토큰 가격 계산
+			double totalPrice = (totalRequestTokenUsage * 0.00006) + (totalResponseTokenUsage * 0.00012);
 
 			// MongoDB에 저장할 데이터 구성
 			Map<String, Object> analysisRequest = new HashMap<>();
 			analysisRequest.put("chatRoomId", chatRoomId);
 			analysisRequest.put("requestId", newRequestId);
-			//analysisRequest.put("fileUrl", fileUrl);
 			analysisRequest.put("requirement", requirement);
-			analysisRequest.put("RecommendedModelFromLLM", recommendedModelData);
+			analysisRequest.put("RecommendedModelFromLLM", parsedContent);
 			analysisRequest.put("createdTime", LocalDateTime.now());
 			analysisRequest.put("requestTokenUsage", totalRequestTokenUsage);
 			analysisRequest.put("responseTokenUsage", totalResponseTokenUsage);
