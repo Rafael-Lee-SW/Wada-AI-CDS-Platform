@@ -1,5 +1,7 @@
 package com.ssafy.wada.presentation.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +26,9 @@ public class MLModelRecommendController {
 	@PostMapping(produces = "application/json")
 	public ResponseEntity<Object> getMLModelRecommend(
 		@SessionId String sessionId,
-		@RequestParam("file") MultipartFile file,
+		@RequestParam("files") List<MultipartFile> files,
 		@RequestParam("chatRoomId") String chatRoomId,
 		@RequestParam("requirement") String requirement) {
-		return ResponseEntity.ok(mlRecommendationService.recommend(sessionId, chatRoomId, requirement, file));
+		return ResponseEntity.ok(mlRecommendationService.recommend(sessionId, chatRoomId, requirement, files));
 	}
 }

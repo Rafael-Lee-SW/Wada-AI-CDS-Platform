@@ -64,7 +64,7 @@ public class MLRecommendationService {
 	private String apiKey;
 
 	@Transactional
-	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, MultipartFile file) {
+	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, List<MultipartFile> files) {
 		log.info("Step 1: Start recommendation process");
 
 		// Step 1-1: Guest 조회 또는 생성
@@ -77,33 +77,48 @@ public class MLRecommendationService {
 			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest)));
 		log.info("Step 1-2: ChatRoom retrieved or created with chatRoomId={}", chatRoomId);
 
-		// Step 2: 파일 업로드 및 URL 저장
-		log.info("Step 2: Uploading file to S3 and preparing for MongoDB save");
-		String fileUrl = CompletableFuture.supplyAsync(() -> s3Client.upload(toAttachedFile(file))).join();
-		File fileEntity = File.create(UUID.randomUUID().toString(), chatRoom, fileUrl);
-		fileRepository.save(fileEntity);
-		log.info("Step 2: File uploaded to S3 with URL={}", fileUrl);
-
+		List<Map<String, Object>> inputDataList = new ArrayList<>();
 		// Step 3: CSV 파일 파싱
 		log.info("Step 3: Parsing CSV file");
-		CsvResult csvResult = csvParsingService.parse(file);
-		String[] headers = csvResult.headers();
-		List<String[]> rows = csvResult.rows();
-		List<String[]> randomRows = getRandomRows(rows, RANDOM_SELECT_ROWS);
-		String jsonData = convertToJson(headers, randomRows);
-		log.info("Step 3: Parsed CSV file with headers={} and random rows={}", Arrays.toString(headers), jsonData);
+		List<CompletableFuture<Void>> futures = files.stream().map(file ->
+			CompletableFuture.runAsync(() -> {
+				try {
+					CsvResult csvResult = csvParsingService.parse(file);
+					String[] headers = csvResult.headers();
+					List<String[]> rows = csvResult.rows();
+					List<String[]> randomRows = getRandomRows(rows, RANDOM_SELECT_ROWS);
+					String jsonData = convertToJson(headers, randomRows);
+					log.info("Step 3: Parsed CSV file with headers={} and random rows={}", Arrays.toString(headers), jsonData);
 
-		// Step 4: Prompt 생성
-		String header = "Bearer " + apiKey;
-		Map<String, Object> modelParams = new HashMap<>();
-		modelParams.put("columns", Arrays.toString(headers));
-		modelParams.put("random_10_rows", jsonData);
-		modelParams.put("analysisPurpose", analysisPurpose);
-		String body = PromptGenerator.createRecommendedModelFromLLM(modelParams);
-		log.info("Step 4: Generated prompt for GPT model");
+					// Step 2: 파일 업로드 및 URL 저장
+					log.info("Step 2: Uploading file to S3 and preparing for MongoDB save");
+					String fileUrl = s3Client.upload(toAttachedFile(file));
+					File fileEntity = File.create(UUID.randomUUID().toString(), chatRoom, fileUrl);
+					fileRepository.save(fileEntity);
+					log.info("Step 2: File uploaded to S3 with URL={}", fileUrl);
+
+					// Step 4: Prompt 생성
+					Map<String, Object> modelParams = new HashMap<>();
+					modelParams.put("fileName", fileUrl);
+					modelParams.put("columns", Arrays.asList(headers)); // Arrays.toString() 대신 List로 변환
+					modelParams.put("random_10_rows", jsonData);
+					synchronized(inputDataList) {
+						inputDataList.add(modelParams);
+					}
+					log.info("Step 4: Generated prompt for GPT model");
+				} catch (Exception e) {
+					log.error("Error processing file: {}", file.getOriginalFilename(), e);
+				}
+			})
+		).toList();
+
+		// 모든 파일의 병렬 처리 완료 후 결과 대기
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
 		// Step 5: GPT 호출 및 응답 처리
 		log.info("Step 5: Calling GPT model");
+		String header = "Bearer " + apiKey;
+		String body = PromptGenerator.createRecommendedModelFromLLM(inputDataList, analysisPurpose);
 		GptRequest.Message message = GptRequest.Message.roleUserMessage(body);
 		GptRequest request = new GptRequest(List.of(message));
 		String gptResponse = gptClient.callFunction(header, request);
@@ -113,7 +128,7 @@ public class MLRecommendationService {
 		int responseToken = calculateTokens(gptResponse); // gptResponse에 사용된 토큰 수 계산
 
 		// Step 6: GPT 응답과 파일 URL을 MongoDB에 저장
-		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrl, analysisPurpose, requestToken, responseToken);
+		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, null, analysisPurpose, requestToken, responseToken);
 		log.info("Step 6: GPT response and file path saved to MongoDB with requestId={}", requestId);
 
 		// 결과 반환
@@ -181,7 +196,7 @@ public class MLRecommendationService {
 			Map<String, Object> analysisRequest = new HashMap<>();
 			analysisRequest.put("chatRoomId", chatRoomId);
 			analysisRequest.put("requestId", newRequestId);
-			analysisRequest.put("fileUrl", fileUrl);
+			//analysisRequest.put("fileUrl", fileUrl);
 			analysisRequest.put("requirement", requirement);
 			analysisRequest.put("RecommendedModelFromLLM", recommendedModelData);
 			analysisRequest.put("createdTime", LocalDateTime.now());
