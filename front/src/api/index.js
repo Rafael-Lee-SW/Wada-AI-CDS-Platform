@@ -15,7 +15,7 @@ function fetchChatList(sessionId) {
 }
 
 // 채팅방 조회
-function fetchChatRoom(sessionId, chatRoomId) {
+function fetchChatRoom(chatRoomId, sessionId) {
   return instance.get(`/history?chatRoomId=${chatRoomId}`, {
     headers: {
       'sessionId': sessionId,
@@ -33,8 +33,8 @@ function fetchModel(formData, sessionId) {
 }
 
 // 선택된 모델로 분석 요청
-function createAnalyze(data, sessionId) {
-    return instance.post('/analyze-model', data, {
+function createAnalyze(jsonData, sessionId) {
+    return instance.post('/analyzeModel', jsonData, {
         headers: {
             'sessionId': sessionId, 
         }

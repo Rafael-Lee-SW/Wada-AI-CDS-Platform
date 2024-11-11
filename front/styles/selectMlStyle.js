@@ -72,6 +72,13 @@ const styles = {
         scrollbarWidth: 'none',
         maxHeight: '220px'
     },
+    buttonContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '20px'
+    },
     button: {
         padding: '10px 20px',
         fontSize: '16px',
@@ -83,7 +90,7 @@ const styles = {
     },
     flipCard: {
         backgroundColor: 'transparent',
-        width: '190px',
+        width: '250px',
         minHeight: '254px',
         perspective: '1000px',
         fontFamily: 'sans-serif',
@@ -116,6 +123,10 @@ const styles = {
         borderRadius: '1rem',
         background: 'linear-gradient(120deg, #dec1de 20%, #d9c5d9 50%, #d9ccd9 80%)',
         color: '#6c4e82',
+        overflowY: 'auto',
+        scrollbarWidth: 'none',
+        boxSizing: 'border-box',
+        padding: '10px'
     },
     flipCardBack: {
         boxShadow: '0 8px 14px 0 rgba(0,0,0,0.2)',
@@ -142,14 +153,25 @@ const styles = {
         },
     },
     reason: {
-        padding: '5px'
+        padding: '5px',
+        wordBreak: 'keep-all',
+    },
+    title1: {
+        fontSize: '18px',
+        fontWeight: 900,
+        margin: 0,
+        paddingBottom: '20px',
+        wordWrap: 'break-word',
+        wordBreak: 'break-all',
+        whiteSpace: 'normal', 
+        overflow: 'hidden',
     },
     title: {
         fontSize: '18px',
         fontWeight: 900,
         margin: 0,
         padding: '10px'
-    },
+    }
 };
 
 export default styles;

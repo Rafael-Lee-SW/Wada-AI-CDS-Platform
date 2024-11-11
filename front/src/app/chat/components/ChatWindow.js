@@ -19,16 +19,18 @@ export default function Home({ sessionId }) {
     const [purpose, setPurpose] = useState();
     const [overview, setOverview] = useState();
     const [result, setResult] = useState(null);
+    const [requestId, setRequestId] = useState(null);
     const [chatRoomId, setChatRoomId] = useState('');
     const [chatList, setChatList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState([]);
+    const [currentStep, setCurrentStep] = useState(0);
 
     useEffect(() => {
         const getChatList = async () => {
             try {
                 const response = await fetchChatList(sessionId);  
-                const chats = response.data; 
+                const chats = response.data.slice(0,10); 
 
                 setChatList(chats); 
             } catch (error) {
@@ -42,7 +44,7 @@ export default function Home({ sessionId }) {
     const handleMenuItemClick = async (chatRoomId) => {
         
         setIsLoading(true); 
-        setPage('loading');  
+        setPage('loading2');  
 
         try {
             const response = await fetchChatRoom(chatRoomId, sessionId);
@@ -72,10 +74,12 @@ export default function Home({ sessionId }) {
 
     const handleSubmitFiles = (files) => {
         setFiles(files);
+        setSubmittedFile(files);
     }
 
     const handleSubmitRequirement = async (requirement) => {
         setRequirement(requirement);
+        setSubmittedRequirement(requirement);
     }
 
     const handleSubmit = async () => {
@@ -86,23 +90,21 @@ export default function Home({ sessionId }) {
 
         const newChatRoomId = uuidv4();
         
-        setSubmittedFile(files);
-        setSubmittedRequirement(requirement);
         setChatRoomId(newChatRoomId);
 
         const formData = new FormData();
 
         formData.append("chatRoomId", newChatRoomId);  
 
-        if (Array.isArray(files)) {
-            files.forEach((file, index) => {
-                formData.append(`file[${index}]`, file);  
+        if (Array.isArray(submittedFile)) {
+            files.forEach((file) => {
+                formData.append('file', file);  
             });
         } else {
-        formData.append("file", files);  
+        formData.append("file", submittedFile);  
         } 
 
-        formData.append("requirement", requirement);
+        formData.append("requirement", submittedRequirement);
         
 
         console.log("FormData 내용:");
@@ -110,6 +112,7 @@ export default function Home({ sessionId }) {
             console.log(key, value);
         }
 
+        setCurrentStep(1);
         setIsLoading(true);  
         setPage('loading');
 
@@ -117,7 +120,7 @@ export default function Home({ sessionId }) {
             const response = await fetchModel(formData, sessionId);
             const result = response.data;
         
-        // 테스트용
+        // // 테스트용
         // const result = {
         //     "purpose_understanding": {
         //         "main_goal": "회사의 인원을 30% 감축하여 인건비를 줄이고자 합니다.",
@@ -148,57 +151,46 @@ export default function Home({ sessionId }) {
         //         ]
         //     },
         //     "model_recommendations": [
-        //         {
-        //             "analysis_name": "Random Forest Classification for Termination Prediction",
-        //             "selection_reasoning": "임직원 해고 예측을 위해 가장 적합하며, 다양한 입력 데이터와 복잡한 상호작용을 처리할 수 있습니다. 또, 피처 중요도를 통해 어떤 변수가 해고에 큰 영향을 미치는지 알 수 있습니다.",
-        //             "implementation_request": {
-        //                 "model_choice": "random_forest_classification",
-        //                 "feature_columns": [
-        //                     "GenderID",
-        //                     "MaritalStatusID",
-        //                     "DeptID",
-        //                     "PositionID",
-        //                     "PerfScoreID",
-        //                     "Salary",
-        //                     "DaysLateLast30",
-        //                     "Absences",
-        //                     "EngagementSurvey",
-        //                     "EmpSatisfaction"
-        //                 ],
-        //                 "target_variable": "Termd"
-        //             }
-        //         },
-        //         {
-        //             "analysis_name": "Logistic Regression for Attrition Risk Prediction",
-        //             "selection_reasoning": "이직 가능성이 높은 직원을 식별하는 데 좋은 해석력을 제공하는 모델입니다. 확률 점수를 통해 이직 위험을 수치로 제시할 수 있습니다.",
-        //             "implementation_request": {
-        //                 "model_choice": "logistic_regression_attrition",
-        //                 "feature_columns": [
-        //                     "GenderID",
-        //                     "MaritalStatusID",
-        //                     "PerfScoreID",
-        //                     "Salary",
-        //                     "DaysLateLast30",
-        //                     "Absences",
-        //                     "EngagementSurvey",
-        //                     "EmpSatisfaction",
-        //                     "SpecialProjectsCount"
-        //                 ],
-        //                 "target_variable": "Termd"
-        //             }
+        //     {
+        //         "analysis_name": "random_forest_regression",
+        //         "selection_reasoning": "이 모델은 공장 운영 비율 및 리스크 관련 데이터를 기반으로 생산량, 비용 등의 연속적 수치를 예측하는 데 적합합니다. Random Forest Regression은 개별 변수의 중요도를 평가할 수 있어 비즈니스 의사결정에 유용할 가능성이 높습니다.",
+        //         "expected_outcome": "운영 효율성에 대한 정확한 예측을 통해 불필요한 비용을 절감하고 생산성 향상을 도모할 수 있습니다.",
+        //         "feature_columns": [
+        //             "Factory Operating Rate (%)",
+        //             "Production Downtime Rate (%)",
+        //             "Role Criticality Score",
+        //             "Shift Flexibility Score",
+        //             "Team Coordination Score",
+        //             "Job Role Coverage (%)"
+        //         ],
+        //         "target_variable": "Production Volume (units)"
+        //     },
+        //     {
+        //         "analysis_name": "kmeans_clustering_anomaly_detection",
+        //         "selection_reasoning": "많은 예측 불가능한 특성을 가진 데이터에서 비정상적이거나 예상치 못한 패턴을 파악하는 데 적합합니다. KMeans 클러스터링은 비지도 학습으로 데이터의 구조를 이해하는 데 큰 도움을 줄 수 있습니다.",
+        //         "expected_outcome": "운영 및 생산성 데이터에서 일반적인 패턴과 벗어난 비정상적인 활동이나 동향을 발견하여 빠르게 대응할 수 있는 기반을 마련합니다.",
+        //         "feature_columns": [
+        //             "Process Bottleneck Potential (%)",
+        //             "Operational Risk Factor",
+        //             "Error Rate Increase (%)",
+        //             "Absence Cost Impact ($)"
+        //         ],
+        //         "optional_parameters": {
+        //             "num_clusters": 4
         //         }
-        //     ]
+        //     }
+        // ],
         // }
 
         console.log("업로드 성공:", result);
+        console.log("requestId", result.requestId);
 
         // 추천 모델들, 목적, 요약 저장
         setModels(result.model_recommendations);
         setPurpose(result.purpose_understanding);
         setOverview(result.data_overview);
+        setRequestId(result.requestId);
         setPage('selectML');
-        setRequirement('');
-        setFiles(null);
 
         if (response.status != 200) {
             throw new Error("업로드 실패");
@@ -207,9 +199,6 @@ export default function Home({ sessionId }) {
         } catch (error) {
             console.error("에러 발생:", error);
 
-            setRequirement(''); 
-            setFiles(null);
-
         } finally {
             setIsLoading(false);  
         }
@@ -217,24 +206,31 @@ export default function Home({ sessionId }) {
     };
 
     // selectMl 에서 선택된 모델로 분석 요청
-    const handleModelSelect = async (chatRoomId, model) => {
+    const handleModelSelect = async (chatRoomId, model, requestId) => {
 
+        console.log(chatRoomId);
+        console.log(requestId);
+        console.log(model.implementation_request);
+        setCurrentStep(3);
         setIsLoading(true);  
         setPage('loading');
 
         try {
             const data = {
                 "chatRoomId": chatRoomId,
+                "requestId": parseInt(requestId),
                 "modelDetail": model.implementation_request
             }
 
-            const response = await createAnalyze(data, sessionId); 
-            // 분석 결과 (형식확인 필요)
-            const result = response.result();
+            const jsonData = JSON.stringify(data);
+
+            const response = await createAnalyze(jsonData, sessionId); 
+            const result = response.data.result;
 
             // 최종 분석 결과 저장
             setResult(result); 
             setPage('chatContent'); 
+            console.log("최종 데이터", result);
 
         } catch (error) {
             // 테스트용 
@@ -275,11 +271,12 @@ export default function Home({ sessionId }) {
 
         {/* page 상태에 따른 조건부 렌더링 */}
         {page === 'default' && <DefaultPage />}
-        {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
+        {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit}/>}
         {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedRequirement} result={result}/>}
-        {page === 'loading' && <Loading />}
+        {page === 'loading' && <Loading currentStep={currentStep}/>}
         {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles}/>}
         {page === 'requirementUploader' && <RequirementUploader onChangePage={handleChangePage} onSubmitRequirement={handleSubmitRequirement} onSubmit={handleSubmit}/>} 
+        {page === 'loading2' && <Loading/>}
     </div>
 );
 
