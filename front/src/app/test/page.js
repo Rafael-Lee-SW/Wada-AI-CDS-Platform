@@ -23,8 +23,10 @@ export default function Test() {
             setError(null);
             try {
                 const [resultResponse, explanationResponse] = await Promise.all([
-                    fetch("/json/test_6.json"),
-                    fetch("/json/test_6_explanation.json"),
+                    // fetch("/json/test_6.json"),
+                    // fetch("/json/test_6_explanation.json"),
+                    fetch("/json/test_5.json"),
+                    fetch("/json/test_5_explanation.json"),
                 ]);
 
                 if (!resultResponse.ok || !explanationResponse.ok) {

@@ -99,6 +99,7 @@ function KMeansVisualization({ result, explanation }) {
 
       // 모델 이름에 'anomalydetection'이 포함되어 있으면 Case6
       setIsAnomalyDetection(modelName.includes("anomalydetection"));
+      console.log(isAnomalyDetection);
 
       // 결과 prop에서 클러스터 레이블과 샘플 데이터를 추출합니다.
       const dfSample = [];
@@ -855,9 +856,9 @@ function KMeansVisualization({ result, explanation }) {
           </Box>
 
           {/* Anomaly Detection (if applicable) */}
-          {isAnomalyDetection && (
-            <Box my={4}>
-              <Box mt={4}>
+          <Box my={4}>
+            {isAnomalyDetection ? (
+              <>
                 <Typography
                   variant="h5"
                   gutterBottom
@@ -866,85 +867,81 @@ function KMeansVisualization({ result, explanation }) {
                   {explanation.anomaly_plot_title ||
                     "데이터 영역 분류(이상값 탐지)"}
                 </Typography>
-                {isAnomalyDetection
-                  ? renderAnomalyScatterPlot()
-                  : renderClusterScatterPlot()}
-              </Box>
-              <Typography
-                id="num-anomalies-slider"
-                gutterBottom
-                className={classes.sectionTitle}
-              >
-                {explanation.slider_title || "클러스터당 이상치 수:"}
-              </Typography>
-              <Slider
-                value={numAnomalies}
-                onChange={handleNumAnomaliesChange}
-                aria-labelledby="num-anomalies-slider"
-                valueLabelDisplay="on"
-                step={1}
-                marks
-                min={1}
-                max={10}
-                className={classes.slider}
-              />
-              <b>그래프에 대한 짧은 개요</b>
-              {visualizationsInfo.map((viz, index) => (
-                <Box my={4} key={index}>
-                  {viz.insights && (
-                    <Typography
-                      variant="body2"
-                      gutterBottom
-                      className={classes.bodyText}
-                    >
-                      {viz.insights}
-                    </Typography>
-                  )}
-                </Box>
-              ))}
-              <Typography
-                variant="h5"
-                gutterBottom
-                className={classes.sectionTitle}
-              >
-                클러스터 설명
-              </Typography>
-              {clusterDescriptions.length > 0 ? (
-                clusterDescriptions.map((desc, index) => {
-                  const clusterId = clusters[index]; // 현재 클러스터 ID 가져오기
-                  const color = clusterColorMap[clusterId] || "#000000"; // 색상 매핑에서 색상 가져오기, 기본값은 검정색
-                  return (
-                    <Card
-                      key={index}
-                      variant="outlined"
-                      className={classes.card}
-                      style={{ borderColor: color }} // 카드 테두리 색상 설정
-                    >
-                      <CardContent>
-                        <Typography
-                          variant="h6"
-                          className={classes.cardTitle}
-                          style={{ color: color }} // 제목 텍스트 색상 설정
-                        >
-                          {clusterTitles[index] || `Cluster ${index + 1}`}
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          className={classes.bodyText}
-                        >
-                          {desc}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  );
-                })
-              ) : (
-                <Typography variant="body1" className={classes.bodyText}>
-                  클러스터 설명이 제공되지 않았습니다.
+                {renderAnomalyScatterPlot()}
+                <Typography
+                  id="num-anomalies-slider"
+                  gutterBottom
+                  className={classes.sectionTitle}
+                >
+                  {explanation.slider_title || "클러스터당 이상치 수:"}
                 </Typography>
-              )}
-            </Box>
-          )}
+                <Slider
+                  value={numAnomalies}
+                  onChange={handleNumAnomaliesChange}
+                  aria-labelledby="num-anomalies-slider"
+                  valueLabelDisplay="on"
+                  step={1}
+                  marks
+                  min={1}
+                  max={10}
+                  className={classes.slider}
+                />
+              </>
+            ) : (renderClusterScatterPlot()
+            )}
+            <b>그래프에 대한 짧은 개요</b>
+            {visualizationsInfo.map((viz, index) => (
+              <Box my={4} key={index}>
+                {viz.insights && (
+                  <Typography
+                    variant="body2"
+                    gutterBottom
+                    className={classes.bodyText}
+                  >
+                    {viz.insights}
+                  </Typography>
+                )}
+              </Box>
+            ))}
+            <Typography
+              variant="h5"
+              gutterBottom
+              className={classes.sectionTitle}
+            >
+              클러스터 설명
+            </Typography>
+            {clusterDescriptions.length > 0 ? (
+              clusterDescriptions.map((desc, index) => {
+                const clusterId = clusters[index]; // 현재 클러스터 ID 가져오기
+                const color = clusterColorMap[clusterId] || "#000000"; // 색상 매핑에서 색상 가져오기, 기본값은 검정색
+                return (
+                  <Card
+                    key={index}
+                    variant="outlined"
+                    className={classes.card}
+                    style={{ borderColor: color }} // 카드 테두리 색상 설정
+                  >
+                    <CardContent>
+                      <Typography
+                        variant="h6"
+                        className={classes.cardTitle}
+                        style={{ color: color }} // 제목 텍스트 색상 설정
+                      >
+                        {clusterTitles[index] || `Cluster ${index + 1}`}
+                      </Typography>
+                      <Typography variant="body1" className={classes.bodyText}>
+                        {desc}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <Typography variant="body1" className={classes.bodyText}>
+                클러스터 설명이 제공되지 않았습니다.
+              </Typography>
+            )}
+          </Box>
 
           {/* Analysis Overview */}
           <Box my={4}>
