@@ -1,5 +1,6 @@
 package com.ssafy.wada.application.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,6 +10,7 @@ import com.ssafy.wada.client.openai.GptRequest.GptResultRequest;
 import com.ssafy.wada.client.openai.GptResponseParser;
 import com.ssafy.wada.client.openai.PromptGenerator;
 import com.ssafy.wada.presentation.response.ModelDispatchResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -83,19 +85,21 @@ public class ModelDispatchService {
     }
 
     private List<Map<String, Object>> getRecommendedModels(Map<String, Object> chatRoomData, String chatRoomId, int requestId) {
-        if (!chatRoomData.containsKey("RecommendedModelFromLLM")) {
-            throw new IllegalArgumentException("RecommendedModelFromLLM not found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
+        // RecommendedModelFromLLM 확인
+        JsonNode recommendedModelData = objectMapper.convertValue(chatRoomData.get("RecommendedModelFromLLM"), JsonNode.class);
+        if (recommendedModelData == null || !recommendedModelData.has("model_recommendations")) {
+            throw new IllegalArgumentException("RecommendedModelFromLLM or model_recommendations not found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
         }
 
-        // RecommendedModelFromLLM의 전체 데이터를 Map으로 가져오기
-        Map<String, Object> recommendedModelData = (Map<String, Object>) chatRoomData.get("RecommendedModelFromLLM");
+        ArrayNode modelRecommendationsNode = (ArrayNode) recommendedModelData.get("model_recommendations");
+        List<Map<String, Object>> modelRecommendations = new ArrayList<>();
 
-        // model_recommendations을 List<Map<String, Object>>로 추출
-        if (recommendedModelData.containsKey("model_recommendations")) {
-            return (List<Map<String, Object>>) recommendedModelData.get("model_recommendations");
-        } else {
-            throw new IllegalArgumentException("model_recommendations not found in RecommendedModelFromLLM for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
+        for (JsonNode modelNode : modelRecommendationsNode) {
+            Map<String, Object> modelMap = objectMapper.convertValue(modelNode, Map.class);
+            modelRecommendations.add(modelMap);
         }
+
+        return modelRecommendations;
     }
 
     private void updateModelSelection(List<Map<String, Object>> recommendedModels, String selectedModelName) {
