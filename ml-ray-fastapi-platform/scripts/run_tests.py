@@ -8,7 +8,7 @@ import os
 import time
 import json
 
-test_config_now = 'test_config_Fatory.yaml'
+test_config_now = 'test_config_soowan_2.yaml'
 
 def setup_logging(base_log_dir, trial_num):
     """
@@ -123,6 +123,7 @@ def save_response(trial_result_dir, test_id, response_content):
         json.dump(response_content, f, indent=4)
 
 def run_test(test, trial_num, trial_result_dir, logger, base_url='http://localhost:8000'):
+# def run_test(test, trial_num, trial_result_dir, logger, base_url='http://3.34.133.111:8282'):
     """
     Executes a single test case.
     
