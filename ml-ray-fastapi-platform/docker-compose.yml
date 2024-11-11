@@ -6,12 +6,13 @@ services:
       context: .
     ports:
       - "8282:8282"  # FastAPI 서비스 포트 매핑
-      - "8000:8000"  # Ray Serve 포트
       - "8265:8265"  # Ray Dashboard 포트
     environment:
       - RAY_SERVE_HTTP_HOST=0.0.0.0
       - RAY_SERVE_HTTP_PORT=8000
       - RAY_METRICS_EXPORT_PORT=8080  # Prometheus 메트릭 노출 포트
+      - RAY_DASHBOARD_HOST=0.0.0.0  # Dashboard host
+      - RAY_DASHBOARD_PORT=8265  # Dashboard host
     volumes:
       - ray_shared:/tmp/ray  # Ray 메트릭 디렉터리 공유
     command: ["python", "app/main.py"]
