@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 //plotly.js 호출
-import Plot from "react-plotly.js";
+import dynamic from "next/dynamic";
 // Material-UI로 Interactive Chart Components
 import {
   Slider,
@@ -25,6 +25,7 @@ import PropTypes from "prop-types"; // 프롭된 값의 타입 검증
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 // 이 컴포넌트는 KMeans(case5-6) 클러스터링 결과를 시각화하며, 산점도, 볼록 껍질, 이상치 및 데이터 테이블을 포함합니다.
 function KMeansVisualization({ result, explanation }) {
   const classes = useAnalyzingKmeansStyles();

@@ -1,12 +1,9 @@
 import { useState } from "react";
 import styles from "/styles/chatContentStyle";
-import Bar from "./graphs/Bar";
-import Line from "./graphs/Line";
-import Pie from "./graphs/Pie";
-import Scatter from "./graphs/Scatter";
-import Table from "./graphs/Table";
 import LogisticRegressionVisualization from "./analyzeReport/LogisticsRegressionVisualization";
 import ClassifierVisualization from "./analyzeReport/RandomForestClassifierVisualization";
+import RegressorVisualization from "./analyzeReport/RandomForestRegressionVisualization";
+import KMeansVisualization from "./analyzeReport/KMeansVisualization";
 
 export default function ChatContent({ file, message, result }) {
     const [showResult, setShowResult] = useState(false);
@@ -56,19 +53,14 @@ export default function ChatContent({ file, message, result }) {
                     </div>
                 </div>
             </div>
-
-            {/* 오른쪽 분석 결과 창 */}
             {showResult && (
                 <div style={styles.rightSection}>
                     <button onClick={handleCloseDashBoard} style={styles.closeButton}>X</button>
                     <div style={styles.resultContent}>
                         {model === 'LogisticRegressionBinary' && <LogisticRegressionVisualization result={result}/>}
                         {model === 'RandomForestClassifier' && <ClassifierVisualization result={result}/> }
-                        {model === 'RandomForestRegression' && <renderFeatureImportances result={result}/> }
-                        {/* {graph.graph_type === 'bar' && <Bar graph={graph}/>}
-                        {graph.graph_type === 'line' && <Line graph={graph}/>}
-                        {graph.graph_type === 'pie' && <Pie graph={graph}/>}
-                        {graph.graph_type === 'scatter' && <Scatter graph={graph}/>} */}
+                        {model === 'RandomForestRegression' && <RegressorVisualization result={result}/> }
+                        {model === 'KmeansClusteringSegmentation' && <KMeansVisualization result={result}/>}
                     </div>
                 </div>
             )}

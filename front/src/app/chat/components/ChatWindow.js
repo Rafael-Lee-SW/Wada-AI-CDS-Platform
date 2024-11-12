@@ -35,6 +35,7 @@ export default function Home({ sessionId }) {
                 console.log("대화기록불러오기에 사용되는 sessionId: ", sessionId);
                 const response = await fetchChatList(sessionId);  
                 const chats = response.data; 
+                console.log("불러온 채팅: ", chats);
 
                 setChatList(chats); 
 
@@ -178,7 +179,7 @@ export default function Home({ sessionId }) {
             console.log("data 전체: ", data);
             const response = await createAnalyze(data, sessionId); 
             const result = response.data;
-            
+
             setResult(result); 
             setPage('chatContent'); 
             console.log("최종 데이터: ", result);

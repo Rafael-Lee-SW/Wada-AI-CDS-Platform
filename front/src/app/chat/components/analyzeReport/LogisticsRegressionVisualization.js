@@ -1,7 +1,7 @@
 // src/app/chat/components/analyzeReport/LogisticRegressionVisualization.js
 
 import React, { useState, useEffect } from "react";
-import Plot from "react-plotly.js";
+import dynamic from "next/dynamic";
 import {
   Typography,
   Card,
@@ -14,6 +14,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import * as d3 from "d3"; // For color scales
 import useAnalyzingLogisticStyles from "/styles/analyzingLogisticStyle.js"; // Custom styles
 import PropTypes from "prop-types";
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 // The LogisticRegressionVisualization component visualizes Logistic Regression results,
 // including Decision Boundary, Classification Report, and Confusion Matrix.
