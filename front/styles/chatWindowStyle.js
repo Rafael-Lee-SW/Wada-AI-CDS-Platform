@@ -1,8 +1,9 @@
 const styles = {
     mainContainer: {
         display: 'flex',
-        height: '100vh',
+        maxHeight: '100vh',
         backgroundColor: 'white',
+        overflowY: 'hidden'
     },
     sidebar: {
         display: 'flex',
@@ -12,7 +13,8 @@ const styles = {
         backgroundColor: '#fdfaff',
         padding: '5px 10px',
         borderRight: '1px solid #d3d3d3',
-        zIndex: '2'
+        zIndex: '2',
+        maxHeight: '100vh'
     },
     info: {
         display: 'flex',
@@ -31,7 +33,7 @@ const styles = {
     menu: {
         width: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
     menuItemTitle: {
         display: 'flex',
@@ -50,7 +52,18 @@ const styles = {
         padding: '10px',
         fontWeight: 'bold'
     },
+    chatListContainer: {
+        display: 'flex',
+        width: '100%',
+        maxHeight: '100vh',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflowY: 'auto',
+        scrollbarWidth: 'none'
+    },
     menuItem: {
+        width: '100%',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center'

@@ -25,6 +25,7 @@ export default function Home({ sessionId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
+    const [graphs, setGraphs] = useState([]);
 
     useEffect(() => {
         const getChatList = async () => {
@@ -33,7 +34,7 @@ export default function Home({ sessionId }) {
 
                 console.log("대화기록불러오기에 사용되는 sessionId: ", sessionId);
                 const response = await fetchChatList(sessionId);  
-                const chats = response.data.slice(0,10); 
+                const chats = response.data; 
 
                 setChatList(chats); 
 
@@ -177,8 +178,7 @@ export default function Home({ sessionId }) {
             console.log("data 전체: ", data);
             const response = await createAnalyze(data, sessionId); 
             const result = response.data;
-
-            // 최종 분석 결과 저장
+            
             setResult(result); 
             setPage('chatContent'); 
             console.log("최종 데이터: ", result);
@@ -204,16 +204,18 @@ export default function Home({ sessionId }) {
                 <div style={styles.menuItemTitle}>
                     <p>분석 기록</p>
                 </div>
-                {chatList.length > 0 ? ( 
-                    chatList.map((chat, index) => (
-                        <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId)}>
-                            <img style={styles.arrow} src="/img/arrow.png" alt="arrow" />
-                            <p style={styles.chatList}>{chat.requirement}</p> 
-                        </div>
-                    ))
-                ): null }
                 <div style={styles.newButtonContainer}>
                     <button style={styles.newButton} onClick={handleChatRoomId}>+ 새 채팅</button>
+                </div>
+                <div style={styles.chatListContainer}>
+                    {chatList.length > 0 ? ( 
+                        chatList.map((chat, index) => (
+                            <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId)}>
+                                <img style={styles.arrow} src="/img/arrow.png" alt="arrow" />
+                                <p style={styles.chatList}>{chat.requirement}</p> 
+                            </div>
+                        ))
+                    ): null }
                 </div>
             </div>
         </div>

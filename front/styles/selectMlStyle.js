@@ -157,7 +157,6 @@ const styles = {
         fontSize: '18px',
         fontWeight: 900,
         margin: 0,
-        paddingBottom: '20px',
         wordWrap: 'break-word',
         wordBreak: 'break-all',
         whiteSpace: 'normal', 
