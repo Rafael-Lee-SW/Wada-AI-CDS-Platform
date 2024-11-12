@@ -68,14 +68,16 @@ public class MLRecommendationService {
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, List<MultipartFile> files) {
 		log.info("Step 1: Start recommendation process");
 
-		// Step 1-1: Guest 조회 또는 생성
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
 		log.info("Step 1-1: Guest retrieved or created with sessionId={}", sessionId);
 
-		// Step 1-2: ChatRoom 조회 또는 생성
+// Step 1-2: ChatRoom 조회 또는 생성
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
-			.orElseGet(() -> chatRoomRepository.save(ChatRoom.create(chatRoomId, guest)));
+			.orElseGet(() -> {
+				log.info("ChatRoom with chatRoomId={} not found for guest with sessionId={}. Creating new ChatRoom.", chatRoomId, sessionId);
+				return chatRoomRepository.save(ChatRoom.create(chatRoomId, guest));
+			});
 		log.info("Step 1-2: ChatRoom retrieved or created with chatRoomId={}", chatRoomId);
 
 		List<Map<String, Object>> inputDataList = new ArrayList<>();
