@@ -40,41 +40,40 @@ public class ModelDispatchService {
     @Value("${openai.api.key}")
     private String apiKey;
 
-    public ModelDispatchResponse dispatchModel(String chatRoomId, int requestId, Map<String, Object> selectedModel) {
+    public ModelDispatchResponse dispatchModel(String chatRoomId, int requestId, int selectedModelIndex) {
 
-        // MongoDB에서 chatRoomId와 requestId에 해당하는 데이터를 가져옵니다.
+        // Step1 MongoQuery 객체 가져오기
         log.info("Step 1: MongoDB에서 chatRoomData 가져오기");
         Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
-
-        // 먼저 Document 형식으로 데이터를 가져옵니다.
         Document chatRoomDataDoc = mongoTemplate.findOne(query, Document.class, "MongoDB");
 
         if (chatRoomDataDoc == null) {
             throw new IllegalArgumentException("No data found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
         }
 
-        // Document 데이터를 Map<String, Object>로 변환합니다.
+        // Step2 Document 데이터를 Map<String, Object>로 변환합니다.
         Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
-        log.info("chatRoomData : {}", chatRoomData);
+        log.info("Step2 Document 데이터 Map 변환 chatRoomData: {}", chatRoomData);
 
-        // fileUrl 추출
-
+        // Step3 Mongo객체에서 fileUrls List 추출후 0번 인덱스
         List<String> fileUrlList = (List<String>) chatRoomData.get("fileUrls");
         String fileUrl = null;
         if (fileUrlList != null && !fileUrlList.isEmpty()) {
             fileUrl = fileUrlList.get(0); // 첫 번째 URL을 추출
+            log.info("Step3 Document 데이터에서 File Url 꺼내기 fileUrl: {}",fileUrl);
         } else {
             throw new IllegalArgumentException("fileUrl not found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
-        }
+        } log.info("step3 Document 데이터에서 fileUrl 인덱스 0번 추출: {}", fileUrl);
 
-        log.info("Using file URL from MongoDB for chatRoomId: {}", chatRoomId);
-        // RecommendedModelFromLLM 추출 및 선택된 모델의 isSelected를 true로 설정
+
+        // step4 선택된 모델 추출 선택된 모델 isSelected없애기
         List<Map<String, Object>> recommendedModels = getRecommendedModels(chatRoomData, chatRoomId, requestId);
-        String selectedModelName = (String) selectedModel.get("model_choice");
-        updateModelSelection(recommendedModels, selectedModelName);
+        Map<String, Object> selectedModel = selectModelByIndex(recommendedModels, selectedModelIndex);
+        log.info("Step 4  IsSelected true로 변경, 인덱스로 selectedModel 추출 , 빈값 null로 삽입  selectedModel: {}", selectedModel);
+        log.info("Step 4 true 변경 반영 확인 recommendedModels: {}", recommendedModels);
 
         // 모델 상세 정보를 FastAPI로 전달
-        log.info("fileUrl: {}", fileUrl);
+        log.info("Step 5 FastAPI 전달");
         Map<String, Object> analysisResult = fastApiService.sendToFastApi(fileUrl, selectedModel);
         Map<String, Object> fastApiResult = (Map<String, Object>) analysisResult.get("result");
 
@@ -106,33 +105,6 @@ public class ModelDispatchService {
         return modelRecommendations;
     }
 
-    private void updateModelSelection(List<Map<String, Object>> recommendedModels, String selectedModelName) {
-        boolean modelFound = false;
-
-        // Normalize `selectedModelName` for comparison
-        selectedModelName = selectedModelName.toLowerCase().replace("_", " ").replace(" ", "");
-
-        for (Map<String, Object> model : recommendedModels) {
-            // Retrieve and normalize `model_choice` within `implementation_request` for comparison
-            Map<String, Object> implementationRequest = (Map<String, Object>) model.get("implementation_request");
-            String modelChoice = ((String) implementationRequest.get("model_choice")).toLowerCase().replace("_", " ").replace(" ", "");
-
-            log.info("Comparing model_choice: '{}' with implementation_request.model_choice: '{}'", selectedModelName, modelChoice);
-
-            if (selectedModelName.equals(modelChoice)) {
-                log.info("Match found for model_choice: {}", selectedModelName);
-                model.put("isSelected", true);
-                modelFound = true;
-                break;
-            }
-        }
-
-        if (!modelFound) {
-            log.error("Model with model_choice '{}' not found in RecommendedModelFromLLM.", selectedModelName);
-            throw new IllegalArgumentException("Model with model_choice " + selectedModelName + " not found in RecommendedModelFromLLM.");
-        }
-    }
-
     private Map<String, Object> getGptResponse(Map<String, Object> selectedModel, Map<String, Object> fastApiResult) {
         String systemPrompt = promptGenerator.createSystemPromptForResult(selectedModel);
         String userPrompt = promptGenerator.createUserPromptForResult(fastApiResult);
@@ -152,4 +124,31 @@ public class ModelDispatchService {
         mongoTemplate.upsert(query, update, "MongoDB");
         log.info("Saved analysis data with chatRoomId: {} in MongoDB", chatRoomId);
     }
+    private Map<String, Object> selectModelByIndex(List<Map<String, Object>> recommendedModels, int selectedModelIndex) {
+        if (selectedModelIndex < 0 || selectedModelIndex >= recommendedModels.size()) {
+            throw new IllegalArgumentException("Invalid selected model index: " + selectedModelIndex);
+        }
+
+        // 선택한 모델의 implementation_request 추출
+        Map<String, Object> selectedModel = (Map<String, Object>) recommendedModels.get(selectedModelIndex).get("implementation_request");
+
+
+        // 필수 키가 없으면 null로 추가
+        ensureKey(selectedModel, "model_choice");
+        ensureKey(selectedModel, "feature_columns");
+        ensureKey(selectedModel, "target_variable");
+        ensureKey(selectedModel, "id_column");
+
+        // 선택한 모델의 isSelected를 true로 설정
+        recommendedModels.get(selectedModelIndex).put("isSelected", true);
+
+        log.info("Selected model implementation_request: {}", selectedModel);
+        return selectedModel;
+    }
+    private void ensureKey(Map<String, Object> model, String key) {
+        if (!model.containsKey(key)) {
+            model.put(key, null);
+        }
+    }
 }
+

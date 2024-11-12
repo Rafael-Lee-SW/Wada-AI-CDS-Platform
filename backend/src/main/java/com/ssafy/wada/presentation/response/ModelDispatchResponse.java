@@ -13,7 +13,6 @@ public record ModelDispatchResponse(
         Map<String, Object> SelectedModelFromUser,
         Map<String, Object> ResultFromModel,
         Map<String, Object> ResultDescriptionFromLLM
-
     ) {
         return new ModelDispatchResponse(requestId,SelectedModelFromUser, ResultFromModel,ResultDescriptionFromLLM);
     }

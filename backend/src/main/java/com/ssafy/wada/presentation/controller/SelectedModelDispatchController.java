@@ -23,7 +23,7 @@ public class SelectedModelDispatchController {
     public ModelDispatchResponse analyzeModel(@RequestBody SelectedModelFromNextToSpringRequest request) {
         String chatRoomId = request.getChatRoomId();  // chatRoomId 추출
         int requestId = request.getRequestId();
-        Map<String, Object> selectedModel = request.getModelDetail();  // selectedModel 추출
+        int selectedModel = request.getSelectedModel();  // selectedModel 추출
 
         log.info("Received chatRoomId: {}", chatRoomId);
         log.info("Received requestId: {}", requestId);
