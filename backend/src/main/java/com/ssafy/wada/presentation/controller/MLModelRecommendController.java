@@ -32,6 +32,10 @@ public class MLModelRecommendController {
 		@RequestParam("files") List<MultipartFile> files,
 		@RequestParam("chatRoomId") String chatRoomId,
 		@RequestParam("requirement") String requirement) {
+		log.info("Request received with parameters:");
+		log.info("sessionId: {}", sessionId);
+		log.info("chatRoomId: {}", chatRoomId);
+		log.info("requirement: {}", requirement);
 		return ResponseEntity.ok(mlRecommendationService.recommend(sessionId, chatRoomId, requirement, files));
 	}
 

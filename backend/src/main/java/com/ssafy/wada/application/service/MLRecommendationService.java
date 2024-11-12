@@ -66,8 +66,8 @@ public class MLRecommendationService {
 
 
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, List<MultipartFile> files) {
-		log.info("Step 1: Start recommendation process");
 
+		log.info("Step 1: Start recommendation process");
 		// Lazy 로딩 방식으로 Guest 조회 및 생성
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));

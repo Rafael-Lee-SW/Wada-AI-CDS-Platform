@@ -28,6 +28,7 @@ public class ChatRecordService {
     private final GuestRepository guestRepository;
     private final MongoTemplate mongoTemplate;
 
+
     public List<ChatHistoryResponse> getAllChatHistory(String sessionId) {
         // Eager 로딩 방식으로 Guest와 ChatRooms를 함께 조회
         Guest guest = guestRepository.findWithChatRoomsById(sessionId)
