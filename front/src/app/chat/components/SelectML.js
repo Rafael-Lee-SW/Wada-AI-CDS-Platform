@@ -101,7 +101,6 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                         }}>
                             <div style={styles.flipCardFront}>
                                 <p style={styles.title1}>{model.analysis_name}</p>
-                                <p style={styles.reason}>{reason["예상되는 분석 결과"]}</p>
                             </div>
                             <div style={styles.flipCardBack}>
                                 {Object.entries(reason).map(([key, value]) => (

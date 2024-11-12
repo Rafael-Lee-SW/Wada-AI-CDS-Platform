@@ -22,6 +22,7 @@ export default function NewChat() {
     return (
         <div style={styles.contentContainer}>
             <div style={styles.messageBox}>
+                <img src="/img/chat.png" style={{ width: '50px', paddingBottom: '10px'}}/>
                 <span style={styles.message}>{displayText}</span>
             </div>
         </div>

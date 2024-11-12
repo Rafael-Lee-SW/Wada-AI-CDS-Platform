@@ -1,7 +1,8 @@
 // src/app/chat/components/analyzeReport/RandomForestClassifierVisualization.js
 
 import React, { useState, useEffect } from "react";
-import Plot from "react-plotly.js";
+import dynamic from "next/dynamic";
+
 import {
   Slider,
   Typography,
@@ -36,7 +37,7 @@ const useStyles = makeStyles({
     fontSize: "14px",
   },
 });
-
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 function ClassifierVisualization({ result, explanation }) {
   const classes = useStyles();
 
