@@ -1,4 +1,4 @@
-// src/app/chat/components/analyzeReport/ClassifierVisualization.js
+// src/app/chat/components/analyzeReport/RandomForestVisualization.js
 
 import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
@@ -9,13 +9,10 @@ import {
   CardContent,
   Box,
   Container,
-  IconButton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 // Define styles using Material-UI's makeStyles
 const useStyles = makeStyles({
@@ -41,64 +38,31 @@ const useStyles = makeStyles({
   },
 });
 
-function ClassifierVisualization({ result, explanation }) {
+function RegressorVisualization({ result, explanation }) {
   const classes = useStyles();
 
-  // Extract necessary data from props
+  // Destructure explanation with default values
   const {
-    overview,
-    key_findings,
-    recommendations,
-    visualizations,
-    report_title,
-    "x-axis_title": xAxisTitle,
-    "x-axis_description": xAxisDescription,
-    "y-axis_title": yAxisTitle,
-    "y-axis_description": yAxisDescription,
+    overview = {},
+    key_findings = [],
+    recommendations = {},
+    visualizations = [],
+    report_title = "Regression Model Analysis Report",
+    "x-axis_title": xAxisTitle = "",
+    "x-axis_description": xAxisDescription = "",
+    "y-axis_title": yAxisTitle = "",
+    "y-axis_description": yAxisDescription = "",
   } = explanation;
-
-  // State for threshold slider
-  const [threshold, setThreshold] = useState(0.5);
-
-  // State for showing/hiding the inset plot
-  const [showInset, setShowInset] = useState(true);
-
-  // State for conditional styling in the predictions table
-  const [tableStyles, setTableStyles] = useState([]);
-
-  // Generate conditional styles based on classification results
-  useEffect(() => {
-    setTableStyles([
-      {
-        if: {
-          filter_query: "{Predicted} = 1",
-          column_id: "Predicted",
-        },
-        backgroundColor: "#FFCCCC",
-        color: "black",
-      },
-      {
-        if: {
-          filter_query: "{Predicted} = 0",
-          column_id: "Predicted",
-        },
-        backgroundColor: "#CCCCFF",
-        color: "black",
-      },
-    ]);
-  }, []);
-
-  // Handle threshold slider change
-  const handleThresholdChange = (event, value) => {
-    setThreshold(value);
-  };
 
   // Render Feature Importances Bar Chart
   const renderFeatureImportances = () => {
-    const featureImportances = result.graph1.feature_importances;
-    const featureNames = result.graph1.feature_names;
+    const featureImportances = result.graph1?.feature_importances;
+    const featureNames = result.graph1?.feature_names;
 
-    if (!featureImportances || !featureNames) return null;
+    if (!Array.isArray(featureImportances) || !Array.isArray(featureNames)) {
+      console.error("Invalid feature importances data:", featureImportances, featureNames);
+      return null;
+    }
 
     const df_importances = featureNames.map((feature, index) => ({
       Feature: feature,
@@ -114,8 +78,8 @@ function ClassifierVisualization({ result, explanation }) {
           data={[
             {
               type: "bar",
-              x: df_importances.Importance,
-              y: df_importances.Feature,
+              x: df_importances.map((item) => item.Importance),
+              y: df_importances.map((item) => item.Feature),
               orientation: "h",
               marker: {
                 color: "rgba(55,128,191,0.7)",
@@ -155,34 +119,36 @@ function ClassifierVisualization({ result, explanation }) {
     );
   };
 
-  // Render Classification Metrics Table
-  const renderClassificationMetrics = () => {
-    const { classification_report } = result.graph3;
+  // Render Regression Metrics Table
+  const renderRegressionMetrics = () => {
+    const mse = result.mse;
+    const r2 = result.r2;
 
-    if (!classification_report) return null;
+    if (typeof mse !== "number" || typeof r2 !== "number") {
+      console.error("Invalid regression metrics:", mse, r2);
+      return null;
+    }
 
-    const metrics = Object.keys(classification_report)
-      .filter((key) => !["accuracy", "macro avg", "weighted avg"].includes(key))
-      .map((key) => ({
-        Class: key,
-        Precision: classification_report[key].precision.toFixed(3),
-        Recall: classification_report[key].recall.toFixed(3),
-        "F1-Score": classification_report[key]["f1-score"].toFixed(3),
-        Support: classification_report[key].support,
-      }));
+    const metrics = [
+      {
+        Metric: "Mean Squared Error (MSE)",
+        Value: mse.toFixed(4),
+      },
+      {
+        Metric: "R² Score",
+        Value: r2.toFixed(4),
+      },
+    ];
 
     const columns = [
-      { field: "Class", headerName: "Class", flex: 1 },
-      { field: "Precision", headerName: "Precision", flex: 1 },
-      { field: "Recall", headerName: "Recall", flex: 1 },
-      { field: "F1-Score", headerName: "F1-Score", flex: 1 },
-      { field: "Support", headerName: "Support", flex: 1 },
+      { field: "Metric", headerName: "Metric", flex: 1 },
+      { field: "Value", headerName: "Value", flex: 1 },
     ];
 
     return (
       <div className={classes.plotContainer}>
         <Typography variant="h6" gutterBottom>
-          Classification Metrics
+          Regression Metrics
         </Typography>
         <DataGrid
           rows={metrics.map((m, index) => ({ id: index, ...m }))}
@@ -194,160 +160,145 @@ function ClassifierVisualization({ result, explanation }) {
           hideFooter
         />
         <Typography variant="body1" gutterBottom>
-          <strong>Accuracy:</strong> {result.accuracy.toFixed(3)}
+          <strong>R² Score:</strong> {r2.toFixed(4)}
         </Typography>
       </div>
     );
   };
 
-  // Render Confusion Matrix Heatmap
-  const renderConfusionMatrix = () => {
-    const { confusion_matrix, labels } = result.graph4;
+  // Render Actual vs. Predicted Scatter Plot
+  const renderActualVsPredictedScatter = () => {
+    const { y_test, y_pred, identifier } = result.graph2;
 
-    if (!confusion_matrix || !labels) return null;
+    if (
+      !Array.isArray(y_test) ||
+      !Array.isArray(y_pred) ||
+      !Array.isArray(identifier)
+    ) {
+      console.error("Invalid or missing data in graph2:", result.graph2);
+      return null;
+    }
 
-    const df_confusion = confusion_matrix.map((row, index) => ({
-      Actual: labels[index],
-      Predicted_0: row[0],
-      Predicted_1: row[1],
-    }));
-
-    return (
-      <div className={classes.plotContainer}>
-        <Plot
-          data={[
-            {
-              z: confusion_matrix,
-              x: labels,
-              y: labels,
-              type: "heatmap",
-              colorscale: "Blues",
-              hoverongaps: false,
-              text: confusion_matrix.map((row) => row.join(", ")),
-              texttemplate: "%{text}",
-              textfont: {
-                color: "white",
-              },
-            },
-          ]}
-          layout={{
-            title: "Confusion Matrix",
-            xaxis: {
-              title: "Predicted",
-              automargin: true,
-            },
-            yaxis: {
-              title: "Actual",
-              automargin: true,
-            },
-            height: 600,
-            template: "plotly_white",
-          }}
-          config={{ responsive: true }}
-        />
-      </div>
-    );
-  };
-
-  // Render Classification Probabilities Scatter Plot
-  const renderClassificationProbabilities = () => {
-    const { y_proba, identifier, y_test, y_pred } = result.graph2;
-
-    if (!y_proba || !identifier || !y_test || !y_pred) return null;
-
-    // Calculate probabilities for class '1'
-    const probabilities = y_proba.map((prob) => prob[1]);
-
-    // Create DataFrame
-    const df_prob = identifier.map((id, index) => ({
+    const df_scatter = identifier.map((id, index) => ({
       Identifier: id,
-      Probability_Class_1: probabilities[index],
       Actual: y_test[index],
       Predicted: y_pred[index],
+      Residual: y_test[index] - y_pred[index],
     }));
-
-    // Sort by probability
-    df_prob.sort((a, b) => b.Probability_Class_1 - a.Probability_Class_1);
-
-    // Assign colors based on classification
-    const color_map = {
-      "Class 1": "red",
-      "Class 0": "blue",
-    };
 
     return (
       <div className={classes.plotContainer}>
-        <Typography variant="h6" gutterBottom>
-          Classification Probabilities per Member
-        </Typography>
         <Plot
           data={[
             {
               type: "scatter",
               mode: "markers",
-              x: df_prob.Identifier,
-              y: df_prob.Probability_Class_1,
-              text: df_prob.Identifier.map(
-                (id, i) =>
-                  `ID: ${id}<br>Probability Class 1: ${df_prob.Probability_Class_1[i].toFixed(
+              x: df_scatter.map((item) => item.Actual),
+              y: df_scatter.map((item) => item.Predicted),
+              text: df_scatter.map(
+                (item) =>
+                  `ID: ${item.Identifier}<br>Residual: ${item.Residual.toFixed(
                     2
-                  )}<br>Classification: ${
-                    df_prob.Probability_Class_1[i] >= threshold
-                      ? "Class 1"
-                      : "Class 0"
-                  }`
+                  )}`
               ),
-              marker: {
-                color: df_prob.Probability_Class_1.map((prob) =>
-                  prob >= threshold ? "red" : "blue"
-                ),
-                size: 8,
-                opacity: 0.6,
-              },
+              marker: { color: "blue", size: 8, opacity: 0.6 },
               hovertemplate:
-                "%{text}<extra></extra>",
+                "%{text}<br>Actual: %{x}<br>Predicted: %{y}<extra></extra>",
             },
             {
               type: "scatter",
               mode: "lines",
-              x: [Math.min(...identifier), Math.max(...identifier)],
-              y: [threshold, threshold],
-              name: `Threshold = ${threshold}`,
-              line: { color: "black", dash: "dash" },
+              x: [
+                Math.min(...y_test, ...y_pred),
+                Math.max(...y_test, ...y_pred),
+              ],
+              y: [
+                Math.min(...y_test, ...y_pred),
+                Math.max(...y_test, ...y_pred),
+              ],
+              name: "Perfect Prediction",
+              line: { color: "red", dash: "dash" },
             },
           ]}
           layout={{
-            title: visualizations[1]?.title || "Classification Probabilities",
+            title: visualizations[1]?.title || "Actual vs. Predicted Values",
             xaxis: {
-              title: "Member Identifier",
+              title: "Actual Values",
               automargin: true,
             },
             yaxis: {
-              title: "Probability of Class 1",
+              title: "Predicted Values",
               automargin: true,
-              range: [0, 1],
             },
             height: 600,
             template: "plotly_white",
           }}
           config={{ responsive: true }}
         />
-        {/* Threshold Slider */}
-        <Box mt={2}>
-          <Typography id="threshold-slider" gutterBottom>
-            Set Classification Threshold: {threshold}
-          </Typography>
-          <Slider
-            value={threshold}
-            onChange={handleThresholdChange}
-            aria-labelledby="threshold-slider"
-            valueLabelDisplay="auto"
-            step={0.01}
-            marks
-            min={0}
-            max={1}
-          />
-        </Box>
+      </div>
+    );
+  };
+
+  // Render Residuals Scatter Plot
+  const renderResidualsPlot = () => {
+    const { y_test, y_pred, identifier } = result.graph2;
+
+    if (
+      !Array.isArray(y_test) ||
+      !Array.isArray(y_pred) ||
+      !Array.isArray(identifier)
+    ) {
+      console.error("Invalid or missing data in graph2:", result.graph2);
+      return null;
+    }
+
+    const residuals = y_test.map((actual, index) => actual - y_pred[index]);
+
+    const df_residual = identifier.map((id, index) => ({
+      Identifier: id,
+      Residual: residuals[index],
+    }));
+
+    return (
+      <div className={classes.plotContainer}>
+        <Plot
+          data={[
+            {
+              type: "scatter",
+              mode: "markers",
+              x: df_residual.map((item) => item.Identifier),
+              y: df_residual.map((item) => item.Residual),
+              text: df_residual.map(
+                (item) =>
+                  `ID: ${item.Identifier}<br>Residual: ${item.Residual.toFixed(2)}`
+              ),
+              marker: { color: "green", size: 8, opacity: 0.6 },
+              hovertemplate: "ID: %{x}<br>Residual: %{y}<extra></extra>",
+            },
+            {
+              type: "scatter",
+              mode: "lines",
+              x: [Math.min(...identifier), Math.max(...identifier)],
+              y: [0, 0],
+              name: "Zero Residual",
+              line: { color: "red", dash: "dash" },
+            },
+          ]}
+          layout={{
+            title: "Residuals of Predictions",
+            xaxis: {
+              title: "Member Identifier",
+              automargin: true,
+            },
+            yaxis: {
+              title: "Residual (Actual - Predicted)",
+              automargin: true,
+            },
+            height: 600,
+            template: "plotly_white",
+          }}
+          config={{ responsive: true }}
+        />
       </div>
     );
   };
@@ -356,19 +307,28 @@ function ClassifierVisualization({ result, explanation }) {
   const renderPredictionsTable = () => {
     const { y_test, y_pred, identifier } = result.graph2;
 
-    if (!y_test || !y_pred || !identifier) return null;
+    if (
+      !Array.isArray(y_test) ||
+      !Array.isArray(y_pred) ||
+      !Array.isArray(identifier)
+    ) {
+      console.error("Invalid or missing data in graph2:", result.graph2);
+      return null;
+    }
 
     const data_table = identifier.map((id, index) => ({
       id: index,
       Identifier: id,
       Actual: y_test[index],
       Predicted: y_pred[index],
+      Residual: (y_test[index] - y_pred[index]).toFixed(2),
     }));
 
     const columns = [
       { field: "Identifier", headerName: "Identifier", flex: 1 },
       { field: "Actual", headerName: "Actual", flex: 1 },
       { field: "Predicted", headerName: "Predicted", flex: 1 },
+      { field: "Residual", headerName: "Residual", flex: 1 },
     ];
 
     return (
@@ -385,19 +345,20 @@ function ClassifierVisualization({ result, explanation }) {
           disableSelectionOnClick
           className={classes.dataGrid}
           style={{ height: 500, width: "100%" }}
-          styleDataConditional={tableStyles}
           getRowClassName={(params) => {
-            return params.row.Predicted === 1 ? "predicted-class1" : "predicted-class0";
+            if (params.row.Residual > 1.0) return "overestimation";
+            if (params.row.Residual < -1.0) return "underestimation";
+            return "";
           }}
         />
         {/* Apply conditional styles */}
         <style>
           {`
-            .predicted-class1 {
+            .overestimation {
               background-color: #FFCCCC;
               color: black;
             }
-            .predicted-class0 {
+            .underestimation {
               background-color: #CCCCFF;
               color: black;
             }
@@ -413,7 +374,7 @@ function ClassifierVisualization({ result, explanation }) {
       {/* Report Title */}
       <Box my={4}>
         <Typography variant="h3" align="center" gutterBottom>
-          {report_title || "Classification Model Analysis Report"}
+          {report_title || "Regression Model Analysis Report"}
         </Typography>
       </Box>
 
@@ -429,21 +390,21 @@ function ClassifierVisualization({ result, explanation }) {
           {overview.data_description}
         </Typography>
         <Typography variant="body1" gutterBottom>
-          {overview.models_used.model_description}
+          {overview.models_used?.model_description}
         </Typography>
       </Box>
 
       {/* Feature Importances */}
       {visualizations.length > 0 && renderFeatureImportances()}
 
-      {/* Classification Metrics */}
-      {visualizations.length > 0 && renderClassificationMetrics()}
+      {/* Regression Metrics */}
+      {visualizations.length > 0 && renderRegressionMetrics()}
 
-      {/* Confusion Matrix */}
-      {visualizations.length > 0 && renderConfusionMatrix()}
+      {/* Actual vs Predicted Scatter Plot */}
+      {visualizations.length > 0 && renderActualVsPredictedScatter()}
 
-      {/* Classification Probabilities */}
-      {visualizations.length > 0 && renderClassificationProbabilities()}
+      {/* Residuals Plot */}
+      {visualizations.length > 0 && renderResidualsPlot()}
 
       {/* Predictions Overview Table */}
       {visualizations.length > 0 && renderPredictionsTable()}
@@ -475,46 +436,49 @@ function ClassifierVisualization({ result, explanation }) {
         <Typography variant="h5" gutterBottom>
           Recommendations
         </Typography>
-        {recommendations.immediate_actions && recommendations.immediate_actions.length > 0 && (
-          <>
-            <Typography variant="h6" gutterBottom>
-              Immediate Actions
-            </Typography>
-            <ul>
-              {recommendations.immediate_actions.map((action, index) => (
-                <li key={index}>
-                  <Typography variant="body1">{action}</Typography>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-        {recommendations.further_analysis && recommendations.further_analysis.length > 0 && (
-          <>
-            <Typography variant="h6" gutterBottom>
-              Further Analysis
-            </Typography>
-            <ul>
-              {recommendations.further_analysis.map((action, index) => (
-                <li key={index}>
-                  <Typography variant="body1">{action}</Typography>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        {recommendations.immediate_actions &&
+          recommendations.immediate_actions.length > 0 && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Immediate Actions
+              </Typography>
+              <ul>
+                {recommendations.immediate_actions.map((action, index) => (
+                  <li key={index}>
+                    <Typography variant="body1">{action}</Typography>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        {recommendations.further_analysis &&
+          recommendations.further_analysis.length > 0 && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Further Analysis
+              </Typography>
+              <ul>
+                {recommendations.further_analysis.map((action, index) => (
+                  <li key={index}>
+                    <Typography variant="body1">{action}</Typography>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
       </Box>
     </Container>
   );
 }
 
 // Define prop types for type checking
-ClassifierVisualization.propTypes = {
+RegressorVisualization.propTypes = {
   result: PropTypes.shape({
     model: PropTypes.string.isRequired,
     n_estimators: PropTypes.number,
     max_depth: PropTypes.string,
-    accuracy: PropTypes.number.isRequired,
+    mse: PropTypes.number.isRequired,
+    r2: PropTypes.number.isRequired,
     graph1: PropTypes.shape({
       graph_type: PropTypes.string.isRequired,
       feature_importances: PropTypes.arrayOf(PropTypes.number).isRequired,
@@ -524,17 +488,7 @@ ClassifierVisualization.propTypes = {
       graph_type: PropTypes.string.isRequired,
       y_test: PropTypes.arrayOf(PropTypes.number).isRequired,
       y_pred: PropTypes.arrayOf(PropTypes.number).isRequired,
-      y_proba: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
       identifier: PropTypes.arrayOf(PropTypes.number).isRequired,
-    }).isRequired,
-    graph3: PropTypes.shape({
-      graph_type: PropTypes.string.isRequired,
-      classification_report: PropTypes.object.isRequired,
-    }).isRequired,
-    graph4: PropTypes.shape({
-      graph_type: PropTypes.string.isRequired,
-      confusion_matrix: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-      labels: PropTypes.arrayOf(PropTypes.string).isRequired,
     }).isRequired,
   }).isRequired,
   explanation: PropTypes.shape({
@@ -573,4 +527,4 @@ ClassifierVisualization.propTypes = {
   }).isRequired,
 };
 
-export default ClassifierVisualization;
+export default RegressorVisualization;
