@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
+// Dynamically import of 보고서 형식들
 const KMeansVisualization = dynamic(
   () => import("../chat/components/analyzeReport/KMeansVisualization.js"),
   { ssr: false, loading: () => <p>Loading visualization...</p> }
@@ -18,16 +19,15 @@ const LogisticRegressionVisualization = dynamic(
   { ssr: false, loading: () => <p>Loading visualization...</p> }
 );
 
-// Dynamically import the visualization components
 const ClassifierVisualization = dynamic(
-  () => import("../chat/components/analyzeReport/ClassifierVisualization.js"),
+  () => import("../chat/components/analyzeReport/RandomForestClassifierVisualization.js"),
   { ssr: false, loading: () => <p>Loading regression visualization...</p> }
-);
+); // test Case 2
 
-const RandomForestVisualization = dynamic(
-  () => import("../chat/components/analyzeReport/RandomForestVisualization.js"),
+const RegressionVisualization = dynamic(
+  () => import("../chat/components/analyzeReport/RandomForestRegressionVisualization.js"),
   { ssr: false, loading: () => <p>Loading classification visualization...</p> }
-);
+); // test Case 1
 
 export default function Test() {
   const [jsonResult, setJsonResult] = useState(null);
@@ -47,8 +47,12 @@ export default function Test() {
           // fetch("/json/test_5_explanation.json"),
           // fetch("/json/test_4.json"),
           // fetch("/json/test_4_explanation.json"),
-          fetch("/json/test_3.json"),
-          fetch("/json/test_3_explanation.json"),
+          // fetch("/json/test_3.json"),
+          // fetch("/json/test_3_explanation.json"),
+          // fetch("/json/test_2.json"), // Classification
+          // fetch("/json/test_2_explanation.json"),
+          fetch("/json/test_1.json"), // Regression
+          fetch("/json/test_1_explanation.json"),
         ]);
 
         if (!resultResponse.ok || !explanationResponse.ok) {
@@ -93,7 +97,7 @@ export default function Test() {
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-        <RandomForestVisualization
+        <RegressionVisualization
           result={jsonResult.result}
           explanation={jsonExplanation.result}
         />
