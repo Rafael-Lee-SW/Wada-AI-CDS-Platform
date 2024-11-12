@@ -240,36 +240,47 @@ public class MLRecommendationService {
 	}
 
 	public Object mlRecommendationExceptChosenService(String chatRoomId, int requestId) {
-		log.info("Fetching data for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+		log.info("Step 1: Start fetching data for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
+		// Step 2: MongoDB에서 chatRoomId와 requestId로 데이터 조회
 		Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
 		Document document = mongoTemplate.findOne(query, Document.class, "MongoDB");
 
 		if (document == null) {
-			log.error("Data not found for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+			log.error("Step 2: Data not found for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
+		log.info("Step 2: Data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
-		// RecommendedModelFromLLM 필드가 있는지 확인하고, 가져온 데이터가 Document 형식인지 확인
+		// Step 3: RecommendedModelFromLLM 필드가 있는지 확인하고 형식 검증
 		Object recommendedModelFromLLMObj = document.get("RecommendedModelFromLLM");
-		if (!(recommendedModelFromLLMObj instanceof Document)) {
-			log.error("RecommendedModelFromLLM field is missing or invalid in MongoDB data for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+		if (!(recommendedModelFromLLMObj instanceof List)) {
+			log.error("Step 3: RecommendedModelFromLLM field is missing or invalid in MongoDB data for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
+		log.info("Step 3: RecommendedModelFromLLM field is valid for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
-		Document recommendedModelFromLLM = (Document) recommendedModelFromLLMObj;
+		List<Document> recommendedModelFromLLM = (List<Document>) recommendedModelFromLLMObj;
+
+		// Step 4: model_recommendations 필드 가져오기
 		List<Map<String, Object>> modelRecommendations;
-
 		try {
-			modelRecommendations = (List<Map<String, Object>>) recommendedModelFromLLM.get("model_recommendations");
+			modelRecommendations = recommendedModelFromLLM.stream()
+				.map(model -> (Map<String, Object>) model)  // 모델 객체를 Map으로 변환
+				.collect(Collectors.toList());
+			log.info("Step 4: model_recommendations retrieved successfully for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 		} catch (ClassCastException e) {
-			log.error("model_recommendations is not in expected format in RecommendedModelFromLLM for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+			log.error("Step 4: model_recommendations is not in expected format in RecommendedModelFromLLM for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
 
-		// isSelected가 true인 항목 제외 후 반환
-		return modelRecommendations.stream()
+		// Step 5: isSelected가 true인 항목을 제외한 결과 반환
+		List<Map<String, Object>> filteredRecommendations = modelRecommendations.stream()
 			.filter(model -> !(Boolean.TRUE.equals(model.get("isSelected"))))
 			.collect(Collectors.toList());
+
+		log.info("Step 5: Returning filtered model recommendations for chatRoomId: {}, requestId: {}. Total recommendations: {}", chatRoomId, requestId, filteredRecommendations.size());
+
+		return filteredRecommendations;
 	}
 }

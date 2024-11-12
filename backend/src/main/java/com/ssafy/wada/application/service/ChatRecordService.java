@@ -3,6 +3,7 @@ package com.ssafy.wada.application.service;
 import com.ssafy.wada.application.domain.Guest;
 import com.ssafy.wada.application.repository.GuestRepository;
 import com.ssafy.wada.presentation.response.ChatHistoryDetailResponse;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class ChatRecordService {
             }
         }).collect(Collectors.toList());
     }
-
+    @Transactional
     public List<ChatHistoryDetailResponse> getChatHistoryDetail(String sessionId,
         String chatRoomId) {
         log.info("Step 1: Fetching Guest with sessionId: {} to validate access to chatRoomId: {}",

@@ -41,12 +41,13 @@ public class MLModelRecommendController {
 
 	@GetMapping(produces = "application/json")
 	public ResponseEntity<Object> getMLModelRecommend(
+		@SessionId String sessionId,
 		@RequestBody Map<String, Object> payload
 	) {
 		String chatRoomId = (String) payload.get("chatRoomId");
 		int requestId = (int) payload.get("requestId");
 
-		log.info("Received request for model recommendation with chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+		log.info("Received request for model recommendation with chatRoomId: {} and requestId: {} and sessionId: {}", chatRoomId, requestId,sessionId);
 		return ResponseEntity.ok(mlRecommendationService.mlRecommendationExceptChosenService(chatRoomId, requestId));
 	}
 }
