@@ -29,15 +29,12 @@ public class ChatRecordService {
     private final MongoTemplate mongoTemplate;
 
     public List<ChatHistoryResponse> getAllChatHistory(String sessionId) {
-        // Step 1: RDBMS에서 sessionId를 통해 Guest 조회 및 ChatRoom 목록 가져오기
-        log.info("Step 1: Fetching Guest with sessionId: {}", sessionId);
-        Guest guest = guestRepository.findById(sessionId)
-            .orElseThrow(
-                () -> new IllegalArgumentException("No guest found for sessionId: " + sessionId));
+        // Eager 로딩 방식으로 Guest와 ChatRooms를 함께 조회
+        Guest guest = guestRepository.findWithChatRoomsById(sessionId)
+            .orElseThrow(() -> new IllegalArgumentException("No guest found for sessionId: " + sessionId));
 
-        // Step 2: 각 ChatRoom의 chatRoomId를 통해 MongoDB에서 요약 정보 조회
-        log.info("Step 2: Fetching chat history for each ChatRoom associated with sessionId: {}",
-            sessionId);
+        log.info("Step 2: Fetching chat history for each ChatRoom associated with sessionId: {}", sessionId);
+
         return guest.getChatRooms().stream().flatMap(chatRoom -> {
             String chatRoomId = chatRoom.getId();
             log.info("Processing ChatRoom with chatRoomId: {}", chatRoomId);
