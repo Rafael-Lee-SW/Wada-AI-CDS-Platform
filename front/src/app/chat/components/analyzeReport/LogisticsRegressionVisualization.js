@@ -41,8 +41,8 @@ function LogisticRegressionVisualization({ result, explanation }) {
   } = explanation || {};
 
   // Extract report titles and descriptions
-  console.log(LogisticRegression_Case.report_title)
-  const reportTitle =
+  // console.log(LogisticRegression_Case.report_title)
+  const reportTitle = 
   LogisticRegression_Case?.report_title || "AI 모델 분석 보고서";
   const classesInfo = LogisticRegression_Case?.classes || {};
   const boundaryLines = LogisticRegression_Case?.boundary_lines || {};

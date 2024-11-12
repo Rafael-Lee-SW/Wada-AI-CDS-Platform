@@ -1,15 +1,9 @@
 import { useState } from "react";
 import styles from "/styles/chatContentStyle";
-import LogisticRegressionVisualization from "./analyzeReport/LogisticsRegressionVisualization";
-import ClassifierVisualization from "./analyzeReport/RandomForestClassifierVisualization";
-import RegressorVisualization from "./analyzeReport/RandomForestRegressionVisualization";
-import KMeansVisualization from "./analyzeReport/KMeansVisualization";
+import Report from "@/app/report/page";
 
 export default function ChatContent({ file, message, result }) {
     const [showResult, setShowResult] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    const model = result.ResultFromModel.model;
 
     const handleDownload = () => {
         const url = URL.createObjectURL(file);
@@ -33,7 +27,6 @@ export default function ChatContent({ file, message, result }) {
 
     return (
         <div style={styles.chatContainer}>
-            {/* 왼쪽 채팅창 */}
             <div style={showResult ? styles.leftSection : styles.fullScreenChat}>
                 <div style={styles.chatWindow}>
                     {file.map((fileItem, index) => (
@@ -57,10 +50,7 @@ export default function ChatContent({ file, message, result }) {
                 <div style={styles.rightSection}>
                     <button onClick={handleCloseDashBoard} style={styles.closeButton}>X</button>
                     <div style={styles.resultContent}>
-                        {model === 'LogisticRegressionBinary' && <LogisticRegressionVisualization result={result}/>}
-                        {model === 'RandomForestClassifier' && <ClassifierVisualization result={result}/> }
-                        {model === 'RandomForestRegression' && <RegressorVisualization result={result}/> }
-                        {model === 'KmeansClusteringSegmentation' && <KMeansVisualization result={result}/>}
+                        <Report result={result}/>
                     </div>
                 </div>
             )}
