@@ -35,7 +35,7 @@ const RegressionVisualization = dynamic(
   { ssr: false, loading: () => <p>Loading classification visualization...</p> }
 ); // test Case 1
 
-export default function Test({ result }) {
+export default function Report({ result }) {
 
 
   const [jsonResult, setJsonResult] = useState(null);

@@ -74,48 +74,48 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
 
             {/* 모델 선택 화면 */}
             {showModelSelection && (
-    <div style={styles.modelSelectContainer}>
-        <div style={styles.iconContainer}>
-            <img 
-                src="/img/cursor.gif" 
-                alt="icon"
-                style={styles.icon} 
-            />
-            <p style={styles.iconText}>모델을 선택해주세요.</p>
-        </div>
-        <div style={styles.cardContainer}>
-            {models.map((model, index) => {
-                const reason = model.selection_reasoning;
+            <div style={styles.modelSelectContainer}>
+                <div style={styles.iconContainer}>
+                    <img 
+                        src="/img/cursor.gif" 
+                        alt="icon"
+                        style={styles.icon} 
+                    />
+                    <p style={styles.iconText}>모델을 선택해주세요.</p>
+                </div>
+                <div style={styles.cardContainer}>
+                    {models.map((model, index) => {
+                        const reason = model.selection_reasoning;
 
-                return (
-                    <div 
-                        key={index} 
-                        style={styles.flipCard}
-                        onMouseEnter={() => setHoveredIndex(index)}
-                        onMouseLeave={() => setHoveredIndex(null)}
-                        onClick={() => handleModelClick(chatRoomId, requestId, index)}
-                    >
-                        <div style={{
-                            ...styles.flipCardInner,
-                            transform: hoveredIndex === index ? 'rotateY(180deg)' : 'none',
-                        }}>
-                            <div style={styles.flipCardFront}>
-                                <p style={styles.title1}>{model.analysis_name}</p>
-                            </div>
-                            <div style={styles.flipCardBack}>
-                                {Object.entries(reason).map(([key, value]) => (
-                                    <div key={key}>
-                                        <p style={styles.title}><strong>{key}</strong></p>
-                                        <p style={styles.reason}>{value}</p>
+                        return (
+                            <div 
+                                key={index} 
+                                style={styles.flipCard}
+                                onMouseEnter={() => setHoveredIndex(index)}
+                                onMouseLeave={() => setHoveredIndex(null)}
+                                onClick={() => handleModelClick(chatRoomId, requestId, index)}
+                            >
+                                <div style={{
+                                    ...styles.flipCardInner,
+                                    transform: hoveredIndex === index ? 'rotateY(180deg)' : 'none',
+                                }}>
+                                    <div style={styles.flipCardFront}>
+                                        <p style={styles.title1}>{model.analysis_name}</p>
                                     </div>
-                                ))}
+                                    <div style={styles.flipCardBack}>
+                                        {Object.entries(reason).map(([key, value]) => (
+                                            <div key={key}>
+                                                <p style={styles.title}><strong>{key}</strong></p>
+                                                <p style={styles.reason}>{value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    </div>
+                        );
+                    })}
+                </div>
+            </div>
 )}
 
         </div>

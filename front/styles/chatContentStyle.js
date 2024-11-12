@@ -3,7 +3,7 @@ const styles = {
         display: "flex",
         flex: 1,
         width: "100%",
-        height: "100%",
+        height: "100vh",
         justifyContent: 'center',
         transition: 'transform 0.5s ease'
     },
@@ -12,7 +12,7 @@ const styles = {
         transition: "width 0.5s ease", 
         transformOrigin: "left",        
         transform: "scaleX(1)",
-        height: '100%',
+        height: '100vh',
         overflowY: "hidden",
     },
     leftSection: {
@@ -23,8 +23,8 @@ const styles = {
     },
     rightSection: {
         overflow: 'hidden',
-        marginTop: '50px',
-        width: "60%",            
+        width: "60%", 
+        height: '100vh',          
         transition: "width 0.5s ease",
         position: "relative",
     },
@@ -33,7 +33,7 @@ const styles = {
         padding: "50px",
         backgroundColor: "white",
         width: '100%',
-        height: '100%',
+        height: '100vh',
         marginTop: '50px',
     },
     img: {
@@ -100,12 +100,8 @@ const styles = {
         width: '100%',
         textAlign: "center",
         overflowY: 'auto',
-        maxHeight: '500px',
+        maxHeight: '100vh',
         scrollbarWidth: 'none', 
-        '&::-webkit-scrollbar': {
-            display: 'none', 
-        },
-        paddingBottom: '10px'
     },
 }
 
