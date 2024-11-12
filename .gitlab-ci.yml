@@ -14,6 +14,8 @@ build:
   - scp -i $SSH_KEY_PATH -r ml-ray-fastapi-platform ec2-user@$EC2_IP:/home/ec2-user/
   - ssh -i $SSH_KEY_PATH ec2-user@$EC2_IP "
         sh /home/ec2-user/ml.sh
-      "  
+      "
+  only:
+    - /.*\/master$/  
   tags:
     - build
