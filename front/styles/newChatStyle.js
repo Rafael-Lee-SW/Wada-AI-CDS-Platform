@@ -23,7 +23,8 @@ const styles = {
         opacity: '0.7'
     },
     message: {
-        fontSize: '16px',
+        fontSize: '21px',
+        fontWeight: 'bold'
     },
 }
 

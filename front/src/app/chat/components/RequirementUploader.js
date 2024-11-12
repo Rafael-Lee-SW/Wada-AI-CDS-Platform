@@ -5,6 +5,7 @@ export default function RequirementUploader({ onSubmitRequirement, onSubmit }) {
     
     const [requirement, setRequirement] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
 
     const handleMessageChange = (event) => {
         setRequirement(event.target.value);
@@ -12,7 +13,9 @@ export default function RequirementUploader({ onSubmitRequirement, onSubmit }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault(); 
+        
         if (requirement.trim() === '') {
+            setError("분석을 원하는 내용을 입력해주세요.")
             return; 
         }
         
@@ -29,6 +32,9 @@ export default function RequirementUploader({ onSubmitRequirement, onSubmit }) {
 
     return (
         <div style={styles.container}>
+            {error && (
+                    <div style={styles.error}>{error}</div>
+                )}
             <div style={styles.inputContainer}>
                 <input
                     type="text"

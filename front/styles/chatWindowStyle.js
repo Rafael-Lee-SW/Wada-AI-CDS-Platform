@@ -5,29 +5,31 @@ const styles = {
         backgroundColor: 'white',
     },
     sidebar: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         width: '180px',
         backgroundColor: '#fdfaff',
         padding: '5px 10px',
         borderRight: '1px solid #d3d3d3',
         zIndex: '2'
     },
-    userInfo: {
+    info: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '20px',
+        paddingRight: '15px'
     },
     avatar: {
         display: 'flex',
         alignItems: 'center',
         paddingRight: '20px'
     },
-    profile: {
-        width: '30px',
-        margin: '10px'
+    icon: {
+        width: '50px',
     },
     menu: {
-        marginTop: '20px',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column'
     },
@@ -75,10 +77,9 @@ const styles = {
         borderBottom: '1px solid #d3d3d3'
     },
     headerMessage: {
-        paddingLeft: '200px',
         fontSize: '16px',
         color: '#545454',
-        cursor: 'pointer'
+        cursor: 'pointer',
     },
     contentContainer: {
         display: 'flex',

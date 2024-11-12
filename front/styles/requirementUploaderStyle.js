@@ -5,6 +5,7 @@ const styles = {
         display: 'flex',
         flex: 1,
         justifyContent: 'center',
+        flexDirection: 'column',
         alignItems: 'center', 
         backgroundColor: 'white' 
     },
@@ -16,6 +17,11 @@ const styles = {
         borderRadius: '10px',
         width: '50%',
         maxWidth: '600px'
+    },
+    error: {
+        marginBottom: '5px',
+        fontSize: '14px',
+        color: 'red'
     },
     input: {
         flex: 1,
