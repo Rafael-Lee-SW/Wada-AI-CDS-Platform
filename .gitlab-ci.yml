@@ -9,5 +9,7 @@ build:
     - cp -R front /home/ubuntu/front
     - cd /home/ubuntu/front
     - sh ./front.sh
+  only:
+    - /.*\/master$/  
   tags:
     - build

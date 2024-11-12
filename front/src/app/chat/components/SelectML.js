@@ -6,9 +6,9 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
     const [showModelSelection, setShowModelSelection] = useState(false); 
     const [isHovered, setIsHovered] = useState(false);
 
-    const handleModelClick = (chatRoomId, model, requestId) => {
+    const handleModelClick = (chatRoomId, requestId, index) => {
         console.log(requestId);
-        onModelSelect(chatRoomId, model, requestId); 
+        onModelSelect(chatRoomId, requestId, index); 
     };
 
     const handleSelectButtonClick = () => {
@@ -93,7 +93,7 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                         style={styles.flipCard}
                         onMouseEnter={() => setHoveredIndex(index)}
                         onMouseLeave={() => setHoveredIndex(null)}
-                        onClick={() => handleModelClick(chatRoomId, model, requestId)}
+                        onClick={() => handleModelClick(chatRoomId, requestId, index)}
                     >
                         <div style={{
                             ...styles.flipCardInner,
@@ -101,15 +101,9 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                         }}>
                             <div style={styles.flipCardFront}>
                                 <p style={styles.title1}>{model.analysis_name}</p>
-                                {/* "예상되는 분석 결과"를 출력 */}
                                 <p style={styles.reason}>{reason["예상되는 분석 결과"]}</p>
                             </div>
                             <div style={styles.flipCardBack}>
-                                {/* <p style={styles.title}>기대 결과</p>
-                                {/* "모델 선택의 이유"를 출력 */}
-                                {/* <p style={styles.reason}>{reason["모델 선택의 이유"]}</p>  */}
-                                
-                                {/* selection_reasoning의 다른 항목들을 출력 */}
                                 {Object.entries(reason).map(([key, value]) => (
                                     <div key={key}>
                                         <p style={styles.title}><strong>{key}</strong></p>

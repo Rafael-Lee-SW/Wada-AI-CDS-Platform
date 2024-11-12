@@ -5,7 +5,7 @@ export default function FileUploader({ onChangePage, onSubmitFiles }) {
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(''); 
-  // 파일 추가 핸들러
+
   const handleFiles = (newFiles) => {
     const fileArray = Array.from(newFiles);
 
@@ -13,11 +13,11 @@ export default function FileUploader({ onChangePage, onSubmitFiles }) {
       setError('파일은 최대 2개까지 업로드 가능합니다.');
       return;
     }
+
     setFiles((prevFiles) => [...prevFiles, ...fileArray]);
     setError('');
   };
 
-  // 드래그 앤 드롭 영역에서 파일을 드롭할 때
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -29,12 +29,14 @@ export default function FileUploader({ onChangePage, onSubmitFiles }) {
     }
   };
 
-  // 파일 선택 핸들러 (input type="file" 사용)
   const handleFileSelect = (e) => {
-    handleFiles(e.target.files);
-  };
+    const selectedFiles = e.target.files;
+    
+    handleFiles(selectedFiles);
+    e.target.value = '';
+};
 
-  // 드래그 상태 핸들러
+
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -83,7 +85,7 @@ export default function FileUploader({ onChangePage, onSubmitFiles }) {
             multiple
             style={styles.input}
             onChange={handleFileSelect}
-            // accept=".csv"
+            accept=".csv"
             />
             <label htmlFor="file-input" style={styles.label}>
             {dragActive ? (
