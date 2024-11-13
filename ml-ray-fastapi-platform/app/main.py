@@ -169,63 +169,35 @@ async def predict(request: ModelRequest):
 
     try:
         if model_choice == "graph_neural_network_analysis":
+            # Remove parameters that we'll pass explicitly to avoid duplication
+            file_path = kwargs.pop("file_path")
+            id_column = kwargs.pop("id_column", None)
+            additional_features = kwargs.pop("additional_features", None)
+            feature_generations = kwargs.pop("feature_generations", [])
+            exclude_columns = kwargs.pop("exclude_columns", None)
+            sample_size = kwargs.pop("sample_size", 10)
+            random_state = kwargs.pop("random_state", 42)
+            
+            # Now call the function with explicit parameters
             results = model_function(
-                file_path=kwargs.get("file_path"),
-                id_column=kwargs.get("id_column"),
-                additional_features=kwargs.get("additional_features"),
-                feature_generations=(
-                    [
-                        feature_gen.dict()
-                        for feature_gen in kwargs.get("feature_generations", [])
-                    ]
-                    if kwargs.get("feature_generations")
-                    else None
-                ),
-                exclude_columns=kwargs.get("exclude_columns"),
-                task_type=kwargs.get("task_type", "classification"),
-                relationship_column=kwargs.get("relationship_column", "ManagerID"),
-                create_random_edges=kwargs.get("create_random_edges", False),
-                num_random_edges=kwargs.get("num_random_edges", 100),
-                sample_size=kwargs.get("sample_size", 10),
-                random_state=kwargs.get("random_state", 42),
-                **kwargs,  # Include any other parameters if necessary
-            )
-        elif model_choice == "neural_network_regression":
-            # Ensure target_variable is provided
-            if not kwargs.get("target_variable"):
-                raise HTTPException(
-                    status_code=400,
-                    detail="`target_variable` is required for neural_network_regression.",
-                )
-            # Ensure feature_columns do not include target_variable
-            feature_columns = kwargs.get("feature_columns", [])
-            target_variable = kwargs.get("target_variable")
-            if target_variable in feature_columns:
-                feature_columns.remove(target_variable)
-                logger.warning(
-                    f"Removed target variable '{target_variable}' from feature_columns to prevent data leakage."
-                )
-            results = model_function(
-                file_path=kwargs.get("file_path"),
-                target_variable=target_variable,
-                feature_columns=feature_columns,
-                id_column=kwargs.get("id_column"),
-                sample_size=kwargs.get("sample_size", 10),
-                random_state=kwargs.get("random_state", 42),
-                **kwargs,  # Include any other parameters if necessary
+                file_path=file_path,
+                id_column=id_column,
+                additional_features=additional_features,
+                feature_generations=feature_generations,
+                exclude_columns=exclude_columns,
+                sample_size=sample_size,
+                random_state=random_state,
+                **kwargs  # Any remaining parameters
             )
         else:
-            # Handle other models
+            # For other models, pass all parameters
             results = model_function(**kwargs)
-    except HTTPException as he:
-        raise he
+
+        return JSONResponse(content=make_serializable(results))
+
     except Exception as e:
         logger.exception(f"Error occurred while running model '{model_choice}': {e}")
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
-
-    serializable_results = make_serializable(results)
-    return JSONResponse(content=serializable_results)
-
 
 # Ray Serve deployment
 @serve.deployment

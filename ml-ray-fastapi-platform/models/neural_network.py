@@ -2,14 +2,22 @@
 
 import pandas as pd
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import scipy.sparse as sp  # Add this import
+from sklearn.metrics import (
+    mean_squared_error,
+    mean_absolute_error,
+    r2_score,
+)  # Encode categorical features
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.layers import Dense, Dropout, Input
 from tensorflow.keras.optimizers import Adam
 from spektral.layers import GCNConv
 from spektral.models import GCN
 from spektral.data import Dataset, Graph
+from spektral.data.loaders import SingleLoader
 import logging
 
 from utils import load_and_preprocess_data, split_data
@@ -17,6 +25,9 @@ from utils import load_and_preprocess_data, split_data
 # Add these imports
 from typing import Optional, List, Dict, Any
 import tensorflow as tf
+from tensorflow.keras.layers import Layer, Dense, Dropout, Input, Lambda
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -26,6 +37,39 @@ formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 if not logger.handlers:
     logger.addHandler(handler)
+
+
+# Add this custom layer class before the main function
+class GraphConvolution(Layer):
+    def __init__(self, units, activation=None, **kwargs):
+        super(GraphConvolution, self).__init__(**kwargs)
+        self.units = units
+        self.activation = tf.keras.activations.get(activation)
+
+    def build(self, input_shape):
+        features_shape = input_shape[0]
+        self.weight = self.add_weight(
+            shape=(features_shape[-1], self.units),
+            initializer="glorot_uniform",
+            name="weight",
+        )
+        self.bias = self.add_weight(
+            shape=(self.units,), initializer="zeros", name="bias"
+        )
+        super().build(input_shape)
+
+    def call(self, inputs):
+        features, adj = inputs
+        # Linear transformation
+        h = tf.matmul(features, self.weight)  # [batch_size, nodes, units]
+        # Graph convolution
+        output = tf.matmul(adj, h)  # [batch_size, nodes, units]
+        # Add bias
+        output = tf.nn.bias_add(output, self.bias)
+        # Apply activation
+        if self.activation is not None:
+            output = self.activation(output)
+        return output
 
 
 def neural_network_regression(
@@ -225,33 +269,18 @@ def neural_network_regression(
         logger.exception(f"Error in neural_network_regression: {e}")
         return {"status": "failed", "detail": str(e)}
 
+
 def graph_neural_network_analysis(
     file_path: str,
     id_column: str,
     additional_features: Optional[List[str]] = None,
     feature_generations: Optional[List[Dict[str, Any]]] = None,
     exclude_columns: Optional[List[str]] = None,
-    sample_size: int = 10,  # For summary
-    random_state: int = 42,
+    task_type: str = "classification",
+    relationship_column: str = "ManagerID",
+    target_column: str = None,
     **kwargs,
 ):
-    """
-    Train and evaluate a Graph Neural Network for node classification or regression.
-    Prepares data for interactive visualization.
-
-    Parameters:
-    - file_path (str): Path to the CSV dataset file.
-    - id_column (str): Column name for node identifiers.
-    - additional_features (list of str): Additional features to include.
-    - feature_generations (list of dict): Instructions for generating new features.
-    - exclude_columns (list of str): Columns to exclude from node features.
-    - sample_size (int): Number of samples to include in the summary.
-    - random_state (int): Random state for reproducibility.
-    - **kwargs: Additional keyword arguments.
-
-    Returns:
-    - dict: Contains the model, metrics, predictions, and summary.
-    """
     try:
         logger.info("Starting Graph Neural Network Analysis...")
 
@@ -268,14 +297,22 @@ def graph_neural_network_analysis(
                     new_col = feature_gen["new_column"]
 
                     if start_col not in df.columns:
-                        raise KeyError(f"Start column '{start_col}' not found in the dataset.")
+                        raise KeyError(
+                            f"Start column '{start_col}' not found in the dataset."
+                        )
                     if end_col not in df.columns:
-                        raise KeyError(f"End column '{end_col}' not found in the dataset.")
+                        raise KeyError(
+                            f"End column '{end_col}' not found in the dataset."
+                        )
 
-                    start = pd.to_datetime(df[start_col], errors='coerce')
-                    end = pd.to_datetime(df[end_col], errors='coerce').fillna(pd.Timestamp.now())
+                    start = pd.to_datetime(df[start_col], errors="coerce")
+                    end = pd.to_datetime(df[end_col], errors="coerce").fillna(
+                        pd.Timestamp.now()
+                    )
                     df[new_col] = (end - start).dt.days
-                    logger.info(f"Generated feature '{new_col}' from '{start_col}' and '{end_col}'.")
+                    logger.info(
+                        f"Generated feature '{new_col}' from '{start_col}' and '{end_col}'."
+                    )
 
         # Handle exclusion of columns
         if exclude_columns is None:
@@ -295,48 +332,74 @@ def graph_neural_network_analysis(
 
         # Optionally exclude additional columns
         if exclude_columns:
-            missing_excludes = [col for col in exclude_columns if col not in node_features.columns]
+            missing_excludes = [
+                col for col in exclude_columns if col not in node_features.columns
+            ]
             if missing_excludes:
-                logger.warning(f"Exclude columns not found in node features: {missing_excludes}")
-            node_features.drop(columns=[col for col in exclude_columns if col in node_features.columns], inplace=True)
+                logger.warning(
+                    f"Exclude columns not found in node features: {missing_excludes}"
+                )
+            node_features.drop(
+                columns=[
+                    col for col in exclude_columns if col in node_features.columns
+                ],
+                inplace=True,
+            )
 
         logger.info("Node features prepared.")
 
         # Generate edges based on a relationship column if specified
-        # For example, using 'ManagerID' to establish hierarchical relationships
-        relationship_column = kwargs.get("relationship_column", "ManagerID")
         if relationship_column in df.columns:
             edges = df[[id_column, relationship_column]].dropna()
             # Ensure relationship_column exists in id_column
             edges = edges[edges[relationship_column].isin(df[id_column])]
-            edges = edges.rename(columns={id_column: f"{id_column}_source", relationship_column: f"{id_column}_target"})
+            edges = edges.rename(
+                columns={
+                    id_column: f"{id_column}_source",
+                    relationship_column: f"{id_column}_target",
+                }
+            )
             logger.info(f"Edges generated based on '{relationship_column}'.")
         else:
-            # If no relationship column is provided or exists, handle accordingly
-            if kwargs.get("create_random_edges", False):
-                # Optionally create random edges if specified
-                num_edges = kwargs.get("num_random_edges", 100)
-                sources = np.random.choice(node_features[id_column], size=num_edges)
-                targets = np.random.choice(node_features[id_column], size=num_edges)
-                edges = pd.DataFrame({
-                    f"{id_column}_source": sources,
-                    f"{id_column}_target": targets
-                })
-                logger.info(f"Randomly generated {num_edges} edges.")
-            else:
-                logger.warning(f"Relationship column '{relationship_column}' not found. No edges will be created.")
-                edges = pd.DataFrame(columns=[f"{id_column}_source", f"{id_column}_target"])
+            # Handle cases where the relationship column is missing
+            logger.warning(
+                f"Relationship column '{relationship_column}' not found. No edges will be created."
+            )
+            edges = pd.DataFrame(columns=[f"{id_column}_source", f"{id_column}_target"])
 
         # Create a mapping from node ID to index
         node_ids = node_features[id_column].unique()
         id_to_index = {id_: idx for idx, id_ in enumerate(node_ids)}
         index_to_id = {idx: id_ for id_, idx in id_to_index.items()}
 
-        # Create feature matrix
-        X = node_features.drop(columns=[id_column]).values
-        logger.info("Feature matrix created.")
+        # Encode categorical features
+        X = node_features.drop(columns=[id_column])
+        categorical_cols = X.select_dtypes(
+            include=["object", "category"]
+        ).columns.tolist()
 
-        # Create adjacency matrix
+        if categorical_cols:
+            try:
+                # Try the new API first
+                encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+            except TypeError:
+                # Fall back to old API if needed
+                encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
+
+            X_encoded = encoder.fit_transform(X[categorical_cols])
+            X_numeric = X.drop(columns=categorical_cols).values
+            X = np.hstack([X_numeric, X_encoded])
+            logger.info("Categorical features one-hot encoded.")
+        else:
+            X = X.values
+
+        # Handle missing values
+        if np.isnan(X).any():
+            imputer = SimpleImputer(strategy="mean")
+            X = imputer.fit_transform(X)
+            logger.info("Missing values imputed.")
+
+        # Create edge index
         if not edges.empty:
             edge_index = edges[[f"{id_column}_source", f"{id_column}_target"]].values
             edge_index = np.array(
@@ -346,218 +409,205 @@ def graph_neural_network_analysis(
                     if src in id_to_index and dst in id_to_index
                 ]
             ).T  # Shape: [2, num_edges]
-            logger.info("Adjacency matrix created.")
+            logger.info("Edge index created.")
         else:
             edge_index = np.array([[], []], dtype=int)
             logger.info("No edges to create adjacency matrix.")
 
-        # Determine task type: classification or regression
-        task_type = kwargs.get("task_type", "classification")  # Default to classification
-
+        # Create labels based on task type
         if task_type == "classification":
-            # Assume binary classification if labels not provided
-            if "labels" not in kwargs or kwargs["labels"] is None:
-                labels = np.random.randint(0, 2, size=(X.shape[0],))
-                logger.info("Generated dummy binary labels for node classification.")
+            if target_column and target_column in df.columns:
+                # Use specified target column if provided
+                labels = df[target_column].values
+                # Convert to binary classification if needed
+                if len(np.unique(labels)) > 2:
+                    logger.info("Converting target to binary classification.")
+                    labels = (labels > np.median(labels)).astype(int)
             else:
-                labels = kwargs["labels"]
-                if isinstance(labels, pd.Series):
-                    labels = labels.values
-                elif isinstance(labels, list):
-                    labels = np.array(labels)
-                elif not isinstance(labels, np.ndarray):
-                    labels = np.array(labels)
-        elif task_type == "regression":
-            # Assume continuous labels
-            if "labels" not in kwargs or kwargs["labels"] is None:
-                labels = np.random.rand(X.shape[0])
-                logger.info("Generated dummy continuous labels for node regression.")
-            else:
-                labels = kwargs["labels"]
-                if isinstance(labels, pd.Series):
-                    labels = labels.values
-                elif isinstance(labels, list):
-                    labels = np.array(labels)
-                elif not isinstance(labels, np.ndarray):
-                    labels = np.array(labels)
+                # Create dummy binary labels if no target specified
+                logger.info("Creating dummy binary labels for node classification.")
+                labels = np.random.binomial(1, 0.5, size=len(node_features))
         else:
-            raise ValueError(f"Unsupported task type: {task_type}")
+            # Regression task
+            if not target_column or target_column not in df.columns:
+                raise ValueError("Target column must be specified for regression tasks")
+            labels = df[target_column].values
+            # Normalize regression targets
+            labels = (labels - np.mean(labels)) / np.std(labels)
 
-        # Create a Graph object using Spektral
-        class MyDataset(Dataset):
-            def read(self):
-                return [Graph(x=X, a=edge_index, y=labels)]
+        # Convert labels to appropriate format
+        labels = tf.convert_to_tensor(
+            labels, dtype=tf.float32 if task_type == "regression" else tf.int32
+        )
 
-        dataset = MyDataset()
-        graph = dataset[0]
+        # Create adjacency matrix with proper handling of empty edges
+        num_nodes = X.shape[0]
+        if len(edge_index[0]) == 0:
+            logger.warning("No edges found. Creating random edges for connectivity.")
+            # Define number of random edges (average 3 connections per node)
+            num_random_edges = num_nodes * 3
 
-        # Split the dataset into train and test
-        idx = np.arange(len(graph.x))
-        np.random.seed(random_state)
-        np.random.shuffle(idx)
-        split = int(0.8 * len(idx))
-        idx_train = idx[:split]
-        idx_test = idx[split:]
+            # Generate random edges
+            random_edges = np.random.randint(0, num_nodes, size=(2, num_random_edges))
 
-        # Define the GNN model
-        class GCNModel(tf.keras.Model):
-            def __init__(self, num_classes: int):
-                super().__init__()
-                self.conv1 = GCNConv(16, activation="relu")
-                if task_type == "classification":
-                    self.conv2 = GCNConv(num_classes, activation="softmax")
-                elif task_type == "regression":
-                    self.conv2 = GCNConv(1, activation="linear")
+            # Create adjacency matrix
+            A = np.zeros((num_nodes, num_nodes))
+            A[random_edges[0], random_edges[1]] = 1
+            A = A + A.T  # Make symmetric
+            A[A > 1] = 1  # Remove duplicates
 
-            def call(self, inputs):
-                x, a = inputs
-                x = self.conv1([x, a])
-                x = self.conv2([x, a])
-                return x
+            logger.info(
+                f"Created {num_random_edges} random edges for {num_nodes} nodes"
+            )
+        else:
+            # Create adjacency matrix from existing edges
+            A = np.zeros((num_nodes, num_nodes))
+            A[edge_index[0], edge_index[1]] = 1
+            A = A + A.T  # Make symmetric
+            A[A > 1] = 1  # Remove duplicates
 
-        num_classes = 2 if task_type == "classification" else 1
-        model = GCNModel(num_classes=num_classes)
+        # Add self-loops and normalize
+        A = A + np.eye(num_nodes)
+        D = np.sum(A, axis=1)
+        D_inv_sqrt = np.power(D, -0.5)
+        D_inv_sqrt[np.isinf(D_inv_sqrt)] = 0
+        D_inv_sqrt = np.diag(D_inv_sqrt)
+        A_normalized = D_inv_sqrt.dot(A).dot(D_inv_sqrt)
+
+        # Fix tensor reshaping
+        num_nodes = X.shape[0]
+        num_features = X.shape[1]
+        batch_size = min(
+            32, num_nodes
+        )  # Ensure batch size doesn't exceed number of nodes
+
+        # Reshape tensors properly for batched processing
+        X_tensor = tf.cast(X, dtype=tf.float32)
+        X_tensor = tf.tile(
+            tf.expand_dims(X_tensor, 0), [batch_size, 1, 1]
+        )  # Create 32 batches
+
+        A_tensor = tf.convert_to_tensor(A_normalized, dtype=tf.float32)
+        A_tensor = tf.tile(
+            tf.expand_dims(A_tensor, 0), [batch_size, 1, 1]
+        )  # Create 32 batches
+
+        # Repeat labels for each batch
+        labels_tensor = tf.tile(tf.expand_dims(labels, 0), [batch_size, 1])
+
+        # Create model inputs with correct shapes
+        node_features = Input(shape=(num_nodes, num_features))
+        adj_matrix = Input(shape=(num_nodes, num_nodes))
+
+        # Model architecture
+        x = GraphConvolution(64, activation="relu")([node_features, adj_matrix])
+        x = Dropout(0.5)(x)
+        x = GraphConvolution(32, activation="relu")([x, adj_matrix])
+        x = Dropout(0.5)(x)
+
+        # Output layer
+        if task_type == "classification":
+            outputs = Dense(2, activation="softmax")(x)
+        else:
+            outputs = Dense(1)(x)
+
+        # Create and compile model
+        model = Model(inputs=[node_features, adj_matrix], outputs=outputs)
 
         if task_type == "classification":
-            loss = "sparse_categorical_crossentropy"
-            metrics = ["accuracy"]
-        elif task_type == "regression":
-            loss = "mse"
-            metrics = ["mae", "mse"]
+            model.compile(
+                optimizer=Adam(learning_rate=0.01),
+                loss="sparse_categorical_crossentropy",
+                metrics=["accuracy"],
+            )
+        else:
+            model.compile(
+                optimizer=Adam(learning_rate=0.01), loss="mse", metrics=["mae"]
+            )
 
-        model.compile(
-            optimizer=Adam(learning_rate=0.01),
-            loss=loss,
-            metrics=metrics,
-        )
-        logger.info("Graph Neural Network model architecture created and compiled.")
+        # Train model with proper validation handling
+        if num_nodes < 5:  # If very small dataset
+            validation_split = 0.0  # No validation
+            logger.warning(
+                "Dataset too small for validation split. Training without validation."
+            )
+        else:
+            validation_split = 0.2
 
-        # Train the model
-        model.fit(
-            [graph.x, graph.a],
-            graph.y,
-            sample_weight=np.isin(idx, idx_train).astype(float),
+        # Train the model with adjusted batch size
+        history = model.fit(
+            [X_tensor, A_tensor],
+            labels_tensor,
             epochs=100,
-            batch_size=1,
-            verbose=0,
+            batch_size=batch_size,
+            validation_split=validation_split,
+            verbose=1,
         )
-        logger.info("Graph Neural Network model training completed.")
 
-        # Predict on test data
-        predictions = model.predict([graph.x, graph.a])
-        if task_type == "classification":
-            y_pred = np.argmax(predictions, axis=1)
-        else:
-            y_pred = predictions.flatten()
-        y_true = graph.y
+        # Get predictions
+        predictions = model.predict([X_tensor, A_tensor])
+        predictions_numpy = predictions[0]  # Take first batch's predictions
 
-        # Evaluate the model
-        if task_type == "classification":
-            accuracy = np.mean(y_pred[idx_test] == y_true[idx_test])
-            logger.info(f"GNN Model Evaluation - Accuracy: {accuracy}")
-        elif task_type == "regression":
-            mse = mean_squared_error(y_true[idx_test], y_pred[idx_test])
-            mae = mean_absolute_error(y_true[idx_test], y_pred[idx_test])
-            r2 = r2_score(y_true[idx_test], y_pred[idx_test])
-            logger.info(f"GNN Model Evaluation - MSE: {mse}, MAE: {mae}, R2: {r2}")
+        # Convert tensors to numpy arrays before visualization
+        if isinstance(X, tf.Tensor):
+            X = X.numpy()
+        if isinstance(labels, tf.Tensor):
+            labels = labels.numpy()
+        if isinstance(edge_index, tf.Tensor):
+            edge_index = edge_index.numpy()
 
-        # Prepare data for visualization
+        # After model training, ensure all tensors are properly converted
+        history_dict = history.history
+
+        # Convert predictions and handle numpy conversions properly
+        embedding_model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+        node_embeddings = embedding_model.predict([X_tensor, A_tensor])
+        node_embeddings_numpy = node_embeddings[0]  # Take first batch's embeddings
+
+        # Sample indices for visualization (after numpy conversion)
+        sample_size = min(10, len(labels))
+        sampled_indices = np.random.choice(len(labels), size=sample_size, replace=False)
+        # Create visualization data with numpy arrays
         graph1 = {
-            "graph_type": "node_embeddings",
-            "embeddings": graph.x.tolist(),
-            "labels": y_true.tolist(),
+            "graph_type": "loss_curve",
+            "loss": [float(x) for x in history.history["loss"]],
+            "val_loss": [float(x) for x in history.history["val_loss"]],
+            "epochs": list(range(1, len(history.history["loss"]) + 1)),
         }
 
         graph2 = {
-            "graph_type": "adjacency",
-            "edge_index": edge_index.tolist(),
-        }
-
-        if task_type == "classification":
-            graph3 = {
-                "graph_type": "metrics_table",
-                "accuracy": accuracy,
-            }
-        elif task_type == "regression":
-            graph3 = {
-                "graph_type": "metrics_table",
-                "mse": mse,
-                "mae": mae,
-                "r2_score": r2,
-            }
-
-        result = {
-            "model": "GraphNeuralNetwork",
-            "architecture": "GCNConv -> GCNConv",
-            "optimizer": "Adam",
-            "learning_rate": 0.01,
-            "epochs": 100,
-            "loss": loss,
-            "metrics": metrics,
-            "graph1": graph1,
-            "graph2": graph2,
-            "graph3": graph3,
-        }
-
-        # Prepare summary data
-        actual_sample_size = min(sample_size, len(y_true))
-        sampled_indices_summary = np.random.choice(
-            len(y_true), size=actual_sample_size, replace=False
-        )
-        embeddings_sample = graph.x[sampled_indices_summary].tolist()
-        labels_sample = y_true[sampled_indices_summary].tolist()
-        edge_index_sample = (
-            edge_index[:, sampled_indices_summary].tolist()
-            if sampled_indices_summary.size > 0 and edge_index.shape[1] >= sampled_indices_summary.size
-            else []
-        )
-
-        graph1_summary = {
             "graph_type": "node_embeddings",
-            "embeddings": embeddings_sample,
-            "labels": labels_sample,
+            "embeddings": node_embeddings_numpy[sampled_indices].tolist(),
+            "predictions": predictions_numpy[sampled_indices].tolist(),
+            "labels": labels[sampled_indices].tolist(),
         }
 
-        graph2_summary = {
-            "graph_type": "adjacency",
-            "edge_index": edge_index_sample,
+        graph3 = {
+            "graph_type": "metrics_table",
+            "accuracy": float(history.history["accuracy"][-1]),
+            "val_accuracy": float(history.history["val_accuracy"][-1]),
         }
 
-        if task_type == "classification":
-            graph3_summary = {
-                "graph_type": "metrics_table",
-                "accuracy": accuracy,
-            }
-        elif task_type == "regression":
-            graph3_summary = {
-                "graph_type": "metrics_table",
-                "mse": mse,
-                "mae": mae,
-                "r2_score": r2,
-            }
-
+        # Prepare final summary
         summary = {
             "model": "GraphNeuralNetwork",
             "architecture": "GCNConv -> GCNConv",
             "optimizer": "Adam",
             "learning_rate": 0.01,
-            "epochs": 100,
-            "loss": loss,
-            "metrics": metrics,
-            "graph1": graph1_summary,
-            "graph2": graph2_summary,
-            "graph3": graph3_summary,
+            "epochs": len(history.history["loss"]),
+            "metrics": {
+                "accuracy": float(history.history["accuracy"][-1]),
+                "val_accuracy": float(history.history["val_accuracy"][-1]),
+                "loss": float(history.history["loss"][-1]),
+                "val_loss": float(history.history["val_loss"][-1]),
+            },
+            "graph1": graph1,
+            "graph2": graph2,
+            "graph3": graph3,
         }
 
-        return {
-            "status": "success",
-            "result": result,
-            "summary": summary,
-        }
+        return {"status": "success", "result": summary["metrics"], "summary": summary}
 
-    except KeyError as ke:
-        logger.error(f"Missing column: {ke}")
-        raise HTTPException(status_code=400, detail=f"Missing column: {ke}")
     except Exception as e:
         logger.exception(f"Error in graph_neural_network_analysis: {e}")
         return {"status": "failed", "detail": str(e)}

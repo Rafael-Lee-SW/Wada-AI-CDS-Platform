@@ -8,7 +8,7 @@ import os
 import time
 import json
 
-test_config_now = 'test_config_newgnn.yaml'
+test_config_now = 'test_config_newgnnShort.yaml'
 
 def setup_logging(base_log_dir, trial_num):
     """
