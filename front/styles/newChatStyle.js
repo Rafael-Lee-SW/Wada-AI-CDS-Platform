@@ -1,11 +1,11 @@
+
 const styles = {
     contentContainer: {
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
         justifyContent: 'space-between', 
-        marginBottom: '110px',
-        marginTop: '50px'
+        height: '100vh'
     },
     messageBox: {
         marginTop: '50px',
