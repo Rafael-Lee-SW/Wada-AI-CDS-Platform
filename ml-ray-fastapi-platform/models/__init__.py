@@ -11,7 +11,6 @@ from .logistic_regression import (
 )
 from .neural_network import neural_network_regression
 from .neural_network import  graph_neural_network_analysis
-from .neural_network import generate_graph_data
 
 __all__ = [
     "random_forest_regression",
@@ -22,5 +21,4 @@ __all__ = [
     "logistic_regression_multinomial",  # Added this line
     "neural_network_regression",
     "graph_neural_network_analysis",
-    "generate_graph_data",
 ]

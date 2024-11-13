@@ -23,10 +23,7 @@ from models import (
     kmeans_clustering_anomaly_detection,
     neural_network_regression,
     graph_neural_network_analysis,
-    generate_graph_data,  # Import the new function
 )
-
-from models.neural_network import run_model, FeatureGeneration
 
 # Import necessary classes for serialization
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
@@ -170,109 +167,65 @@ async def predict(request: ModelRequest):
     kwargs = request.dict()
     kwargs.pop("model_choice", None)
 
-    # Handle 'graph_neural_network_analysis' by generating node_features and edges in-memory
-    if model_choice == "graph_neural_network_analysis":
-        # Extract necessary parameters
-        file_path = kwargs.get("file_path")
-        id_column = kwargs.get("id_column", "EmpID")
-        edge_source_column = kwargs.get("edge_source_column", "EmpID")
-        edge_target_column = kwargs.get("edge_target_column", "ManagerID")
-        additional_features = kwargs.get("additional_features", [])
-        feature_generations = kwargs.get("feature_generations", [])
-
-        # **additional_features 리스트 내의 공백 제거**
-        if additional_features:
-            additional_features = [col.strip() for col in additional_features]
-            kwargs["additional_features"] = additional_features
-
-        # Validate required parameters
-        if not file_path:
-            raise HTTPException(
-                status_code=400,
-                detail="file_path is required for graph_neural_network_analysis.",
-            )
-
-        # Generate node_features and edges DataFrames in-memory
-        try:
-            node_features, edges = generate_graph_data(
-                file_path=file_path,
-                id_column=id_column,
-                edge_source_column=edge_source_column,
-                edge_target_column=edge_target_column,
-                additional_features=additional_features,
-                feature_generations=(
-                    feature_generations if feature_generations else None
-                ),
-            )
-            logger.info("Generated node_features and edges in-memory.")
-        except HTTPException as he:
-            raise he
-        except Exception as e:
-            logger.exception(f"Error occurred while generating graph data: {e}")
-            raise HTTPException(
-                status_code=500, detail=f"Error generating graph data: {e}"
-            )
-
-        # Remove additional unwanted arguments to prevent unexpected keyword arguments
-        kwargs.pop("file_path", None)
-        kwargs.pop("id_column", None)
-        kwargs.pop("edge_source_column", None)
-        kwargs.pop("edge_target_column", None)
-        kwargs.pop("additional_features", None)
-        kwargs.pop("feature_generations", None)
-        kwargs.pop("target_variable", None)  # 추가: target_variable 제거
-
-        try:
+    try:
+        if model_choice == "graph_neural_network_analysis":
             results = model_function(
-                node_features=node_features, edges=edges, id_column=id_column, **kwargs
+                file_path=kwargs.get("file_path"),
+                id_column=kwargs.get("id_column"),
+                additional_features=kwargs.get("additional_features"),
+                feature_generations=(
+                    [
+                        feature_gen.dict()
+                        for feature_gen in kwargs.get("feature_generations", [])
+                    ]
+                    if kwargs.get("feature_generations")
+                    else None
+                ),
+                exclude_columns=kwargs.get("exclude_columns"),
+                task_type=kwargs.get("task_type", "classification"),
+                relationship_column=kwargs.get("relationship_column", "ManagerID"),
+                create_random_edges=kwargs.get("create_random_edges", False),
+                num_random_edges=kwargs.get("num_random_edges", 100),
+                sample_size=kwargs.get("sample_size", 10),
+                random_state=kwargs.get("random_state", 42),
+                **kwargs,  # Include any other parameters if necessary
             )
-        except Exception as e:
-            logger.exception(
-                f"Error occurred while running model '{model_choice}': {e}"
-            )
-            raise HTTPException(status_code=500, detail=f"Exception: {e}")
-
-    elif model_choice == "neural_network_regression":
-        # Ensure feature_generations include 'TenureDays'
-        feature_generations = kwargs.get("feature_generations")
-        if not feature_generations:
-            kwargs["feature_generations"] = [
-                FeatureGeneration(
-                    type="period",
-                    new_column="TenureDays",
-                    start_column="DateofHire",
-                    end_column="DateofTermination",
+        elif model_choice == "neural_network_regression":
+            # Ensure target_variable is provided
+            if not kwargs.get("target_variable"):
+                raise HTTPException(
+                    status_code=400,
+                    detail="`target_variable` is required for neural_network_regression.",
                 )
-            ]
-            logger.info(
-                "Added default feature_generations for neural_network_regression."
+            # Ensure feature_columns do not include target_variable
+            feature_columns = kwargs.get("feature_columns", [])
+            target_variable = kwargs.get("target_variable")
+            if target_variable in feature_columns:
+                feature_columns.remove(target_variable)
+                logger.warning(
+                    f"Removed target variable '{target_variable}' from feature_columns to prevent data leakage."
+                )
+            results = model_function(
+                file_path=kwargs.get("file_path"),
+                target_variable=target_variable,
+                feature_columns=feature_columns,
+                id_column=kwargs.get("id_column"),
+                sample_size=kwargs.get("sample_size", 10),
+                random_state=kwargs.get("random_state", 42),
+                **kwargs,  # Include any other parameters if necessary
             )
-
-        # **feature_columns 리스트 내의 공백 제거**
-        feature_columns = kwargs.get("feature_columns")
-        if feature_columns:
-            feature_columns = [col.strip() for col in feature_columns]
-            kwargs["feature_columns"] = feature_columns
-
-        try:
+        else:
+            # Handle other models
             results = model_function(**kwargs)
-        except Exception as e:
-            logger.exception(
-                f"Error occurred while running model '{model_choice}': {e}"
-            )
-            raise HTTPException(status_code=500, detail=f"Exception: {e}")
-    else:
-        # For other models, proceed as usual
-        try:
-            results = model_function(**kwargs)
-        except Exception as e:
-            logger.exception(
-                f"Error occurred while running model '{model_choice}': {e}"
-            )
-            raise HTTPException(status_code=500, detail=f"Exception: {e}")
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        logger.exception(f"Error occurred while running model '{model_choice}': {e}")
+        raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
     serializable_results = make_serializable(results)
     return JSONResponse(content=serializable_results)
+
 
 # Ray Serve deployment
 @serve.deployment

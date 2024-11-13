@@ -1,711 +1,563 @@
 # models/neural_network.py
 
-import networkx as nx
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler, LabelEncoder, MultiLabelBinarizer
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import Adam
+from spektral.layers import GCNConv
+from spektral.models import GCN
+from spektral.data import Dataset, Graph
 import logging
-from fastapi import HTTPException
-import os
-import re
 
-from pydantic import BaseModel
-from typing import List, Optional, Any
+from utils import load_and_preprocess_data, split_data
 
-
-class Condition(BaseModel):
-    column: str
-    operator: str
-    value: Any
-    target_column: str
-
-
-class FeatureGeneration(BaseModel):
-    type: str  # e.g., "period", "binary_condition"
-    new_column: str
-    start_column: Optional[str] = None
-    end_column: Optional[str] = None
-    conditions: Optional[List[Condition]] = None
-
+# Add these imports
+from typing import Optional, List, Dict, Any
+import tensorflow as tf
 
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-# Optional: Add handlers (e.g., StreamHandler, FileHandler) if needed
-# Example:
-# handler = logging.StreamHandler()
-# formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-# handler.setFormatter(formatter)
-# logger.addHandler(handler)
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+if not logger.handlers:
+    logger.addHandler(handler)
 
 
-# Helper functions for loading, preprocessing, and splitting data
-def load_and_preprocess_data(
-    data,
-    target_variable=None,
-    feature_columns=None,
-    task_type="classification",
-    encode_categorical=True,
-    fill_missing=True,
-):
-    """
-    데이터 로딩 및 전처리 함수
-    """
-    if isinstance(data, str):
-        try:
-            df = pd.read_csv(data)
-            logger.info(f"Loaded data from {data}")
-        except Exception as e:
-            logger.error(f"Failed to load data from {data}: {e}")
-            raise HTTPException(status_code=400, detail=f"Failed to load data: {e}")
-    elif isinstance(data, pd.DataFrame):
-        df = data.copy()
-        logger.info("Received data as pandas DataFrame")
-    else:
-        logger.error("Invalid data format. Must be a file path or pandas DataFrame.")
-        raise HTTPException(status_code=400, detail="Invalid data format.")
-
-    # **컬럼 이름의 앞뒤 공백 제거**
-    df.columns = df.columns.str.strip()
-
-    # **feature_columns 리스트 내의 공백 제거**
-    if feature_columns:
-        feature_columns = [col.strip() for col in feature_columns]
-
-    original_indices = df.index.copy()
-
-    # Process date columns
-    date_cols = [
-        col for col in df.columns if "date" in col.lower() or "dob" in col.lower()
-    ]
-    for date_col in date_cols:
-        df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
-        derived_col = f"{date_col}_DaysSince"
-        df[derived_col] = (pd.to_datetime("today") - df[date_col]).dt.days
-        df = df.drop(date_col, axis=1)
-        if feature_columns and date_col in feature_columns:
-            feature_columns.remove(date_col)
-            feature_columns.append(derived_col)
-        logger.info(f"Processed date column: {date_col}")
-
-    # Identify categorical columns
-    categorical_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
-    if target_variable in categorical_cols:
-        categorical_cols.remove(target_variable)
-
-    # Identify multi-category columns (assuming comma-separated)
-    multi_cat_cols = []
-    for col in categorical_cols:
-        if df[col].str.contains(",", na=False).any():
-            multi_cat_cols.append(col)
-
-    # Split multi-category columns and apply MultiLabelBinarizer
-    if multi_cat_cols:
-        for col in multi_cat_cols:
-            try:
-                # Split by comma and strip whitespace
-                df[col] = df[col].apply(
-                    lambda x: (
-                        [cls.strip() for cls in x.split(",")]
-                        if isinstance(x, str)
-                        else []
-                    )
-                )
-                mlb = MultiLabelBinarizer()
-                dummies = pd.DataFrame(
-                    mlb.fit_transform(df[col]),
-                    columns=[f"{col}_{cls}" for cls in mlb.classes_],
-                    index=df.index,
-                )
-                df = pd.concat([df, dummies], axis=1)
-                df = df.drop(columns=col)
-                logger.info(f"Handled multi-category column: {col}")
-            except Exception as e:
-                logger.error(f"Error processing multi-category column '{col}': {e}")
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Error processing multi-category column '{col}': {e}",
-                )
-
-    if encode_categorical:
-        # Convert all object-type columns to string and strip whitespace to handle mixed types
-        non_numeric_cols = df.select_dtypes(
-            include=["object", "category"]
-        ).columns.tolist()
-        if non_numeric_cols:
-            # Strip leading and trailing whitespace and replace multiple internal spaces with single space
-            df[non_numeric_cols] = (
-                df[non_numeric_cols]
-                .astype(str)
-                .apply(lambda x: x.str.strip().str.replace(r"\s+", " ", regex=True))
-            )
-            logger.info(
-                f"Converted and stripped non-numeric columns: {non_numeric_cols}"
-            )
-
-            # **결측치 처리**
-            if fill_missing:
-                # Fill NaN for numerical columns
-                num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-                df[num_cols] = df[num_cols].fillna(0)
-
-                # Fill NaN for categorical columns
-                df[non_numeric_cols] = df[non_numeric_cols].fillna("Unknown")
-
-                logger.info(
-                    "Filled missing data: numerical columns with 0, categorical columns with 'Unknown'."
-                )
-
-            # Apply one-hot encoding
-            df = pd.get_dummies(df, drop_first=True)
-
-            remaining_non_numeric = df.select_dtypes(
-                exclude=[np.number]
-            ).columns.tolist()
-            if remaining_non_numeric:
-                logger.error(
-                    f"Non-numeric columns still present after encoding: {remaining_non_numeric}"
-                )
-                for col in remaining_non_numeric:
-                    unique_values = df[col].unique()
-                    logger.info(f"Unique values in {col}: {unique_values}")
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Non-numeric columns present after encoding: {remaining_non_numeric}",
-                )
-
-            logger.info("Applied one-hot encoding to categorical variables.")
-
-            # **데이터 타입 로깅**
-            logger.info("Data types after one-hot encoding:")
-            logger.info(df.dtypes)
-
-            # Ensure all remaining columns are numeric
-            remaining_non_numeric = df.select_dtypes(
-                exclude=[np.number]
-            ).columns.tolist()
-            if remaining_non_numeric:
-                logger.error(
-                    f"Non-numeric columns still present after encoding: {remaining_non_numeric}"
-                )
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Non-numeric columns present after encoding: {remaining_non_numeric}",
-                )
-
-        # Encode target variable if it's categorical
-        if target_variable and df[target_variable].dtype == "object":
-            try:
-                y_encoded = LabelEncoder().fit_transform(df[target_variable])
-                y = pd.Series(y_encoded, index=original_indices, name=target_variable)
-                logger.info("Encoded target variable using LabelEncoder.")
-            except Exception as e:
-                logger.error(f"Failed to encode target variable: {e}")
-                raise HTTPException(
-                    status_code=400, detail=f"Failed to encode target variable: {e}"
-                )
-        else:
-            y = df[target_variable] if target_variable else None
-    else:
-        y = df[target_variable] if target_variable else None
-
-    # Re-align indices
-    if y is not None:
-        y.index = original_indices
-    if feature_columns:
-        X = df[feature_columns].copy()
-    else:
-        X = df.drop(
-            columns=[target_variable] if target_variable else df.columns.tolist()
-        ).copy()
-
-    # Additional enforcement to convert all columns to numeric types
-    try:
-        X = X.apply(pd.to_numeric, errors="raise")
-        logger.info("All feature columns converted to numeric types successfully.")
-    except Exception as e:
-        remaining_non_numeric = X.select_dtypes(exclude=[np.number]).columns.tolist()
-        logger.error(f"Error converting columns to numeric types: {e}")
-        raise HTTPException(
-            status_code=400,
-            detail=f"Non-numeric columns present in feature matrix after preprocessing: {remaining_non_numeric}",
-        )
-
-    # Final validation: Ensure all columns in X are numeric
-    if not X.select_dtypes(include=[np.number]).shape[1] == X.shape[1]:
-        remaining_non_numeric = X.select_dtypes(exclude=[np.number]).columns.tolist()
-        logger.error(
-            f"Non-numeric columns still present after preprocessing: {remaining_non_numeric}"
-        )
-        raise HTTPException(
-            status_code=400,
-            detail=f"Non-numeric columns present in feature matrix after preprocessing: {remaining_non_numeric}",
-        )
-
-    logger.info("Data loading and preprocessing completed successfully.")
-    return X, y
-
-def split_data(X, y, test_size=0.2, random_state=42):
-    """
-    Splits the data into training and testing sets.
-
-    Parameters:
-    - X (DataFrame): Feature matrix.
-    - y (Series): Target variable.
-    - test_size (float): Proportion of the dataset to include in the test split.
-    - random_state (int): Random seed.
-
-    Returns:
-    - X_train, X_test, y_train, y_test: Split datasets.
-    """
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
-
-
-# Neural Network Regression
 def neural_network_regression(
+    file_path,
+    target_variable,
+    feature_columns=None,
+    id_column=None,
+    sample_size=10,  # For summary
+    random_state=42,
     **kwargs,
 ):
     """
-    Neural Network Regression model.
+    Train and evaluate a Neural Network for regression tasks.
+    Prepares data for interactive visualization.
 
-    Parameters (from kwargs):
+    Parameters:
     - file_path (str): Path to the CSV dataset file.
-    - target_variable (str): Name of the target variable.
-    - feature_columns (list): List of feature column names.
-    - epochs (int, optional): Number of training epochs. Default is 50.
-    - batch_size (int, optional): Batch size for training. Default is 10.
-    - Any extra kwargs are ignored.
+    - target_variable (str): Name of the target column.
+    - feature_columns (list of str): List of feature column names.
+    - id_column (str): Column name for identifiers (e.g., Employee Name or ID).
+    - sample_size (int): Number of samples to include in the summary.
+    - random_state (int): Random state for reproducibility.
+    - **kwargs: Additional keyword arguments.
 
     Returns:
-    - dict: Contains the model, history, loss, and predictions.
+    - dict: Contains the model, metrics, predictions, identifiers, and summary.
     """
-    file_path = kwargs.get("file_path")
-    target_variable = kwargs.get("target_variable")
-    feature_columns = kwargs.get("feature_columns")
-    epochs = kwargs.get("epochs", 50)
-    batch_size = kwargs.get("batch_size", 10)
-
-    # Validate required parameters
-    if not all([file_path, target_variable, feature_columns]):
-        logger.error("Missing required parameters for neural_network_regression.")
-        raise HTTPException(
-            status_code=400,
-            detail="Missing required parameters for neural_network_regression.",
-        )
-
-    # **feature_columns 리스트 내의 공백 제거**
-    if feature_columns:
-        feature_columns = [col.strip() for col in feature_columns]
-        kwargs["feature_columns"] = feature_columns
-
-    # Load and preprocess data
     try:
+        logger.info("Starting Neural Network Regression...")
+
+        # Load and preprocess data
         X, y = load_and_preprocess_data(
             data=file_path,
             target_variable=target_variable,
             feature_columns=feature_columns,
             task_type="regression",
         )
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        logger.error(f"Unexpected error during data loading and preprocessing: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Unexpected error during data loading: {e}"
+        logger.info("Data loaded and preprocessed successfully.")
+
+        # Handle identifiers
+        if id_column:
+            df = pd.read_csv(file_path)
+            if id_column in df.columns:
+                identifiers = df[id_column].loc[X.index]
+            else:
+                identifiers = pd.Series(np.arange(len(X)), name="Index")
+        else:
+            identifiers = pd.Series(np.arange(len(X)), name="Index")
+
+        # Split the data
+        X_train, X_test, y_train, y_test, id_train, id_test = split_data(
+            X, y, identifiers, return_ids=True, task_type="regression"
         )
+        logger.info("Data split into training and testing sets.")
 
-    # Check if X is numeric
-    if not np.all([np.issubdtype(dtype, np.number) for dtype in X.dtypes]):
-        logger.error(
-            "Non-numeric columns present in feature matrix after preprocessing."
+        # Feature scaling
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+        logger.info("Feature scaling completed.")
+
+        # Build the Neural Network model
+        model = Sequential(
+            [
+                Dense(64, activation="relu", input_shape=(X_train_scaled.shape[1],)),
+                Dropout(0.2),
+                Dense(32, activation="relu"),
+                Dropout(0.2),
+                Dense(1, activation="linear"),
+            ]
         )
-        raise HTTPException(
-            status_code=400,
-            detail="Non-numeric columns present in feature matrix after preprocessing.",
+        logger.info("Neural Network model architecture created.")
+
+        # Compile the model
+        model.compile(
+            optimizer=Adam(learning_rate=0.001), loss="mse", metrics=["mae", "mse"]
         )
+        logger.info("Neural Network model compiled.")
 
-    # Split data
-    X_train, X_test, y_train, y_test = split_data(X, y)
-
-    # Scale the features
-    scaler_X = StandardScaler()
-    X_train_scaled = scaler_X.fit_transform(X_train)
-    X_test_scaled = scaler_X.transform(X_test)
-
-    # Optionally, scale the target variable
-    scaler_y = StandardScaler()
-    y_train_scaled = scaler_y.fit_transform(y_train.values.reshape(-1, 1))
-    y_test_scaled = scaler_y.transform(y_test.values.reshape(-1, 1))
-
-    # Build the model
-    model = Sequential(
-        [
-            Dense(64, activation="relu", input_dim=X_train_scaled.shape[1]),
-            Dense(32, activation="relu"),
-            Dense(1, activation="linear"),  # Output layer for regression
-        ]
-    )
-
-    # Compile the model
-    model.compile(optimizer=Adam(), loss="mean_squared_error")
-
-    # Train the model
-    try:
+        # Train the model
         history = model.fit(
             X_train_scaled,
-            y_train_scaled,
-            epochs=epochs,
-            batch_size=batch_size,
-            validation_data=(X_test_scaled, y_test_scaled),
+            y_train,
+            epochs=100,
+            batch_size=32,
+            validation_split=0.2,
             verbose=0,  # Set to 1 for more detailed logs
         )
-        logger.info("Model training completed successfully.")
-    except Exception as e:
-        logger.error(f"Error during model training: {e}")
-        raise HTTPException(status_code=500, detail=f"Error during model training: {e}")
+        logger.info("Neural Network model training completed.")
 
-    # Evaluate the model
-    try:
-        loss = model.evaluate(X_test_scaled, y_test_scaled, verbose=0)
-        logger.info(f"Model evaluation completed. Loss: {loss}")
-    except Exception as e:
-        logger.error(f"Error during model evaluation: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Error during model evaluation: {e}"
+        # Predict on test data
+        y_pred = model.predict(X_test_scaled).flatten()
+        logger.info("Predictions on test data completed.")
+
+        # Evaluate the model
+        mse = mean_squared_error(y_test, y_pred)
+        mae = mean_absolute_error(y_test, y_pred)
+        r2 = r2_score(y_test, y_pred)
+        logger.info(f"Model Evaluation - MSE: {mse}, MAE: {mae}, R2: {r2}")
+
+        # Limit the number of data points for visualization
+        max_points = 1000
+        if len(X_test_scaled) > max_points:
+            sampled_indices = np.random.choice(
+                len(X_test_scaled), size=max_points, replace=False
+            )
+            X_test_sampled = X_test_scaled[sampled_indices]
+            y_test_sampled = y_test.iloc[sampled_indices]
+            y_pred_sampled = y_pred[sampled_indices]
+            id_test_sampled = id_test.iloc[sampled_indices]
+        else:
+            X_test_sampled = X_test_scaled
+            y_test_sampled = y_test
+            y_pred_sampled = y_pred
+            id_test_sampled = id_test
+
+        # Prepare data for visualization
+        graph1 = {
+            "graph_type": "loss_curve",
+            "loss": history.history["loss"],
+            "val_loss": history.history["val_loss"],
+            "epochs": list(range(1, len(history.history["loss"]) + 1)),
+        }
+
+        graph2 = {
+            "graph_type": "prediction_scatter",
+            "y_test": y_test_sampled.tolist(),
+            "y_pred": y_pred_sampled.tolist(),
+            "identifiers": id_test_sampled.tolist(),
+        }
+
+        graph3 = {"graph_type": "metrics_table", "mse": mse, "mae": mae, "r2_score": r2}
+
+        result = {
+            "model": "NeuralNetworkRegressor",
+            "architecture": "Dense -> Dropout -> Dense -> Dropout -> Dense",
+            "optimizer": "Adam",
+            "learning_rate": 0.001,
+            "epochs": len(history.history["loss"]),
+            "batch_size": 32,
+            "loss": history.history["loss"],
+            "val_loss": history.history["val_loss"],
+            "graph1": graph1,
+            "graph2": graph2,
+            "graph3": graph3,
+        }
+
+        # Prepare summary data
+        actual_sample_size = min(sample_size, len(y_test))
+        sampled_indices_summary = np.random.choice(
+            len(y_test), size=actual_sample_size, replace=False
         )
+        X_test_sampled_summary = X_test_scaled[sampled_indices_summary]
+        y_test_sampled_summary = y_test.iloc[sampled_indices_summary]
+        y_pred_sampled_summary = y_pred[sampled_indices_summary]
+        id_test_sampled_summary = id_test.iloc[sampled_indices_summary]
 
-    # Make predictions and inverse transform
-    try:
-        y_pred_scaled = model.predict(X_test_scaled).flatten()
-        y_pred = scaler_y.inverse_transform(y_pred_scaled.reshape(-1, 1)).flatten()
-        logger.info("Predictions made successfully.")
+        graph1_summary = {
+            "graph_type": "loss_curve",
+            "loss": history.history["loss"],
+            "val_loss": history.history["val_loss"],
+            "epochs": list(range(1, len(history.history["loss"]) + 1)),
+        }
+
+        graph2_summary = {
+            "graph_type": "prediction_scatter",
+            "y_test": y_test_sampled_summary.tolist(),
+            "y_pred": y_pred_sampled_summary.tolist(),
+            "identifiers": id_test_sampled_summary.tolist(),
+        }
+
+        graph3_summary = {
+            "graph_type": "metrics_table",
+            "mse": mse,
+            "mae": mae,
+            "r2_score": r2,
+        }
+
+        summary = {
+            "model": "NeuralNetworkRegressor",
+            "architecture": "Dense -> Dropout -> Dense -> Dropout -> Dense",
+            "optimizer": "Adam",
+            "learning_rate": 0.001,
+            "epochs": len(history.history["loss"]),
+            "batch_size": 32,
+            "graph1": graph1_summary,
+            "graph2": graph2_summary,
+            "graph3": graph3_summary,
+        }
+
+        return {
+            "status": "success",
+            "result": result,
+            "summary": summary,
+        }
     except Exception as e:
-        logger.error(f"Error during prediction: {e}")
-        raise HTTPException(status_code=500, detail=f"Error during prediction: {e}")
-
-    return {
-        "model": model,
-        "history": history.history,  # Convert history object to dict
-        "loss": loss,
-        "y_test": y_test.tolist(),
-        "y_pred": y_pred.tolist(),
-    }
-
+        logger.exception(f"Error in neural_network_regression: {e}")
+        return {"status": "failed", "detail": str(e)}
 
 def graph_neural_network_analysis(
-    node_features: pd.DataFrame,
-    edges: pd.DataFrame,
-    id_column: str = "EmpID",
+    file_path: str,
+    id_column: str,
+    additional_features: Optional[List[str]] = None,
+    feature_generations: Optional[List[Dict[str, Any]]] = None,
+    exclude_columns: Optional[List[str]] = None,
+    sample_size: int = 10,  # For summary
+    random_state: int = 42,
+    **kwargs,
 ):
     """
-    Implements Graph Neural Network Analysis.
+    Train and evaluate a Graph Neural Network for node classification or regression.
+    Prepares data for interactive visualization.
 
     Parameters:
-    - node_features (DataFrame): DataFrame containing node features.
-    - edges (DataFrame): DataFrame representing edges in the graph.
-    - id_column (str, optional): Column name for node identifiers. Default is "EmpID".
+    - file_path (str): Path to the CSV dataset file.
+    - id_column (str): Column name for node identifiers.
+    - additional_features (list of str): Additional features to include.
+    - feature_generations (list of dict): Instructions for generating new features.
+    - exclude_columns (list of str): Columns to exclude from node features.
+    - sample_size (int): Number of samples to include in the summary.
+    - random_state (int): Random state for reproducibility.
+    - **kwargs: Additional keyword arguments.
 
     Returns:
-    - dict: Graph metrics.
-    """
-    # Validate required parameters
-    if node_features is None or edges is None:
-        logger.error("Missing node_features or edges DataFrame.")
-        raise HTTPException(
-            status_code=400,
-            detail="Missing node_features or edges DataFrame.",
-        )
-
-    if id_column not in node_features.columns:
-        logger.error(f"Identifier column '{id_column}' not found in node_features.")
-        raise HTTPException(
-            status_code=400,
-            detail=f"Identifier column '{id_column}' not found in node_features.",
-        )
-
-    # Log number of nodes and edges loaded
-    logger.info(f"Number of nodes loaded: {node_features.shape[0]}")
-    logger.info(f"Number of edges loaded: {edges.shape[0]}")
-
-    # Create a graph
-    try:
-        G = nx.from_pandas_edgelist(edges, source="source", target="target")
-        logger.info(
-            f"Graph created with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
-        )
-    except Exception as e:
-        logger.error(f"Error creating graph from edges: {e}")
-        raise HTTPException(
-            status_code=400, detail=f"Error creating graph from edges: {e}"
-        )
-
-    # Add node attributes
-    try:
-        for _, row in node_features.iterrows():
-            node = row[id_column]
-            attrs = row.drop(id_column).to_dict()
-            nx.set_node_attributes(G, {node: attrs})
-        logger.info("Node attributes set successfully.")
-    except Exception as e:
-        logger.error(f"Error setting node attributes: {e}")
-        raise HTTPException(
-            status_code=400, detail=f"Error setting node attributes: {e}"
-        )
-
-    # Compute basic graph metrics
-    try:
-        graph_metrics = {
-            "number_of_nodes": G.number_of_nodes(),
-            "number_of_edges": G.number_of_edges(),
-            "average_degree": (
-                sum(dict(G.degree()).values()) / G.number_of_nodes()
-                if G.number_of_nodes() > 0
-                else 0
-            ),
-            "density": nx.density(G),
-        }
-        logger.info("Graph metrics computed successfully.")
-    except Exception as e:
-        logger.error(f"Error computing graph metrics: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Error computing graph metrics: {e}"
-        )
-
-    return {"graph_metrics": graph_metrics}
-
-
-def generate_graph_data(
-    file_path,
-    id_column,
-    edge_source_column,
-    edge_target_column,
-    additional_features=None,
-    feature_generations=None,
-):
-    """
-    그래프 데이터 생성 함수
+    - dict: Contains the model, metrics, predictions, and summary.
     """
     try:
+        logger.info("Starting Graph Neural Network Analysis...")
+
+        # Load the dataset
         df = pd.read_csv(file_path)
-        logger.info(f"Loaded data from {file_path}")
-    except Exception as e:
-        logger.error(f"Failed to load data from {file_path}: {e}")
-        raise HTTPException(status_code=400, detail=f"Failed to load data: {e}")
+        logger.info("Dataset loaded successfully.")
 
-    # **컬럼 이름의 앞뒤 공백 제거**
-    df.columns = df.columns.str.strip()
+        # Apply feature generations if any
+        if feature_generations:
+            for feature_gen in feature_generations:
+                if feature_gen["type"] == "period":
+                    start_col = feature_gen["start_column"]
+                    end_col = feature_gen["end_column"]
+                    new_col = feature_gen["new_column"]
 
-    # **additional_features 리스트 내의 공백 제거**
-    if additional_features:
-        additional_features = [col.strip() for col in additional_features]
+                    if start_col not in df.columns:
+                        raise KeyError(f"Start column '{start_col}' not found in the dataset.")
+                    if end_col not in df.columns:
+                        raise KeyError(f"End column '{end_col}' not found in the dataset.")
 
-    if feature_generations:
-        for fg in feature_generations:
-            if isinstance(fg, FeatureGeneration):
-                fg = fg.dict()
-            gen_type = fg.get("type")
-            new_column = fg.get("new_column")
-            if gen_type == "period":
-                start_col = fg.get("start_column")
-                end_col = fg.get("end_column")
-                try:
-                    df[new_column] = (
-                        pd.to_datetime(df[end_col]) - pd.to_datetime(df[start_col])
-                    ).dt.days
-                    logger.info(
-                        f"Generated period feature '{new_column}' from '{start_col}' and '{end_col}'."
-                    )
-                except Exception as e:
-                    logger.error(f"Error generating period feature '{new_column}': {e}")
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Error generating period feature '{new_column}': {e}",
-                    )
-            elif gen_type == "binary_condition":
-                conditions = fg.get("conditions", [])
-                for condition in conditions:
-                    column = condition.get("column")
-                    operator = condition.get("operator")
-                    value = condition.get("value")
-                    target_column = condition.get("target_column")
-                    try:
-                        # **범주형 변수 값의 공백 제거 및 정규화**
-                        df[column] = (
-                            df[column]
-                            .astype(str)
-                            .str.strip()
-                            .str.replace("\s+", " ", regex=True)
-                        )
-                        df[target_column] = df.apply(
-                            lambda row: (
-                                1 if eval(f"row['{column}'] {operator} {value}") else 0
-                            ),
-                            axis=1,
-                        )
-                        logger.info(
-                            f"Generated binary condition feature '{target_column}' based on '{column} {operator} {value}'."
-                        )
-                    except Exception as e:
-                        logger.error(
-                            f"Error generating binary condition feature '{target_column}': {e}"
-                        )
-                        raise HTTPException(
-                            status_code=400,
-                            detail=f"Error generating binary condition feature '{target_column}': {e}",
-                        )
-            else:
-                logger.error(f"Unsupported feature generation type: {gen_type}")
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Unsupported feature generation type: {gen_type}",
-                )
+                    start = pd.to_datetime(df[start_col], errors='coerce')
+                    end = pd.to_datetime(df[end_col], errors='coerce').fillna(pd.Timestamp.now())
+                    df[new_col] = (end - start).dt.days
+                    logger.info(f"Generated feature '{new_col}' from '{start_col}' and '{end_col}'.")
 
-    if additional_features is None:
-        additional_features = df.columns.drop(
-            [id_column, edge_source_column, edge_target_column]
-        ).tolist()
+        # Handle exclusion of columns
+        if exclude_columns is None:
+            exclude_columns = []
 
-    node_features = df[[id_column] + additional_features].copy()
-
-    # Handle categorical features in node_features
-    node_features = pd.get_dummies(node_features, drop_first=True)
-
-    # **결측치 처리**
-    # Fill missing data
-    num_cols = node_features.select_dtypes(include=[np.number]).columns.tolist()
-    cat_cols = node_features.select_dtypes(
-        include=["object", "category"]
-    ).columns.tolist()
-    if num_cols:
-        node_features[num_cols] = node_features[num_cols].fillna(0)
-    if cat_cols:
-        node_features[cat_cols] = node_features[cat_cols].fillna("Unknown")
-
-    # **모든 문자열 값의 공백 제거 및 정규화**
-    node_features = node_features.applymap(
-        lambda x: re.sub(r"\s+", " ", x.strip()) if isinstance(x, str) else x
-    )
-
-    # **확인 후 수치형으로 변환**
-    try:
-        node_features = node_features.apply(pd.to_numeric, errors="raise")
-    except Exception as e:
-        remaining_non_numeric = node_features.select_dtypes(
-            exclude=[np.number]
-        ).columns.tolist()
-        logger.error(
-            f"Non-numeric columns present in node_features after encoding: {remaining_non_numeric}"
-        )
-        raise HTTPException(
-            status_code=400,
-            detail=f"Non-numeric columns present in node_features after encoding: {remaining_non_numeric}",
-        )
-
-    edges = df[[edge_source_column, edge_target_column]].dropna()
-    edges = edges[edges[edge_target_column].isin(df[id_column])]
-    edges = edges.rename(
-        columns={edge_source_column: "source", edge_target_column: "target"}
-    )
-
-    logger.info("Generated node_features and edges DataFrames successfully.")
-
-    return node_features, edges
-
-
-# Main function to determine model type and execute
-def run_model(model_choice, **kwargs):
-    """
-    Determines which model to run based on model_choice and executes it.
-
-    Parameters:
-    - model_choice (str): Choice of the model to run.
-    - **kwargs: Additional keyword arguments required by the model.
-
-    Returns:
-    - dict: Result from the model execution.
-    """
-    if model_choice == "neural_network_regression":
-        return neural_network_regression(**kwargs)
-    elif model_choice == "graph_neural_network_analysis":
-        # Extract required parameters for graph analysis
-        file_path = kwargs.get("file_path")
-        id_column = kwargs.get("id_column")
-        edge_source_column = kwargs.get("edge_source_column")
-        edge_target_column = kwargs.get("edge_target_column")
-        additional_features = kwargs.get("additional_features", [])
-        feature_generations = kwargs.get("feature_generations", [])
-
-        # **additional_features 리스트 내의 공백 제거**
+        # Always include id_column in node_features
         if additional_features:
-            additional_features = [col.strip() for col in additional_features]
-            kwargs["additional_features"] = additional_features
+            # Ensure id_column is included
+            if id_column not in additional_features:
+                additional_features = [id_column] + additional_features
+        else:
+            # If no additional_features provided, include only id_column
+            additional_features = [id_column]
 
-        # Validate required parameters
-        if not all([file_path, id_column, edge_source_column, edge_target_column]):
-            logger.error(
-                "Missing required parameters for graph_neural_network_analysis."
-            )
-            raise HTTPException(
-                status_code=400,
-                detail="Missing required parameters for graph_neural_network_analysis.",
-            )
+        # Select node features dynamically
+        node_features = df[additional_features].copy()
 
-        # Convert feature_generations to FeatureGeneration objects if they are dicts
-        if feature_generations and isinstance(feature_generations[0], dict):
-            try:
-                feature_generations = [
-                    FeatureGeneration(**fg) for fg in feature_generations
+        # Optionally exclude additional columns
+        if exclude_columns:
+            missing_excludes = [col for col in exclude_columns if col not in node_features.columns]
+            if missing_excludes:
+                logger.warning(f"Exclude columns not found in node features: {missing_excludes}")
+            node_features.drop(columns=[col for col in exclude_columns if col in node_features.columns], inplace=True)
+
+        logger.info("Node features prepared.")
+
+        # Generate edges based on a relationship column if specified
+        # For example, using 'ManagerID' to establish hierarchical relationships
+        relationship_column = kwargs.get("relationship_column", "ManagerID")
+        if relationship_column in df.columns:
+            edges = df[[id_column, relationship_column]].dropna()
+            # Ensure relationship_column exists in id_column
+            edges = edges[edges[relationship_column].isin(df[id_column])]
+            edges = edges.rename(columns={id_column: f"{id_column}_source", relationship_column: f"{id_column}_target"})
+            logger.info(f"Edges generated based on '{relationship_column}'.")
+        else:
+            # If no relationship column is provided or exists, handle accordingly
+            if kwargs.get("create_random_edges", False):
+                # Optionally create random edges if specified
+                num_edges = kwargs.get("num_random_edges", 100)
+                sources = np.random.choice(node_features[id_column], size=num_edges)
+                targets = np.random.choice(node_features[id_column], size=num_edges)
+                edges = pd.DataFrame({
+                    f"{id_column}_source": sources,
+                    f"{id_column}_target": targets
+                })
+                logger.info(f"Randomly generated {num_edges} edges.")
+            else:
+                logger.warning(f"Relationship column '{relationship_column}' not found. No edges will be created.")
+                edges = pd.DataFrame(columns=[f"{id_column}_source", f"{id_column}_target"])
+
+        # Create a mapping from node ID to index
+        node_ids = node_features[id_column].unique()
+        id_to_index = {id_: idx for idx, id_ in enumerate(node_ids)}
+        index_to_id = {idx: id_ for id_, idx in id_to_index.items()}
+
+        # Create feature matrix
+        X = node_features.drop(columns=[id_column]).values
+        logger.info("Feature matrix created.")
+
+        # Create adjacency matrix
+        if not edges.empty:
+            edge_index = edges[[f"{id_column}_source", f"{id_column}_target"]].values
+            edge_index = np.array(
+                [
+                    [id_to_index[src], id_to_index[dst]]
+                    for src, dst in edge_index
+                    if src in id_to_index and dst in id_to_index
                 ]
-                logger.info(
-                    "Converted feature_generations to FeatureGeneration objects."
-                )
-            except Exception as e:
-                logger.error(f"Error converting feature_generations: {e}")
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Error converting feature_generations: {e}",
-                )
+            ).T  # Shape: [2, num_edges]
+            logger.info("Adjacency matrix created.")
+        else:
+            edge_index = np.array([[], []], dtype=int)
+            logger.info("No edges to create adjacency matrix.")
 
-        # Generate graph data
-        try:
-            node_features, edges = generate_graph_data(
-                file_path=file_path,
-                id_column=id_column,
-                edge_source_column=edge_source_column,
-                edge_target_column=edge_target_column,
-                additional_features=additional_features,
-                feature_generations=feature_generations,
-            )
-        except HTTPException as he:
-            raise he
-        except Exception as e:
-            logger.error(f"Unexpected error during graph data generation: {e}")
-            raise HTTPException(
-                status_code=500,
-                detail=f"Unexpected error during graph data generation: {e}",
-            )
+        # Determine task type: classification or regression
+        task_type = kwargs.get("task_type", "classification")  # Default to classification
 
-        # Perform graph neural network analysis
-        try:
-            graph_metrics = graph_neural_network_analysis(
-                node_features=node_features,
-                edges=edges,
-                id_column=id_column,
-            )
-        except HTTPException as he:
-            raise he
-        except Exception as e:
-            logger.error(f"Unexpected error during graph analysis: {e}")
-            raise HTTPException(
-                status_code=500, detail=f"Unexpected error during graph analysis: {e}"
-            )
+        if task_type == "classification":
+            # Assume binary classification if labels not provided
+            if "labels" not in kwargs or kwargs["labels"] is None:
+                labels = np.random.randint(0, 2, size=(X.shape[0],))
+                logger.info("Generated dummy binary labels for node classification.")
+            else:
+                labels = kwargs["labels"]
+                if isinstance(labels, pd.Series):
+                    labels = labels.values
+                elif isinstance(labels, list):
+                    labels = np.array(labels)
+                elif not isinstance(labels, np.ndarray):
+                    labels = np.array(labels)
+        elif task_type == "regression":
+            # Assume continuous labels
+            if "labels" not in kwargs or kwargs["labels"] is None:
+                labels = np.random.rand(X.shape[0])
+                logger.info("Generated dummy continuous labels for node regression.")
+            else:
+                labels = kwargs["labels"]
+                if isinstance(labels, pd.Series):
+                    labels = labels.values
+                elif isinstance(labels, list):
+                    labels = np.array(labels)
+                elif not isinstance(labels, np.ndarray):
+                    labels = np.array(labels)
+        else:
+            raise ValueError(f"Unsupported task type: {task_type}")
 
-        return graph_metrics
-    else:
-        logger.error(f"Model choice '{model_choice}' not recognized.")
-        raise HTTPException(status_code=400, detail="Model choice not recognized")
+        # Create a Graph object using Spektral
+        class MyDataset(Dataset):
+            def read(self):
+                return [Graph(x=X, a=edge_index, y=labels)]
+
+        dataset = MyDataset()
+        graph = dataset[0]
+
+        # Split the dataset into train and test
+        idx = np.arange(len(graph.x))
+        np.random.seed(random_state)
+        np.random.shuffle(idx)
+        split = int(0.8 * len(idx))
+        idx_train = idx[:split]
+        idx_test = idx[split:]
+
+        # Define the GNN model
+        class GCNModel(tf.keras.Model):
+            def __init__(self, num_classes: int):
+                super().__init__()
+                self.conv1 = GCNConv(16, activation="relu")
+                if task_type == "classification":
+                    self.conv2 = GCNConv(num_classes, activation="softmax")
+                elif task_type == "regression":
+                    self.conv2 = GCNConv(1, activation="linear")
+
+            def call(self, inputs):
+                x, a = inputs
+                x = self.conv1([x, a])
+                x = self.conv2([x, a])
+                return x
+
+        num_classes = 2 if task_type == "classification" else 1
+        model = GCNModel(num_classes=num_classes)
+
+        if task_type == "classification":
+            loss = "sparse_categorical_crossentropy"
+            metrics = ["accuracy"]
+        elif task_type == "regression":
+            loss = "mse"
+            metrics = ["mae", "mse"]
+
+        model.compile(
+            optimizer=Adam(learning_rate=0.01),
+            loss=loss,
+            metrics=metrics,
+        )
+        logger.info("Graph Neural Network model architecture created and compiled.")
+
+        # Train the model
+        model.fit(
+            [graph.x, graph.a],
+            graph.y,
+            sample_weight=np.isin(idx, idx_train).astype(float),
+            epochs=100,
+            batch_size=1,
+            verbose=0,
+        )
+        logger.info("Graph Neural Network model training completed.")
+
+        # Predict on test data
+        predictions = model.predict([graph.x, graph.a])
+        if task_type == "classification":
+            y_pred = np.argmax(predictions, axis=1)
+        else:
+            y_pred = predictions.flatten()
+        y_true = graph.y
+
+        # Evaluate the model
+        if task_type == "classification":
+            accuracy = np.mean(y_pred[idx_test] == y_true[idx_test])
+            logger.info(f"GNN Model Evaluation - Accuracy: {accuracy}")
+        elif task_type == "regression":
+            mse = mean_squared_error(y_true[idx_test], y_pred[idx_test])
+            mae = mean_absolute_error(y_true[idx_test], y_pred[idx_test])
+            r2 = r2_score(y_true[idx_test], y_pred[idx_test])
+            logger.info(f"GNN Model Evaluation - MSE: {mse}, MAE: {mae}, R2: {r2}")
+
+        # Prepare data for visualization
+        graph1 = {
+            "graph_type": "node_embeddings",
+            "embeddings": graph.x.tolist(),
+            "labels": y_true.tolist(),
+        }
+
+        graph2 = {
+            "graph_type": "adjacency",
+            "edge_index": edge_index.tolist(),
+        }
+
+        if task_type == "classification":
+            graph3 = {
+                "graph_type": "metrics_table",
+                "accuracy": accuracy,
+            }
+        elif task_type == "regression":
+            graph3 = {
+                "graph_type": "metrics_table",
+                "mse": mse,
+                "mae": mae,
+                "r2_score": r2,
+            }
+
+        result = {
+            "model": "GraphNeuralNetwork",
+            "architecture": "GCNConv -> GCNConv",
+            "optimizer": "Adam",
+            "learning_rate": 0.01,
+            "epochs": 100,
+            "loss": loss,
+            "metrics": metrics,
+            "graph1": graph1,
+            "graph2": graph2,
+            "graph3": graph3,
+        }
+
+        # Prepare summary data
+        actual_sample_size = min(sample_size, len(y_true))
+        sampled_indices_summary = np.random.choice(
+            len(y_true), size=actual_sample_size, replace=False
+        )
+        embeddings_sample = graph.x[sampled_indices_summary].tolist()
+        labels_sample = y_true[sampled_indices_summary].tolist()
+        edge_index_sample = (
+            edge_index[:, sampled_indices_summary].tolist()
+            if sampled_indices_summary.size > 0 and edge_index.shape[1] >= sampled_indices_summary.size
+            else []
+        )
+
+        graph1_summary = {
+            "graph_type": "node_embeddings",
+            "embeddings": embeddings_sample,
+            "labels": labels_sample,
+        }
+
+        graph2_summary = {
+            "graph_type": "adjacency",
+            "edge_index": edge_index_sample,
+        }
+
+        if task_type == "classification":
+            graph3_summary = {
+                "graph_type": "metrics_table",
+                "accuracy": accuracy,
+            }
+        elif task_type == "regression":
+            graph3_summary = {
+                "graph_type": "metrics_table",
+                "mse": mse,
+                "mae": mae,
+                "r2_score": r2,
+            }
+
+        summary = {
+            "model": "GraphNeuralNetwork",
+            "architecture": "GCNConv -> GCNConv",
+            "optimizer": "Adam",
+            "learning_rate": 0.01,
+            "epochs": 100,
+            "loss": loss,
+            "metrics": metrics,
+            "graph1": graph1_summary,
+            "graph2": graph2_summary,
+            "graph3": graph3_summary,
+        }
+
+        return {
+            "status": "success",
+            "result": result,
+            "summary": summary,
+        }
+
+    except KeyError as ke:
+        logger.error(f"Missing column: {ke}")
+        raise HTTPException(status_code=400, detail=f"Missing column: {ke}")
+    except Exception as e:
+        logger.exception(f"Error in graph_neural_network_analysis: {e}")
+        return {"status": "failed", "detail": str(e)}
