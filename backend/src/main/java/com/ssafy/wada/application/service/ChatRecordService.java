@@ -5,6 +5,7 @@ import com.ssafy.wada.application.repository.GuestRepository;
 import com.ssafy.wada.presentation.response.ChatHistoryDetailResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,8 +34,12 @@ public class ChatRecordService {
     public List<ChatHistoryResponse> getAllChatHistory(String sessionId) {
         // Eager 로딩 방식으로 Guest와 ChatRooms를 함께 조회
         Guest guest = guestRepository.findWithChatRoomsById(sessionId)
-            .orElseThrow(() -> new IllegalArgumentException("No guest found for sessionId: " + sessionId));
+            .orElse(null); // null을 반환하여 이후 처리 가능하게 수정
 
+        if (guest == null) {
+            log.warn("No guest found for sessionId: {}", sessionId);
+            return Collections.emptyList(); // 빈 리스트 반환
+        }
         log.info("Step 2: Fetching chat history for each ChatRoom associated with sessionId: {}", sessionId);
 
         return guest.getChatRooms().stream().flatMap(chatRoom -> {
