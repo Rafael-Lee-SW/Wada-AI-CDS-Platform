@@ -36,6 +36,7 @@ public class ModelDispatchService {
     private final GptClient gptClient;
     private final GptResponseParser gptResponseParser;
     private final ObjectMapper objectMapper;
+    private final ConvertToSelectedService convertToSelectedService;
 
     @Value("${openai.api.key}")
     private String apiKey;
@@ -65,6 +66,8 @@ public class ModelDispatchService {
             throw new IllegalArgumentException("fileUrl not found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
         } log.info("step3 Document 데이터에서 fileUrl 인덱스 0번 추출: {}", fileUrl);
 
+        Map<String, Object> recommendedModelFromLLM = (Map<String, Object>) chatRoomData.get("RecommendedModelFromLLM");
+        Map<String, Object> updatedRecommendedModelFromLLM = convertToSelectedService.ConvertRecommendedModelFromLLM(recommendedModelFromLLM, selectedModelIndex);
 
         // step4 선택된 모델 추출 선택된 모델 isSelected없애기
         List<Map<String, Object>> recommendedModels = getRecommendedModels(chatRoomData, chatRoomId, requestId);
@@ -81,7 +84,7 @@ public class ModelDispatchService {
         Map<String, Object> gptResultResponse = getGptResponse(selectedModel, fastApiResult);
 
         // MongoDB에 최종 데이터 저장
-        saveToMongoDB(query, recommendedModels, selectedModel, fastApiResult, gptResultResponse, chatRoomId);
+        saveToMongoDB(query, updatedRecommendedModelFromLLM, selectedModel, fastApiResult, gptResultResponse, chatRoomId);
 
         // 결과 반환
         return ModelDispatchResponse.of(requestId, selectedModel, fastApiResult, gptResultResponse);
@@ -113,17 +116,17 @@ public class ModelDispatchService {
         return gptResponseParser.parseGptResponse(gptResponseContent);
     }
 
-    private void saveToMongoDB(Query query, List<Map<String, Object>> recommendedModels, Map<String, Object> selectedModel,
+    private void saveToMongoDB(Query query, Map<String, Object> recommendedModels, Map<String, Object> selectedModel,
         Map<String, Object> fastApiResult, Map<String, Object> gptResultResponse, String chatRoomId) {
         Update update = new Update()
             .set("RecommendedModelFromLLM", recommendedModels)
             .set("SelectedModelFromUser", selectedModel)
             .set("ResultFromModel", fastApiResult)
             .set("ResultDescriptionFromLLM", gptResultResponse);
-
         mongoTemplate.upsert(query, update, "MongoDB");
         log.info("Saved analysis data with chatRoomId: {} in MongoDB", chatRoomId);
     }
+
     private Map<String, Object> selectModelByIndex(List<Map<String, Object>> recommendedModels, int selectedModelIndex) {
         if (selectedModelIndex < 0 || selectedModelIndex >= recommendedModels.size()) {
             throw new IllegalArgumentException("Invalid selected model index: " + selectedModelIndex);

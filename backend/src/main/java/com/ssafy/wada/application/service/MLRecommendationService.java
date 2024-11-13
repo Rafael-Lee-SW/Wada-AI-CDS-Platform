@@ -239,48 +239,88 @@ public class MLRecommendationService {
 		return content.length() / 4; // 간단한 추정치로 1 토큰 ≈ 4자
 	}
 
+	/**
+	 *
+	 * @param chatRoomId
+	 * @param requestId
+	 * @return
+	 * 선택된 모델 제외하고 새로 requestID 채번
+	 * Step1 ChatRoomId와 RequestId로 조회
+	 * Step2
+	 */
 	public Object mlRecommendationExceptChosenService(String chatRoomId, int requestId) {
 		log.info("Step 1: Start fetching data for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 2: MongoDB에서 chatRoomId와 requestId로 데이터 조회
 		Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
-		Document document = mongoTemplate.findOne(query, Document.class, "MongoDB");
+		Document chatRoomDataDoc = mongoTemplate.findOne(query, Document.class, "MongoDB");
 
-		if (document == null) {
+		if (chatRoomDataDoc == null) {
 			log.error("Step 2: Data not found for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
 		log.info("Step 2: Data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+		Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
 
-		// Step 3: RecommendedModelFromLLM 필드가 있는지 확인하고 형식 검증
-		Object recommendedModelFromLLMObj = document.get("RecommendedModelFromLLM");
-		if (!(recommendedModelFromLLMObj instanceof List)) {
-			log.error("Step 3: RecommendedModelFromLLM field is missing or invalid in MongoDB data for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
-			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
-		}
-		log.info("Step 3: RecommendedModelFromLLM field is valid for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+		// Step 3: 필요한 필드를 기존 데이터에서 추출 및 null 체크
+		Object fileUrls = chatRoomData.getOrDefault("fileUrls", new ArrayList<>()); // 기본 빈 리스트
+		Object createdTime = chatRoomData.getOrDefault("createdTime", LocalDateTime.now()); // 기본 현재 시간
+		Object requirement = chatRoomData.getOrDefault("requirement", ""); // 기본 빈 문자열
+		Map<String, Object> purposeUnderstanding = (Map<String, Object>) chatRoomData.getOrDefault("purpose_understanding", new HashMap<>());
+		List<Map<String, Object>> dataOverview = (List<Map<String, Object>>) chatRoomData.getOrDefault("data_overview", new ArrayList<>());
 
-		List<Document> recommendedModelFromLLM = (List<Document>) recommendedModelFromLLMObj;
+		// Step 4: RecommendedModelFromLLM 필드가 있는지 확인하고 형식 검증
+		Map<String, Object> recommendedModelFromLLMObj = (Map<String, Object>) chatRoomData.get("RecommendedModelFromLLM");
 
-		// Step 4: model_recommendations 필드 가져오기
-		List<Map<String, Object>> modelRecommendations;
-		try {
-			modelRecommendations = recommendedModelFromLLM.stream()
-				.map(model -> (Map<String, Object>) model)  // 모델 객체를 Map으로 변환
+		// model_recommendations 필드를 List<Map<String, Object>> 형식으로 캐스팅
+		List<Map<String, Object>> modelRecommendations = null;
+		if (recommendedModelFromLLMObj != null && recommendedModelFromLLMObj.get("model_recommendations") instanceof List) {
+			modelRecommendations = ((List<?>) recommendedModelFromLLMObj.get("model_recommendations")).stream()
+				.filter(item -> item instanceof Map)
+				.map(item -> (Map<String, Object>) item)
 				.collect(Collectors.toList());
-			log.info("Step 4: model_recommendations retrieved successfully for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
-		} catch (ClassCastException e) {
-			log.error("Step 4: model_recommendations is not in expected format in RecommendedModelFromLLM for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
+		} else {
+			log.error("Step 4: model_recommendations field is missing or invalid in MongoDB data for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
+		log.info("Step 4: model_recommendations field is valid for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
-		// Step 5: isSelected가 true인 항목을 제외한 결과 반환
+		// Step 5: model_recommendations 필드에서 isSelected가 true인 항목을 제외
 		List<Map<String, Object>> filteredRecommendations = modelRecommendations.stream()
-			.filter(model -> !(Boolean.TRUE.equals(model.get("isSelected"))))
+			.filter(model -> !Boolean.TRUE.equals(model.get("isSelected")))
 			.collect(Collectors.toList());
 
-		log.info("Step 5: Returning filtered model recommendations for chatRoomId: {}, requestId: {}. Total recommendations: {}", chatRoomId, requestId, filteredRecommendations.size());
+		log.info("Step 5: Filtered model recommendations for chatRoomId: {}, requestId: {}. Total recommendations: {}", chatRoomId, requestId, filteredRecommendations.size());
 
-		return filteredRecommendations;
+		// Step 6: 새 requestId 생성 - chatRoomId로 조회된 객체 수 + 1
+		Query countQuery = new Query(Criteria.where("chatRoomId").is(chatRoomId));
+		long existingCount = mongoTemplate.count(countQuery, "MongoDB");
+		int newRequestId = (int) existingCount + 1;
+		log.info("Step 6: Generated new requestId: {}", newRequestId);
+
+		// Step 7: 새로운 Document에 필드 저장
+		Document newDocument = new Document();
+		newDocument.put("chatRoomId", chatRoomId);
+		newDocument.put("requestId", newRequestId);
+		newDocument.put("createdTime", createdTime);
+		newDocument.put("fileUrls", fileUrls);
+		newDocument.put("requirement", requirement);
+		newDocument.put("RecommendedModelFromLLM", Map.of(
+			"purpose_understanding", purposeUnderstanding,
+			"data_overview", dataOverview,
+			"model_recommendations", filteredRecommendations
+		));
+
+		mongoTemplate.insert(newDocument, "MongoDB");
+		log.info("Step 7: Saved filtered recommendations to MongoDB with new requestId: {}", newRequestId);
+
+		// Step 8: 필요한 형식으로 응답 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("requestId", newRequestId);
+		response.put("purpose_understanding", purposeUnderstanding);
+		response.put("data_overview", dataOverview);
+		response.put("model_recommendations", filteredRecommendations);
+
+		return response;
 	}
 }
