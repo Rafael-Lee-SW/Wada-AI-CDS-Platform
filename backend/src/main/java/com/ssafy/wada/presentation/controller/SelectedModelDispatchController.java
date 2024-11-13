@@ -2,7 +2,9 @@ package com.ssafy.wada.presentation.controller;
 
 import com.ssafy.wada.application.service.ModelDispatchService;
 import com.ssafy.wada.presentation.request.SelectedModelFromNextToSpringRequest;
+import com.ssafy.wada.presentation.response.ModelConversationResponse;
 import com.ssafy.wada.presentation.response.ModelDispatchResponse;
+import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,5 +33,19 @@ public class SelectedModelDispatchController {
 
         // ModelDispatchService에 chatRoomId와 selectedModel 전달
         return modelDispatchService.dispatchModel(chatRoomId,requestId, selectedModel);
+    }
+
+    @PostMapping("/conversation")
+    public ModelConversationResponse HandleConversation(@RequestBody Map<String, Object> request){
+        String chatRoomId = (String) request.get("chatRoomId");
+        int requestId = (Integer) request.get("requestId");
+        String text = (String) request.get("text");
+        log.info("Received chatRoomId: {}, requestId: {} , text: {}" , chatRoomId, requestId , text);
+// ModelDispatchService의 Conversation 메서드 호출
+        String answer = modelDispatchService.Conversation(chatRoomId, requestId, text);
+
+        // 응답 데이터 생성 및 반환
+        return new ModelConversationResponse(requestId, answer, LocalDateTime.now());
+
     }
 }

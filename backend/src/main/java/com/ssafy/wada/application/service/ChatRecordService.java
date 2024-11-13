@@ -55,13 +55,14 @@ public class ChatRecordService {
                 log.info("Data found in MongoDB for chatRoomId: {}", chatRoomId);
                 return chatRoomDataList.stream().map(chatRoomData -> new ChatHistoryResponse(
                     chatRoomId,
+                    (String) chatRoomData.get("fileName"),
                     (String) chatRoomData.get("requirement"),
                     chatRoomData.get("ResultDescriptionFromLLM"),
                     chatRoom.getCreatedAt()
                 ));
             } else {
                 log.warn("No data found in MongoDB for chatRoomId: {}", chatRoomId);
-                return Stream.of(new ChatHistoryResponse(chatRoomId, "No data found", null,
+                return Stream.of(new ChatHistoryResponse(chatRoomId, "No data found", null, null,
                     chatRoom.getCreatedAt()));
             }
         }).collect(Collectors.toList());

@@ -5,6 +5,7 @@ import static com.ssafy.wada.application.domain.util.AttachedFile.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.wada.application.domain.File;
 import com.ssafy.wada.application.repository.FileRepository;
+import com.ssafy.wada.client.openai.GptRequest.GptResultRequest;
 import com.ssafy.wada.client.openai.PromptGenerator;
 import com.ssafy.wada.common.error.SessionErrorCode;
 import java.time.LocalDateTime;
@@ -60,6 +61,7 @@ public class MLRecommendationService {
 	private final GptClient gptClient;
 	private final S3Client s3Client;
 	private final MongoTemplate mongoTemplate;
+	private final PromptGenerator promptGenerator;
 
 	@Value("${openai.api.key}")
 	private String apiKey;
@@ -72,7 +74,7 @@ public class MLRecommendationService {
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
 		log.info("Step 1-1: Guest retrieved or created with sessionId={}", sessionId);
-
+		String fileName = files.get(0).getOriginalFilename();
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
 			.orElseGet(() -> {
 				log.info("ChatRoom with chatRoomId={} not found for guest with sessionId={}. Creating new ChatRoom.", chatRoomId, sessionId);
@@ -136,13 +138,15 @@ public class MLRecommendationService {
 		int responseToken = calculateTokens(gptResponse);
 
 		// Step 6: MongoDB에 GPT 응답 및 파일 URL 리스트 저장
-		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, analysisPurpose, requestToken, responseToken);
+		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, analysisPurpose, requestToken, responseToken,inputDataList,fileName);
 		log.info("Step 6: GPT response and file paths saved to MongoDB with requestId={}", requestId);
 
 		return createResponse(gptResponse, requestId);
 	}
 
-	private int saveGptResponseToMongo(String gptResponse, String chatRoomId, List<String> fileUrls, String requirement, int requestToken, int responseToken) {
+	private int saveGptResponseToMongo(String gptResponse, String chatRoomId,
+		List<String> fileUrls, String requirement, int requestToken,
+		int responseToken, List<Map<String, Object>> inputDataList,String fileName) {
 		try {
 			// GPT 응답의 content 추출 및 Map으로 변환
 			JsonNode rootNode = objectMapper.readTree(gptResponse);
@@ -180,6 +184,8 @@ public class MLRecommendationService {
 			analysisRequest.put("requestTokenUsage", totalRequestTokenUsage);
 			analysisRequest.put("responseTokenUsage", totalResponseTokenUsage);
 			analysisRequest.put("totalPrice", totalPrice);
+			analysisRequest.put("inputDataList", inputDataList);
+			analysisRequest.put("fileName",fileName);
 
 			mongoTemplate.save(new Document(analysisRequest), "MongoDB");
 			log.info("Saved data with chatRoomId: {} and requestId: {}", chatRoomId, newRequestId);
@@ -266,11 +272,13 @@ public class MLRecommendationService {
 		Object fileUrls = chatRoomData.getOrDefault("fileUrls", new ArrayList<>()); // 기본 빈 리스트
 		Object createdTime = chatRoomData.getOrDefault("createdTime", LocalDateTime.now()); // 기본 현재 시간
 		Object requirement = chatRoomData.getOrDefault("requirement", ""); // 기본 빈 문자열
-		Map<String, Object> purposeUnderstanding = (Map<String, Object>) chatRoomData.getOrDefault("purpose_understanding", new HashMap<>());
-		List<Map<String, Object>> dataOverview = (List<Map<String, Object>>) chatRoomData.getOrDefault("data_overview", new ArrayList<>());
+
 
 		// Step 4: RecommendedModelFromLLM 필드가 있는지 확인하고 형식 검증
 		Map<String, Object> recommendedModelFromLLMObj = (Map<String, Object>) chatRoomData.get("RecommendedModelFromLLM");
+		Object purposeUnderstanding =  recommendedModelFromLLMObj.get("purpose_understanding");
+		Object dataOverview = recommendedModelFromLLMObj.get("data_overview");
+
 
 		// model_recommendations 필드를 List<Map<String, Object>> 형식으로 캐스팅
 		List<Map<String, Object>> modelRecommendations = null;
@@ -323,4 +331,56 @@ public class MLRecommendationService {
 
 		return response;
 	}
+
+	public Object alternativeRecommend(String chatRoomId, int requestId, String newRequirement) {
+		log.info("Step 1: Start alternative recommendation process for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		// Step 2: MongoDB에서 요청 문서 조회
+		Query query = new Query();
+		query.addCriteria(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
+		Document chatRoomDataDoc = mongoTemplate.findOne(query, Document.class, "MongoDB");
+
+		if (chatRoomDataDoc == null) {
+			log.warn("Step 2: No data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+			return "데이터를 찾을 수 없습니다.";
+		}
+		log.info("Step 2: Found MongoDB document for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		// Step 3: Document를 Map으로 변환
+		Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
+		log.info("Step 3: Converted MongoDB document to Map for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		// Step 4: 필요한 데이터 추출
+		Object requirement = chatRoomData.get("requirement");
+		List<String> fileUrls = (List<String>) chatRoomData.get("fileUrls");
+		List<Map<String, Object>> inputDataList = (List<Map<String, Object>>) chatRoomData.get("inputDataList");
+		String fileName = (String) chatRoomData.get("fileName");
+		Object recommendedModelFromLLM = chatRoomData.get("RecommendedModelFromLLM");
+		log.info("Step 4: Extracted requirement, fileUrls, inputDataList, and recommendedModelFromLLM for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		// Step 5: System Prompt 및 User Prompt 생성
+		String systemPrompt = promptGenerator.createSystemPromptForAlternative(requirement, inputDataList, recommendedModelFromLLM);
+		String userPrompt = promptGenerator.createUserPromptForAlternative(newRequirement);
+		log.info("Step 5: Generated systemPrompt and userPrompt for alternative recommendation for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		// Step 6: GPT 요청
+		GptResultRequest gptRequest = new GptResultRequest(systemPrompt, userPrompt);
+		String gptResponse = gptClient.callFunctionWithResultRequest("Bearer " + apiKey, gptRequest);
+		log.info("Step 6: Received GPT response for alternative recommendation for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+		// Step 7: MongoDB에 GPT 응답 저장
+		int requestToken = calculateTokens(systemPrompt + userPrompt);
+		int responseToken = calculateTokens(gptResponse);
+		log.info("gptResponse: {}", gptResponse);
+
+		int newRequestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, newRequirement, requestToken, responseToken, inputDataList,fileName);
+		log.info("Step 7: Saved GPT response to MongoDB with newRequestId: {} for chatRoomId: {}", newRequestId, chatRoomId);
+
+		// Step 8: 응답 포맷팅
+		String formattedResponse = createResponse(gptResponse, newRequestId);
+		log.info("Step 8: Created formatted response for newRequestId: {}", newRequestId);
+
+		return formattedResponse;
+	}
+
 }

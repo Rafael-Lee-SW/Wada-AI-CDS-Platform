@@ -10,7 +10,9 @@ import com.ssafy.wada.client.openai.GptRequest.GptResultRequest;
 import com.ssafy.wada.client.openai.GptResponseParser;
 import com.ssafy.wada.client.openai.PromptGenerator;
 import com.ssafy.wada.presentation.response.ModelDispatchResponse;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -152,6 +154,70 @@ public class ModelDispatchService {
         if (!model.containsKey(key)) {
             model.put(key, null);
         }
+    }
+
+    public String Conversation(String chatRoomId, int requestId, String answer) {
+        // Step 1: MongoDB에서 chatRoomId와 requestId로 Document 조회
+        Query query = new Query();
+        query.addCriteria(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
+        Document chatRoomDataDoc = mongoTemplate.findOne(query, Document.class, "MongoDB");
+
+        if (chatRoomDataDoc == null) {
+            System.out.println("No data found for chatRoomId: " + chatRoomId + ", requestId: " + requestId);
+            return "데이터를 찾을 수 없습니다.";
+        }
+        log.info("Step 1: Found MongoDB document for requestId: {}, chatRoomId: {}", requestId, chatRoomId);
+
+        // Step 2: Document를 Map으로 변환
+        Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
+
+        // Step 3: 분석 결과가 없으면 반환
+        Object analysis_result = chatRoomData.get("ResultFromModel");
+        if (analysis_result == null) {
+            return "분석결과가 없습니다.";
+        }
+
+        Object report_summary = chatRoomData.get("ResultDescriptionFromLLM");
+        if (report_summary == null) {
+            return "분석결과가 없습니다.";
+        }
+
+        // Step 4: ConversationRecord 리스트 확인 및 초기화
+        List<Map<String, Object>> conversationRecord = (List<Map<String, Object>>) chatRoomData.get("ConversationRecord");
+        if (conversationRecord == null) {
+            conversationRecord = new ArrayList<>();
+            chatRoomData.put("ConversationRecord", conversationRecord);
+        }
+
+        // Step 5: analysisContext 생성 및 GPT 프롬프트 생성
+        Map<String, Object> analysisContext = new HashMap<>();
+        analysisContext.put("analysis_result", analysis_result);
+        analysisContext.put("report_summary", report_summary);
+        analysisContext.put("previous_QA_summary", conversationRecord);
+
+        String systemPrompt = promptGenerator.createSystemPromptForConversation(analysisContext);
+        String userPrompt = promptGenerator.createUserPromptForConversation(answer);
+
+        // Step 6: GPT 요청
+        GptResultRequest gptRequest = new GptResultRequest(systemPrompt, userPrompt);
+        String gptResponse = gptClient.callFunctionWithResultRequest("Bearer " + apiKey, gptRequest);
+
+        // Step 7: Q&A 기록 생성 및 타임스탬프 추가
+        Map<String, Object> qaEntry = new HashMap<>();
+        qaEntry.put("question", answer);
+        qaEntry.put("answer", gptResponse);
+        qaEntry.put("timestamp", LocalDateTime.now().toString()); // 현재 시간 추가
+
+        // Step 8: ConversationRecord에 새 Q&A 기록 추가
+        conversationRecord.add(qaEntry);
+
+        // Step 9: MongoDB에 업데이트
+        chatRoomData.put("ConversationRecord", conversationRecord);
+        mongoTemplate.save(new Document(chatRoomData), "MongoDB");
+
+        log.info("Step 9: ConversationRecord updated with new entry for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+
+        return gptResponse;
     }
 }
 

@@ -50,4 +50,16 @@ public class MLModelRecommendController {
 		log.info("Received request for model recommendation with chatRoomId: {} and requestId: {} and sessionId: {}", chatRoomId, requestId,sessionId);
 		return ResponseEntity.ok(mlRecommendationService.mlRecommendationExceptChosenService(chatRoomId, requestId));
 	}
+	@PostMapping(value = "/alternative", produces = "application/json")
+	public ResponseEntity<Object> getMLModelRecommend(
+		@RequestBody Map<String, Object> payload
+	) {
+		String chatRoomId = (String) payload.get("chatRoomId");
+		int requestId = (int) payload.get("requestId");
+		String newRequirement = (String) payload.get("newRequirement");
+		log.info("chatRoomId: {}", chatRoomId);
+		log.info("requestId: {}", requestId);
+		log.info("newRequirement: {}", newRequirement);
+		return ResponseEntity.ok(mlRecommendationService.alternativeRecommend(chatRoomId, requestId, newRequirement));
+	}
 }
