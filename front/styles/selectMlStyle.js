@@ -1,15 +1,36 @@
+
 const styles = {
     container: {
         display: 'flex',
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
+        width: '100vw',
+        height: '100vh', 
+        overflowY: 'auto', 
+        scrollSnapType: 'y mandatory', 
+        scrollbarWidth: 'none'
+    },
+    preContainer: {
+        display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
-        textAlign: 'center',
-        backgroundColor: 'white',
-        minHeight: '100%',
-        paddingBottom: '80px',
-        transition: 'transform 0.5s ease'
+        alignItems: 'center',
+        width: '100%',
+        minHeight: '100vh',
+        boxSizing: 'border-box',
+        scrollSnapAlign: 'start', 
+    },
+    modelSelectContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100vw',
+        minHeight: '100vh', 
+        boxSizing: 'border-box',
+        scrollSnapAlign: 'start', 
+        paddingBottom: '50px'
     },
     h2: {
         fontSize: '20px',
@@ -21,7 +42,7 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         paddingBottom: '10px',
-        paddingRight: '10px'
+        paddingRight: '10px',
     },
     iconText: {
         fontSize: '25px',
@@ -41,15 +62,24 @@ const styles = {
         gap: '20px',
         marginTop: '20px',
         alignItems: 'center',
+        paddingBottom: '40px'
     },
     preCardContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        gap: '20px',
+        flexWrap: 'wrap',
+        padding: '20px'
+    },
+    preContentContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'stretch',
         gap: '20px',
         flexWrap: 'wrap',
-        padding: '20px'
     },
     cardText: {
         fontSize: '22px',
@@ -70,14 +100,28 @@ const styles = {
         textAlign: 'center',
         overflowY: 'auto',
         scrollbarWidth: 'none',
-        maxHeight: '220px'
+        maxHeight: '220px',
+        padding: '15px 20px 20px',
+    },
+    cardContent: {
+        textAlign: 'start',
+        paddingTop: '10px'
+    },
+    modelContent: {
+        paddingTop: '10px'
     },
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '20px'
+        gap: '20px',
+        width: '100%',
+    },
+    button2Container: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-end'
     },
     button: {
         padding: '10px 20px',
@@ -86,7 +130,14 @@ const styles = {
         color: 'white',
         border: 'none',
         borderRadius: '5px',
-        marginTop: '20px',
+    },
+    button2: {
+        padding: '10px 20px',
+        fontSize: '16px',
+        backgroundColor: '#9370db',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
     },
     flipCard: {
         backgroundColor: 'transparent',
@@ -117,7 +168,7 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center', 
         width: '100%',
-        minHeight: '254px',
+        maxHeight: '254px',
         backfaceVisibility: 'hidden',
         border: '1px solid #9370db',
         borderRadius: '1rem',
@@ -126,7 +177,8 @@ const styles = {
         overflowY: 'auto',
         scrollbarWidth: 'none',
         boxSizing: 'border-box',
-        padding: '10px'
+        padding: '15px 20px 20px',
+        justifyContent: 'flex-start',
     },
     flipCardBack: {
         boxShadow: '0 8px 14px 0 rgba(0,0,0,0.2)',
@@ -154,13 +206,12 @@ const styles = {
         wordBreak: 'keep-all',
     },
     title1: {
-        fontSize: '18px',
+        fontSize: '20px',
         fontWeight: 900,
         margin: 0,
         wordWrap: 'break-word',
         wordBreak: 'break-all',
         whiteSpace: 'normal', 
-        overflow: 'hidden',
     },
     title: {
         fontSize: '18px',

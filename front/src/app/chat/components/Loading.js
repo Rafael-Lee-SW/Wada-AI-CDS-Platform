@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaCheck } from 'react-icons/fa';
 
@@ -11,16 +11,50 @@ const steps = [
 ];
 
 const ProgressBar = ({ currentStep }) => {
+    const [message, setMessage] = useState('');
+
     const renderMessage = () => {
         switch (currentStep) {
             case 1:
-                return '업로드하신 내용을 바탕으로 사전분석을 수행하는 중이에요. 잠시만 기다려주세요.';
+                return '업로드하신 내용을 바탕으로 사전 분석을 수행하는 중이에요. 잠시만 기다려주세요.';
             case 3:
                 return '선택하신 모델을 사용해 데이터를 분석하는 중입니다. 잠시만 기다려주세요.';
             default:
                 return '';
         }
     };
+
+    const [isTimeout, setIsTimeout] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsTimeout(true);
+            setMessage('거의 다 됐어요! 조금만 더 기다려주세요.');
+        }, 7000); // 7초
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        setMessage(renderMessage());
+    }, [currentStep]);
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const slides = [
+        { image: '/img/1.png' },
+        { image: '/img/2.png' },
+        { image: '/img/3.png' },
+        { image: '/img/4.png' },
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length); // 슬라이드 전환
+        }, 8000); 
+
+        return () => clearInterval(interval); 
+    }, [slides.length]);
 
     return (
         <Overlay>
@@ -43,7 +77,21 @@ const ProgressBar = ({ currentStep }) => {
                         </StepContainer>
                     ))}
                 </StepsWrapper>
-                {renderMessage() && <Message>{renderMessage()}</Message>}
+                {message && <Message>{message}</Message>}
+                {/* 슬라이드 추가 */}
+                <SlideContainer>
+                    <SlideWrapper
+                        style={{
+                            transform: `translateX(-${currentIndex * 100}%)`,
+                        }}
+                    >
+                        {slides.map((slide, index) => (
+                            <Slide key={index}>
+                                <Image src={slide.image} alt={`slide ${index + 1}`} />
+                            </Slide>
+                        ))}
+                    </SlideWrapper>
+                </SlideContainer>
             </Container>
         </Overlay>
     );
@@ -71,11 +119,9 @@ const Overlay = styled.div`
 
 const Container = styled.div`
     background-color: white;
-    padding: 30px;
     border-radius: 15px;
-    width: 80%;
+    width: 100%;
     max-width: 600px;
-    margin: 0 auto;
     text-align: center;
 `;
 
@@ -131,6 +177,33 @@ const Message = styled.div`
     margin-top: 20px;
     font-size: 14px;
     color: #888;
+`;
+
+const SlideContainer = styled.div`
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-top: 20px;
+`;
+
+const SlideWrapper = styled.div`
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+`;
+
+const Slide = styled.div`
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+const Image = styled.img`
+    width: 90%;
+    height: 500px;
+    object-fit: cover;
+    height: auto;
+    border-radius: 10px;
 `;
 
 export default ProgressBar;

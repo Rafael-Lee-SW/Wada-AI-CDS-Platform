@@ -10,7 +10,7 @@ import RequirementUploader from "./RequirementUploader";
 import NewChat from "./NewChat";
 
 export default function Home({ sessionId }) {
-
+    const [pageHistory, setPageHistory] = useState([]);
     const [submittedFile, setSubmittedFile] = useState([]);
     const [submittedRequirement, setSubmittedRequirement] = useState('');   
     const [requirement, setRequirement] = useState('');
@@ -25,7 +25,14 @@ export default function Home({ sessionId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
-    const [graphs, setGraphs] = useState([]);
+
+    const handleGoBack = () => {
+        if (pageHistory.length > 0) {
+            const lastPage = pageHistory.pop(); 
+            setPage(lastPage);
+            setPageHistory([...pageHistory]); 
+        }
+    };
 
     useEffect(() => {
         const getChatList = async () => {
@@ -64,10 +71,8 @@ export default function Home({ sessionId }) {
 
             const fileUrl = response.data.fileUrl;
             console.log("특정채팅방 내용: ", response.data);
-            // const modelResult = response.data.resultFromModel.result;
 
             setSubmittedFile([fileUrl]);  
-            // setResult(modelResult);
 
             setPage('chatContent');
         } catch (error) {
@@ -77,13 +82,15 @@ export default function Home({ sessionId }) {
         }
     };
 
-    const handleChangePage = (pageName) => {
-        setPage(pageName);
-    }
+    const handleChangePage = (newPage) => {
+        setPageHistory((prevHistory) => [...prevHistory, page]); 
+        setPage(newPage);
+    };
+
 
     const handleChangeHome = (event) => {
         event.preventDefault();
-        setPage('fileUploader');
+        setPage('newChat');
     }
 
     const handleSubmitFiles = (files) => {
@@ -142,7 +149,7 @@ export default function Home({ sessionId }) {
         setPurpose(result.purpose_understanding);
         setOverview(result.data_overview);
         setRequestId(result.requestId);
-        setPage('selectML');
+        handleChangePage('selectML');
 
         if (response.status != 200) {
             throw new Error("업로드 실패");
@@ -157,7 +164,6 @@ export default function Home({ sessionId }) {
 
     };
 
-    // selectMl 에서 선택된 모델로 분석 요청
     const handleModelSelect = async (chatRoomId, requestId, index) => {
 
         console.log("모델 선택 후 보내는 데이터")
@@ -181,7 +187,7 @@ export default function Home({ sessionId }) {
             const result = response.data;
 
             setResult(result); 
-            setPage('chatContent'); 
+            handleChangePage('chatContent')
             console.log("최종 데이터: ", result);
 
         } catch (error) {
@@ -220,8 +226,20 @@ export default function Home({ sessionId }) {
                 </div>
             </div>
         </div>
-
-        {/* page 상태에 따른 조건부 렌더링 */}
+        <img 
+        src="/img/goBack.png" 
+        onClick={handleGoBack} 
+        style={{ 
+            width: '20px', 
+            position: 'absolute', 
+            op: 20, 
+            left: 20, 
+            zIndex: 9999, 
+            position: 'fixed', 
+            left: '200px', 
+            top: '18px',
+            display: (page === 'fileUploader' || page === 'newChat') ? 'none' : 'block'
+        }}/>
         {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit}/>}
         {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedRequirement} result={result}/>}
         {page === 'loading' && <Loading currentStep={currentStep}/>}
@@ -230,6 +248,5 @@ export default function Home({ sessionId }) {
         {page === 'loading2' && <Loading/>}
         {page === 'newChat' && <NewChat/>}
     </div>
-);
-
+    );
 }

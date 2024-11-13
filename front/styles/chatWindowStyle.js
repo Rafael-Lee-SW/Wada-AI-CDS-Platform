@@ -3,7 +3,8 @@ const styles = {
         display: 'flex',
         maxHeight: '100vh',
         backgroundColor: 'white',
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+        
     },
     sidebar: {
         display: 'flex',
