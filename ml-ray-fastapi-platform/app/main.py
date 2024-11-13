@@ -23,6 +23,8 @@ from models import (
     kmeans_clustering_anomaly_detection,
     neural_network_regression,
     graph_neural_network_analysis,
+    support_vector_machine_classification,
+    support_vector_machine_regression,
 )
 
 # Import necessary classes for serialization
@@ -156,6 +158,8 @@ async def predict(request: ModelRequest):
         "kmeans_clustering_anomaly_detection": kmeans_clustering_anomaly_detection,
         "neural_network_regression": neural_network_regression,
         "graph_neural_network_analysis": graph_neural_network_analysis,
+        "support_vector_machine_classification": support_vector_machine_classification,
+        "support_vector_machine_regression": support_vector_machine_regression,
     }
 
     if model_choice not in model_functions:
@@ -177,7 +181,7 @@ async def predict(request: ModelRequest):
             exclude_columns = kwargs.pop("exclude_columns", None)
             sample_size = kwargs.pop("sample_size", 10)
             random_state = kwargs.pop("random_state", 42)
-            
+
             # Now call the function with explicit parameters
             results = model_function(
                 file_path=file_path,
@@ -187,7 +191,7 @@ async def predict(request: ModelRequest):
                 exclude_columns=exclude_columns,
                 sample_size=sample_size,
                 random_state=random_state,
-                **kwargs  # Any remaining parameters
+                **kwargs,  # Any remaining parameters
             )
         else:
             # For other models, pass all parameters
@@ -198,6 +202,7 @@ async def predict(request: ModelRequest):
     except Exception as e:
         logger.exception(f"Error occurred while running model '{model_choice}': {e}")
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
+
 
 # Ray Serve deployment
 @serve.deployment

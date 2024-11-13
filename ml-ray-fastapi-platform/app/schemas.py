@@ -1,6 +1,6 @@
 # app/schemas.py
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 class FeatureGeneration(BaseModel):
     type: str
@@ -31,6 +31,11 @@ class ModelRequest(BaseModel):
     feature_generations: Optional[List[FeatureGeneration]] = None
     additional_features: Optional[List[str]] = None
     threshold: Optional[float] = None  # For anomaly detection
+    kernel: Optional[str] = "rbf" # For SVM
+    C: Optional[float] = 1.0 # For SVM
+    gamma: Optional[Union[str, float]] = "scale" # For SVM
+    epsilon: Optional[float] = 0.1  # For SVM
+    param_grid: Optional[Dict[str, List[Any]]] = None # For SVM
 
     model_config = ConfigDict(
         protected_namespaces=()

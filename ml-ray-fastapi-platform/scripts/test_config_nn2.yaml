@@ -1,135 +1,5 @@
 tests:
   - id: 1
-    description: "1. Random Forest Regression"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
-      model_choice: "random_forest_regression"
-      target_variable: "PerfScoreID"
-      feature_columns:
-        - "EmpSatisfaction"
-        - "EngagementSurvey"
-        - "SpecialProjectsCount"
-        - "Absences"
-        - "DaysLateLast30"
-        - "Department"
-        - "Position"
-        - "Salary"
-        - "TenureDays"
-        - "ManagerID"
-      id_column: "EmpID"
-    expected_status: 200
-
-  - id: 2
-    description: "2. Random Forest Classification"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
-      model_choice: "random_forest_classification"
-      target_variable: "Termd"
-      feature_columns:
-        - "EmpSatisfaction"
-        - "EngagementSurvey"
-        - "PerfScoreID"
-        - "Salary"
-        - "TenureDays"
-        - "Absences"
-        - "DaysLateLast30"
-        - "Department"
-        - "Position"
-        - "ManagerID"
-      id_column: "EmpID"
-    expected_status: 200
-
-  - id: 3
-    description: "3. Logistic Regression Binary Classification - Generate Overpaid Feature"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
-      model_choice: "logistic_regression_binary"
-      target_variable: "Overpaid"
-      feature_columns:
-        - "PerfScoreID"
-        - "EmpSatisfaction"
-        - "EngagementSurvey"
-        - "SpecialProjectsCount"
-        - "Absences"
-        - "DaysLateLast30"
-        - "Department"
-        - "Position"
-        - "Salary"
-        - "TenureDays"
-        - "ManagerID"
-      binary_conditions:
-        - column: "Salary"
-          operator: ">"
-          value: 75000
-          target_column: "Overpaid"
-        - column: "PerfScoreID"
-          operator: "<"
-          value: 3
-          target_column: "Overpaid"
-    expected_status: 200
-
-  - id: 4
-    description: "4. Logistic Regression Multinomial Classification"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
-      model_choice: "logistic_regression_multinomial"
-      target_variable: "PerfScoreID"
-      feature_columns:
-        - "EmpSatisfaction"
-        - "EngagementSurvey"
-        - "SpecialProjectsCount"
-        - "Absences"
-        - "DaysLateLast30"
-        - "Department"
-        - "Position"
-        - "Salary"
-        - "TenureDays"
-        - "ManagerID"
-      plot_filename: "multinomial_plot.png"
-    expected_status: 200
-
-  - id: 5
-    description: "5. K-Means Clustering - Employee Segmentation"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
-      model_choice: "kmeans_clustering_segmentation"
-      feature_columns:
-        - "Position"
-        - "Department"
-        - "Salary"
-        - "TenureDays"
-        - "ManagerID"
-      num_clusters: 4
-    expected_status: 200
-
-  - id: 6
-    description: "6. K-Means Clustering - Anomaly Detection"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
-      model_choice: "kmeans_clustering_anomaly_detection"
-      feature_columns:
-        - "Salary"
-        - "TenureDays"
-        - "Absences"
-        - "EngagementSurvey"
-        - "ManagerID"
-      num_clusters: 4
-      threshold: 1.5
-    expected_status: 200
-
-  - id: 7
     description: "Neural Network Regression on Absence Cost Impact"
     endpoint: "/predict"
     method: "POST"
@@ -159,7 +29,7 @@ tests:
       id_column: "Employee ID"
     expected_status: 200
 
-  - id: 8
+  - id: 2
     description: "Graph Neural Network Regression on Absence Cost Impact"
     endpoint: "/predict"
     method: "POST"
@@ -193,7 +63,7 @@ tests:
       random_state: 42
     expected_status: 200
 
-  - id: 9
+  - id: 3
     description: "Graph Neural Network Classification on Role Criticality Score"
     endpoint: "/predict"
     method: "POST"
@@ -226,7 +96,7 @@ tests:
       random_state: 42
     expected_status: 200
 
-  - id: 10
+  - id: 4
     description: "Neural Network Regression with Limited Features"
     endpoint: "/predict"
     method: "POST"
@@ -242,12 +112,12 @@ tests:
       id_column: "Employee ID"
     expected_status: 200
 
-  - id: 11
+  - id: 5
     description: "Neural Network Regression with Missing Values"
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/your-dataset-with-missing-values.csv"
       model_choice: "neural_network_regression"
       target_variable: "Absence Cost Impact ($)"
       feature_columns:
@@ -271,5 +141,3 @@ tests:
         - "Skill Redundancy Level"
       id_column: "Employee ID"
     expected_status: 200
-
-
