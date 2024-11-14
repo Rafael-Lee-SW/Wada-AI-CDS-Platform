@@ -47,7 +47,10 @@ public class ChatRecordService {
             log.info("Processing ChatRoom with chatRoomId: {}", chatRoomId);
 
             // Step 2-1: MongoDB에서 chatRoomId로 요약 정보 조회 (여러 문서를 가져오기 위해 find 사용)
-            Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
+            Query query = new Query(
+                Criteria.where("chatRoomId").is(chatRoomId)
+                    .and("requestId").is(1)
+            );
             List<Document> chatRoomDataList = mongoTemplate.find(query, Document.class, "MongoDB");
 
             // Step 2-2: MongoDB 조회 결과가 있을 경우 각 문서마다 ChatHistoryResponse 생성
@@ -67,6 +70,8 @@ public class ChatRecordService {
             }
         }).collect(Collectors.toList());
     }
+
+
     @Transactional
     public List<ChatHistoryDetailResponse> getChatHistoryDetail(String sessionId,
         String chatRoomId) {
