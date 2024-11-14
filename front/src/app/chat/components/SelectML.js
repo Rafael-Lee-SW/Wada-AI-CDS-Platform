@@ -1,13 +1,13 @@
 import styles from "/styles/selectMlStyle";
 import { useState, useRef } from "react";
-import InputChat from "./components/InputChat"; // 새로 추가한 Input 컴포넌트
+import InputChat from "./components/InputChat";
 
-export default function SelectML({ chatRoomId, models, purpose, overview, requestId, onModelSelect, onSubmit }) {
+export default function SelectML({ chatRoomId, models, purpose, overview, requestId, onModelSelect, onSubmit, onReSubmit }) {
     const [isHovered1, setIsHovered1] = useState(false);
     const [isHovered2, setIsHovered2] = useState(false);
-    const modelSectionRef = useRef(null); // 스크롤 참조를 위한 ref 생성
+    const [hoveredCard, setHoveredCard] = useState(null); 
+    const modelSectionRef = useRef(null);
 
-    // 모델 선택 핸들러
     const handleModelClick = (chatRoomId, requestId, index) => {
         onModelSelect(chatRoomId, requestId, index);
     };
@@ -17,18 +17,17 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
     };
 
     const handleNext = () => {
-        // modelSelectContainer로 스크롤 이동
+        
         if (modelSectionRef.current) {
             modelSectionRef.current.scrollIntoView({
-                behavior: 'smooth', // 부드럽게 스크롤
-                block: 'start', // 상단에 맞추기
+                behavior: 'smooth',
+                block: 'start',
             });
         }
     };
 
     return (
         <div style={styles.container}>
-            {/* 사전 분석 화면 */}
             <div style={styles.preContainer}>
                 <div style={styles.iconContainer}>
                     <img src="/img/news.gif" alt="icon" style={styles.icon} />
@@ -86,8 +85,6 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                     </div>
                 </div>
             </div>
-
-            {/* 모델 선택 화면 */}
             <div ref={modelSectionRef} style={styles.modelSelectContainer}>
                 <div style={styles.iconContainer}>
                     <img src="/img/cursor.gif" alt="icon" style={styles.icon} />
@@ -102,12 +99,21 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                                     key={index}
                                     style={styles.flipCard}
                                     onClick={() => handleModelClick(chatRoomId, requestId, index)}
+                                    onMouseEnter={() => setHoveredCard(index)}
+                                    onMouseLeave={() => setHoveredCard(null)}
                                 >
-                                    <div style={{
-                                        ...styles.flipCardInner,
-                                    }}>
-                                        <div style={styles.flipCardFront}>
-                                            <p style={styles.title1}>{model.analysis_name}</p>
+                                    <div
+                                        style={{
+                                            ...styles.flipCardInner,
+                                        }}>
+                                        <div
+                                            style={{
+                                                ...styles.flipCardFront,
+                                                transform: hoveredCard === index ? 'scale(1.05)' : 'scale(1)',
+                                                transition: 'transform 0.3s',
+                                            }}
+                                        >
+                                            <p style={styles.title1}>{model.implementation_request.model_choice}</p>
                                             {Object.entries(reason).map(([key, value]) => (
                                                 <div style={styles.modelContent} key={key}>
                                                     <p style={styles.title}><strong>{key}</strong></p>
@@ -136,8 +142,7 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                     </div>
                 </div>
             </div>
-            {/* 하단의 Input Chat 창 */}
-            <InputChat/>
+            <InputChat chatRoomId={chatRoomId} requestId={requestId} onReSubmit={onReSubmit}/>
         </div>
     );
 }

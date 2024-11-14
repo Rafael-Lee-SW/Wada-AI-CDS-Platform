@@ -13,13 +13,52 @@ const styles = {
         transformOrigin: "left",        
         transform: "scaleX(1)",
         height: '100vh',
-        overflowY: "hidden",
+        overflowY: "auto",
+        scrollbarWidth: 'none'
     },
     leftSection: {
         width: '40%',
         borderRight: "1px solid #ddd",
-        overflowY: "hidden",
+        overflowY: "auto",
+        scrollbarWidth: 'none',
         transition: "width 0.5s ease",
+    },
+    inputContainer: {
+        display: 'flex',
+        padding: '20px',
+        backgroundColor: '#fff',
+        width: '50%',
+        position: 'fixed',
+        bottom: 0,
+        zIndex: 1000,
+        boxSizing: 'border-box',
+        backgroundColor: 'transparent'
+    },
+    input: {
+        flex: 1,
+        paddingLeft: '20px', 
+        paddingTop: '5px',
+        paddingBottom: '5px',
+        border: '1px solid #ccc',
+        borderRadius: '10px',
+        marginRight: '5px',
+        height: '40px'
+    },
+    inputImg: {
+        width: '40px',
+        cursor: 'pointer',
+    },
+    inputContainerLeft: {
+        display: 'flex',
+        padding: '20px',
+        marginLeft: '40px',
+        backgroundColor: '#fff',
+        width: '30%',
+        position: 'fixed',
+        bottom: 0,
+        zIndex: 1000,
+        boxSizing: 'border-box',
+        backgroundColor: 'transparent'
     },
     rightSection: {
         overflow: 'hidden',
@@ -34,11 +73,15 @@ const styles = {
         backgroundColor: "white",
         width: '100%',
         height: '100vh',
-        marginTop: '50px',
     },
     img: {
         width: '25px',
         marginRight: '10px'
+    },
+    pdfImg: {
+        width: '30px',
+        cursor: 'pointer',
+        marginLeft: '10px'
     },
     file: {
         display: 'flex',                

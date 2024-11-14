@@ -1,7 +1,7 @@
 import styles from "/styles/components/inputChatStyle";
 import { useState } from "react";
 
-export default function InputChat() {
+export default function InputChat({ chatRoomId, requestId, onReSubmit }) {
     const [inputValue, setInputValue] = useState('');
 
     const handleMessage = (e) => {
@@ -9,7 +9,7 @@ export default function InputChat() {
     };
 
     const handleSendClick = () => {
-        console.log("User Input:", inputValue);
+        onReSubmit(inputValue, chatRoomId, requestId);
         setInputValue(''); 
     };
 
@@ -18,7 +18,7 @@ export default function InputChat() {
             <input 
                 type="text" 
                 style={styles.input} 
-                placeholder="추가 요구사항을 입력해주세요." 
+                placeholder="원하는 결과가 없다면 추가 요구사항을 입력해주세요." 
                 value={inputValue}
                 onChange={handleMessage}
             />
