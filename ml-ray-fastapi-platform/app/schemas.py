@@ -2,17 +2,20 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Any, Dict, List, Optional, Union
 
+
 class FeatureGeneration(BaseModel):
     type: str
     new_column: str
     start_column: str
     end_column: Optional[str] = None
 
+
 class BinaryCondition(BaseModel):
     column: str
     operator: str
     value: Union[str, int, float]
     target_column: str  # Name of the column to create
+
 
 class ModelRequest(BaseModel):
     file_path: str
@@ -31,12 +34,11 @@ class ModelRequest(BaseModel):
     feature_generations: Optional[List[FeatureGeneration]] = None
     additional_features: Optional[List[str]] = None
     threshold: Optional[float] = None  # For anomaly detection
-    kernel: Optional[str] = "rbf" # For SVM
-    C: Optional[float] = 1.0 # For SVM
-    gamma: Optional[Union[str, float]] = "scale" # For SVM
+    kernel: Optional[str] = "rbf"  # For SVM
+    C: Optional[float] = 1.0  # For SVM
+    gamma: Optional[Union[str, float]] = "scale"  # For SVM
     epsilon: Optional[float] = 0.1  # For SVM
-    param_grid: Optional[Dict[str, List[Any]]] = None # For SVM
-
-    model_config = ConfigDict(
-        protected_namespaces=()
-    )
+    param_grid: Optional[Dict[str, List[Any]]] = None  # For SVM
+    relationship_column: Optional[str] = None # GNN
+    
+    model_config = ConfigDict(protected_namespaces=())
