@@ -270,11 +270,11 @@ def neural_network_regression(
 def graph_neural_network_analysis(
     file_path: str,
     id_column: str,
+    relationship_column: str,
     additional_features: Optional[List[str]] = None,
     feature_generations: Optional[List[Dict[str, Any]]] = None,
     exclude_columns: Optional[List[str]] = None,
     task_type: str = "classification",
-    relationship_column: str = "ManagerID",
     target_column: str = None,
     **kwargs,
 ):

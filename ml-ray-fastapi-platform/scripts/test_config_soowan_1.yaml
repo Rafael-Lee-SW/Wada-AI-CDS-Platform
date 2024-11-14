@@ -188,7 +188,7 @@ tests:
         - "Skill Redundancy Level"
       target_column: "Absence Cost Impact ($)"
       task_type: "regression"
-      relationship_column: "ManagerID" # Adjust if 'ManagerID' exists in your dataset
+      relationship_column: "ManagerID"
       sample_size: 10
       random_state: 42
     expected_status: 200
