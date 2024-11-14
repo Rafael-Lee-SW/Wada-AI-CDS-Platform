@@ -119,6 +119,7 @@ const styles = {
         width: '100%',
     },
     button2Container: {
+        marginTop: '10px',
         width: '100%',
         display: 'flex',
         justifyContent: 'flex-end'
@@ -168,7 +169,7 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center', 
         width: '100%',
-        maxHeight: '254px',
+        maxHeight: '280px',
         backfaceVisibility: 'hidden',
         border: '1px solid #9370db',
         borderRadius: '1rem',
@@ -179,6 +180,7 @@ const styles = {
         boxSizing: 'border-box',
         padding: '15px 20px 20px',
         justifyContent: 'flex-start',
+        cursor: 'pointer'
     },
     flipCardBack: {
         boxShadow: '0 8px 14px 0 rgba(0,0,0,0.2)',
@@ -206,18 +208,25 @@ const styles = {
         wordBreak: 'keep-all',
     },
     title1: {
-        fontSize: '20px',
+        fontSize: '19px',
         fontWeight: 900,
         margin: 0,
         wordWrap: 'break-word',
         wordBreak: 'break-all',
         whiteSpace: 'normal', 
+        color: '#481677'
     },
     title: {
         fontSize: '18px',
         fontWeight: 900,
         margin: 0,
         padding: '10px'
+    },
+    notice: {
+        width: '100%',
+        textAlign: 'center',
+        position: 'fixed',
+        bottom: '50px',
     }
 };
 
