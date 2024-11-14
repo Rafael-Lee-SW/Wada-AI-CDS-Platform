@@ -92,9 +92,11 @@ public class ChatRecordService {
                 Integer requestId = (Integer) chatRoomData.get("requestId");
                 String requirement = (String) chatRoomData.get("requirement");
                 String fileUrl = (String) chatRoomData.get("fileUrl");
+
                 Map<String, Object> selectedModel = (Map<String, Object>) chatRoomData.get("SelectedModelFromUser");
                 Map<String, Object> resultFromModel = (Map<String, Object>) chatRoomData.get("ResultFromModel");
                 Map<String, Object> resultDescription = (Map<String, Object>) chatRoomData.get("ResultDescriptionFromLLM");
+                List<Map<String, Object>> conversationRecord = (List<Map<String, Object>>) chatRoomData.get("ConversationRecord");
 
                 // MongoDB에서 생성 시간을 가져와 LocalDateTime으로 변환
                 LocalDateTime createdTime = null;
@@ -107,7 +109,6 @@ public class ChatRecordService {
                         createdTime = ((Date) createdTimeObj).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
                     }
                 }
-
                 return new ChatHistoryDetailResponse(
                     chatRoomId,
                     requestId,
@@ -116,6 +117,7 @@ public class ChatRecordService {
                     selectedModel,
                     resultFromModel,
                     resultDescription,
+                    conversationRecord, // conversationRecord 추가
                     createdTime
                 );
             }).collect(Collectors.toList());

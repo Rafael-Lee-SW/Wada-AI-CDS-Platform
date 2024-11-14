@@ -1,6 +1,7 @@
 package com.ssafy.wada.presentation.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class ChatHistoryDetailResponse {
     private Map<String, Object> selectedModel;  // 사용자가 선택한 모델 정보
     private Map<String, Object> resultFromModel; // 모델의 분석 결과
     private Map<String, Object> resultDescription; // LLM의 분석 결과 설명
+    private List<Map<String, Object>> conversationRecord;
     private LocalDateTime createdTime;
 
 }
