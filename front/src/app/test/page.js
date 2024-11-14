@@ -71,10 +71,10 @@ export default function Test() {
           // fetch("/json/test_3_explanation.json"),
           // fetch("/json/test_2.json"), // Classification
           // fetch("/json/test_2_explanation.json"),
-          // fetch("/json/test_1.json"), // Regression
-          // fetch("/json/test_1_explanation.json"),
-          fetch("/json/test_7.json"),
-          fetch("/json/test_7_explanation.json"),
+          fetch("/json/test_1.json"), // Regression
+          fetch("/json/test_1_explanation.json"),
+          // fetch("/json/test_7.json"),
+          // fetch("/json/test_7_explanation.json"),
           // fetch("/json/test_9.json"),
           // fetch("/json/test_9_explanation.json"),
         ]);
@@ -154,18 +154,18 @@ export default function Test() {
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-        // <RegressionVisualization
-        //   result={jsonResult}
-        //   explanation={jsonExplanation}
-        // />
+        <RegressionVisualization
+          result={jsonResult.result}
+          explanation={jsonExplanation.result}
+        />
         // <SupporVectorVisualization
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-        <NeuralNetworkVisualization
-        result={jsonResult.result}
-        explanation={jsonExplanation.result}
-      />
+      //   <NeuralNetworkVisualization
+      //   result={jsonResult.result}
+      //   explanation={jsonExplanation.result}
+      // />
       )}
     </div>
   );
