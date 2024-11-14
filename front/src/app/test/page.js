@@ -35,91 +35,93 @@ const RegressionVisualization = dynamic(
   { ssr: false, loading: () => <p>Loading classification visualization...</p> }
 ); // test Case 1
 
-export default function Test({ result }) {
+const SupporVectorVisualization = dynamic(
+  () => import("../chat/components/analyzeReport/SupporVectorVisualization.js"),
+  { ssr: false, loading: () => <p>Loading classification visualization...</p> }
+);
 
+const NeuralNetworkVisualization = dynamic(
+  () =>
+    import("../chat/components/analyzeReport/NeuralNetworkVisualization.js"),
+  { ssr: false, loading: () => <p>Loading classification visualization...</p> }
+);
 
+export default function Test() {
   const [jsonResult, setJsonResult] = useState(null);
   const [jsonExplanation, setJsonExplanation] = useState(null);
-  const [model, setModel] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-
       setIsLoading(true);
       setError(null);
       try {
         /**
          * 과거 테스트 흔적
          */
-        // const [resultResponse, explanationResponse] = await Promise.all([
-        // fetch("/json/test_6.json"),
-        // fetch("/json/test_6_explanation.json"),
-        // fetch("/json/test_5.json"),
-        // fetch("/json/test_5_explanation.json"),
-        // fetch("/json/test_4.json"),
-        // fetch("/json/test_4_explanation.json"),
-        // fetch("/json/test_3.json"),
-        // fetch("/json/test_3_explanation.json"),
-        // fetch("/json/test_2.json"), // Classification
-        // fetch("/json/test_2_explanation.json"),
-        // fetch("/json/test_1.json"), // Regression
-        // fetch("/json/test_1_explanation.json"),
-        // ]);
+        const [resultResponse, explanationResponse] = await Promise.all([
+          // fetch("/json/test_6.json"),
+          // fetch("/json/test_6_explanation.json"),
+          // fetch("/json/test_5.json"),
+          // fetch("/json/test_5_explanation.json"),
+          // fetch("/json/test_4.json"),
+          // fetch("/json/test_4_explanation.json"),
+          // fetch("/json/test_3.json"),
+          // fetch("/json/test_3_explanation.json"),
+          // fetch("/json/test_2.json"), // Classification
+          // fetch("/json/test_2_explanation.json"),
+          // fetch("/json/test_1.json"), // Regression
+          // fetch("/json/test_1_explanation.json"),
+          fetch("/json/test_7.json"),
+          fetch("/json/test_7_explanation.json"),
+          // fetch("/json/test_9.json"),
+          // fetch("/json/test_9_explanation.json"),
+        ]);
 
-        // if (!resultResponse.ok || !explanationResponse.ok) {
-        //   throw new Error(
-        //     `HTTP error! status: ${resultResponse.status} and ${explanationResponse.status}`
-        //   );
-        // }
+        if (!resultResponse.ok || !explanationResponse.ok) {
+          throw new Error(
+            `HTTP error! status: ${resultResponse.status} and ${explanationResponse.status}`
+          );
+        }
 
-        // const resultData = await resultResponse.json();
-        // const explanationData = await explanationResponse.json();
+        const resultData = await resultResponse.json();
+        const explanationData = await explanationResponse.json();
 
-        // console.log("Fetched result data:", resultData);
-        // console.log("Fetched explanation data:", explanationData);
+        console.log("Fetched result data:", resultData);
+        console.log("Fetched explanation data:", explanationData);
 
         /**
          * 새로운 테스트 데이터(최신)
          */
-
-        // setJsonResult(result);
-        const data = result;
-        // 여기 수완님 코드 
         // const response = await fetch("/json/test_1_combination.json"); // Update the path as needed
 
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! status: ${response.status}`);
-        // }
-        
-        // 여기 수완님 코드
-        // const data = await response.json();
-        console.log("백엔드에서 전달되는 데이터 : ", data);
+        // // if (!response.ok) {
+        // //   throw new Error(`HTTP error! status: ${response.status}`);
+        // // }
 
-        const resultData = data.ResultFromModel;
-        setModel(resultData.model);
-        // 여기 수완님 코드
-        // ResultFromModel 추출 (ML 서버에서 온 결과)
+        // const data = await response.json();
+        // console.log("백엔드에서 전달되는 데이터 : ", data);
+
+        // // ResultFromModel 추출 (ML 서버에서 온 결과)
         // const resultData = data.ResultFromModel;
 
-        // ResultDescriptionFromLLM.content 추출 (보고서의 해석 파트)
-        const explanationContent =
-          data.ResultDescriptionFromLLM?.choices?.[0]?.message?.content;
+        // // ResultDescriptionFromLLM.content 추출 (보고서의 해석 파트)
+        // const explanationContent =
+        //   data.ResultDescriptionFromLLM?.choices?.[0]?.message?.content;
 
-        if (!explanationContent) {
-          throw new Error("Missing explanation content in the response.");
-        }
+        // if (!explanationContent) {
+        //   throw new Error("Missing explanation content in the response.");
+        // }
 
-        let explanationData;
-        try {
-          explanationData = JSON.parse(explanationContent);
-        } catch (parseError) {
-          console.error("Failed to parse explanation content:", parseError);
-          throw new Error("Invalid JSON format in explanation content.");
-        }
-        console.log("Parsed explanation data:", explanationData);
+        // let explanationData;
+        // try {
+        //   explanationData = JSON.parse(explanationContent);
+        // } catch (parseError) {
+        //   console.error("Failed to parse explanation content:", parseError);
+        //   throw new Error("Invalid JSON format in explanation content.");
+        // }
+        // console.log("Parsed explanation data:", explanationData);
 
         // 최종 데이터 저장 및 전달
         setJsonResult(resultData);
@@ -152,12 +154,18 @@ export default function Test({ result }) {
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-        <>
-        {model === 'LogisticRegressionBinary' && <LogisticRegressionVisualization result={jsonResult} explanation={jsonExplanation}/>}
-        {model === 'RandomForestClassifier' && <ClassifierVisualization result={jsonResult} explanation={jsonExplanation}/> }
-        {model === 'RandomForestRegression' && <RegressionVisualization result={jsonResult} explanation={jsonExplanation}/> }
-        {model === 'KmeansClusteringSegmentation' && <KMeansVisualization result={jsonResult} explanation={jsonExplanation}/>}
-        </>
+        // <RegressionVisualization
+        //   result={jsonResult}
+        //   explanation={jsonExplanation}
+        // />
+        // <SupporVectorVisualization
+        //   result={jsonResult.result}
+        //   explanation={jsonExplanation.result}
+        // />
+        <NeuralNetworkVisualization
+        result={jsonResult.result}
+        explanation={jsonExplanation.result}
+      />
       )}
     </div>
   );
