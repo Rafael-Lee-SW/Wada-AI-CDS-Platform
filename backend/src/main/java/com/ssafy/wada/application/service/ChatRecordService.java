@@ -5,6 +5,8 @@ import com.ssafy.wada.application.repository.GuestRepository;
 import com.ssafy.wada.presentation.response.ChatHistoryDetailResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,8 @@ public class ChatRecordService {
             log.warn("No guest found for sessionId: {}", sessionId);
             return Collections.emptyList();
         }
-        log.info("Fetching chat history for each ChatRoom associated with sessionId: {}", sessionId);
+        log.info("Fetching chat history for each ChatRoom associated with sessionId: {}",
+            sessionId);
 
         return guest.getChatRooms().stream().flatMap(chatRoom -> {
             String chatRoomId = chatRoom.getId();
@@ -93,11 +96,16 @@ public class ChatRecordService {
                 Map<String, Object> resultFromModel = (Map<String, Object>) chatRoomData.get("ResultFromModel");
                 Map<String, Object> resultDescription = (Map<String, Object>) chatRoomData.get("ResultDescriptionFromLLM");
 
-                // Convert createdTime to LocalDateTime if it's present
+                // MongoDB에서 생성 시간을 가져와 LocalDateTime으로 변환
                 LocalDateTime createdTime = null;
                 if (chatRoomData.get("createdTime") != null) {
-                    Date createdDate = (Date) chatRoomData.get("createdTime");
-                    createdTime = createdDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    Object createdTimeObj = chatRoomData.get("createdTime");
+                    if (createdTimeObj instanceof String) {
+                        createdTime = OffsetDateTime.parse((String) createdTimeObj, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                            .toLocalDateTime();
+                    } else if (createdTimeObj instanceof Date) {
+                        createdTime = ((Date) createdTimeObj).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    }
                 }
 
                 return new ChatHistoryDetailResponse(
