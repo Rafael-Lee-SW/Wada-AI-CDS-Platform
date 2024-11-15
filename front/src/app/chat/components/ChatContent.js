@@ -227,8 +227,31 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
                         ))}
                     </div>
                 ))}
-
-            </div>
+                {otherModels && models !== null && (
+                        <div style={styles.otherModelTitleContainer}>
+                            <div style={styles.imgContainer}>
+                                <img src="/img/change.gif" style={styles.img}/>
+                                <p style={styles.text}>다른 모델로 분석하기</p>
+                            </div>
+                            <div style={styles.otherModelContainer}>
+                                {models && models.map ((model, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            ...styles.modelCard,
+                                            ...(hoveredCard === index ? styles.modelCardHover : {}),
+                                        }}
+                                        onMouseEnter={() => setHoveredCard(index)}
+                                        onMouseLeave={() => setHoveredCard(null)}
+                                        onClick={() => handleModelClick(chatRoomId, lastRequestId, index)}
+                                        >
+                                        <p style={styles.text}>{model.implementation_request.model_choice}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
             {showResult && (
                 <div style={styles.rightSection}>
