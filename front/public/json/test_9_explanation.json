@@ -1,0 +1,110 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "회사의 인력 감축을 위한 의사 결정을 지원하기 위해 직원 데이터를 분석하였습니다.",
+      "data_description": "분석된 데이터는 직원들의 다양한 특성 및 성과 지표를 포함하고 있으며, 이를 통해 어떤 직원들이 해고 대상이 되어야 하는지 판단하고자 합니다.",
+      "models_used": {
+        "model_name": "SupportVectorMachineClassifier",
+        "model_description": "Support Vector Machine 분류 모델은 데이터를 분류하기 위한 초평면을 찾아주는 알고리즘으로, 복잡한 데이터 패턴을 효과적으로 분류합니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "정확도 (Accuracy)",
+          "metric_value": "0.8254",
+          "interpretation": "전체 예측 중 약 82.54%가 실제 값과一致했습니다."
+        },
+        {
+          "metric_name": "ROC AUC 점수",
+          "metric_value": "0.8866",
+          "interpretation": "모델의 분류 성능이 우수하며, 무작위 추측보다 훨씬 뛰어납니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "모델은 해고 대상자를 82.54%의 정확도로 예측하였습니다.",
+        "notable_patterns": [
+          "클래스 '0'에 대한 재현율이 높아 해당 그룹을 잘 예측함",
+          "클래스 '1'에 대한 정밀도가 높아 실제 해고 대상자를 정확히 식별함"
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "Feature1",
+          "importance_score": null,
+          "business_impact": "Feature1은 직원의 생산성을 나타내며, 해고 결정에 중요한 역할을 합니다."
+        },
+        {
+          "feature_name": "Feature2",
+          "importance_score": null,
+          "business_impact": "Feature2는 직원의 근속 연수를 나타내며, 조직에 대한 기여도를 평가하는 데 사용됩니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "Feature1과 Feature2 사이에 음의 상관관계가 나타났습니다.",
+          "business_insight": "생산성이 낮고 근속 연수가 짧은 직원들이 해고 대상이 될 가능성이 높습니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "ROC 곡선",
+        "type": "선 그래프",
+        "description": "다양한 임곗값에서의 민감도와 특이도를 보여줍니다.",
+        "insights": "모델의 분류 능력이 뛰어나며, 최적의 임곗값 선택에 도움이 됩니다."
+      },
+      {
+        "title": "결정 경계",
+        "type": "2D 산점도",
+        "description": "Feature1과 Feature2를 기준으로 한 데이터 분포와 결정 경계를 보여줍니다.",
+        "insights": "해고 대상자와 비대상자의 분포를 시각적으로 확인할 수 있습니다."
+      },
+      {
+        "title": "혼동 행렬",
+        "type": "히트맵",
+        "description": "실제 값과 예측 값의 비교를 보여줍니다.",
+        "insights": "모델이 어떤 클래스에서 오차가 발생하는지 확인할 수 있습니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "모델은 해고 대상자를 높은 정확도로 예측함",
+        "impact": "효율적인 인력 감축 가능",
+        "recommendation": "모델의 예측 결과를 기반으로 해고 대상자를 선정할 것을 권장"
+      },
+      {
+        "finding": "일부 클래스에서 재현율이 낮음",
+        "impact": "일부 해고 대상자를 놓칠 수 있음",
+        "recommendation": "데이터를 추가 수집하여 모델 성능 개선 필요"
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "예측 결과를 토대로 해고 대상자 명단을 검토",
+        "해고 결정 전에 인사팀과 개별 사례 검토"
+      ],
+      "further_analysis": [
+        "모델의 성능을 높이기 위한 추가 특성 발굴",
+        "재현율이 낮은 클래스에 대한 데이터 보강"
+      ]
+    },
+    "SupportVectorMachine_case": {
+      "report_title": "인력 감축을 위한 직원 예측 분석 보고서",
+      "Decision_Boundary_Graph": {
+        "x-axis_title": "근무 성과 지표",
+        "x-axis_description": "직원의 업무 성과를 나타내는 지표입니다.",
+        "y-axis_title": "근속 연수",
+        "y-axis_description": "직원이 회사에서 근무한 기간을 나타냅니다."
+      },
+      "Classification_Report": {
+        "Feature1": "직원의 생산성 수준",
+        "Feature2": "근속 기간",
+        "Feature3": "교육 수준"
+      }
+    }
+  }
+}

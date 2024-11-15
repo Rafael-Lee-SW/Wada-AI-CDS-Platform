@@ -61,17 +61,24 @@ function RegressorVisualization({ result, explanation }) {
     const featureNames = result.graph1?.feature_names;
 
     if (!Array.isArray(featureImportances) || !Array.isArray(featureNames)) {
-      console.error("Invalid feature importances data:", featureImportances, featureNames);
+      console.error(
+        "Invalid feature importances data:",
+        featureImportances,
+        featureNames
+      );
       return null;
     }
 
-    const df_importances = featureNames.map((feature, index) => ({
+    let df_importances = featureNames.map((feature, index) => ({
       Feature: feature,
       Importance: featureImportances[index],
     }));
 
     // Sort ascending for better visualization
-    df_importances.sort((a, b) => a.Importance - b.Importance);
+    df_importances.sort((a, b) => b.Importance - a.Importance);
+
+    // 상위 6개만 표출
+    df_importances = df_importances.slice(0, 6);
 
     return (
       <div className={classes.plotContainer}>
@@ -79,9 +86,9 @@ function RegressorVisualization({ result, explanation }) {
           data={[
             {
               type: "bar",
-              x: df_importances.map((item) => item.Importance),
-              y: df_importances.map((item) => item.Feature),
-              orientation: "h",
+              y: df_importances.map((item) => item.Importance),
+              x: df_importances.map((item) => item.Feature),
+              orientation: "v",
               marker: {
                 color: "rgba(55,128,191,0.7)",
                 width: 1,
@@ -91,13 +98,12 @@ function RegressorVisualization({ result, explanation }) {
           layout={{
             title: visualizations[0]?.title || "Feature Importances",
             xaxis: {
-              title: "Importance",
+              title: "칼럼",
               automargin: true,
             },
             yaxis: {
-              title: "Feature",
+              title: "중요도",
               automargin: true,
-              categoryorder: "total ascending",
             },
             margin: { l: 150, r: 50, t: 50, b: 50 },
             height: 600,
@@ -271,7 +277,9 @@ function RegressorVisualization({ result, explanation }) {
               y: df_residual.map((item) => item.Residual),
               text: df_residual.map(
                 (item) =>
-                  `ID: ${item.Identifier}<br>Residual: ${item.Residual.toFixed(2)}`
+                  `ID: ${item.Identifier}<br>Residual: ${item.Residual.toFixed(
+                    2
+                  )}`
               ),
               marker: { color: "green", size: 8, opacity: 0.6 },
               hovertemplate: "ID: %{x}<br>Residual: %{y}<extra></extra>",
