@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 
 // Dynamically import of 보고서 형식들
 const KMeansVisualization = dynamic(
-  () => import("../chat/components/analyzeReport/KMeansVisualization.js"),
+  () => import("../chat/components/analyzeReport/KMeansVisualization.jsx"),
   { ssr: false, loading: () => <p>Loading visualization...</p> }
 );
 
@@ -61,8 +61,8 @@ export default function Test() {
          * 과거 테스트 흔적
          */
         const [resultResponse, explanationResponse] = await Promise.all([
-          // fetch("/json/test_6.json"),
-          // fetch("/json/test_6_explanation.json"),
+          fetch("/json/test_6.json"),
+          fetch("/json/test_6_explanation.json"),
           // fetch("/json/test_5.json"),
           // fetch("/json/test_5_explanation.json"),
           // fetch("/json/test_4.json"),
@@ -71,8 +71,8 @@ export default function Test() {
           // fetch("/json/test_3_explanation.json"),
           // fetch("/json/test_2.json"), // Classification
           // fetch("/json/test_2_explanation.json"),
-          fetch("/json/test_1.json"), // Regression
-          fetch("/json/test_1_explanation.json"),
+          // fetch("/json/test_1.json"), // Regression
+          // fetch("/json/test_1_explanation.json"),
           // fetch("/json/test_7.json"),
           // fetch("/json/test_7_explanation.json"),
           // fetch("/json/test_9.json"),
@@ -142,10 +142,10 @@ export default function Test() {
       {isLoading && <p>Loading visualization...</p>}
       {error && <p>{error}</p>}
       {jsonResult && jsonExplanation && (
-        // <KMeansVisualization
-        //     result={jsonResult.result}
-        //     explanation={jsonExplanation.result}
-        // />
+        <KMeansVisualization
+            result={jsonResult.result}
+            explanation={jsonExplanation.result}
+        />
         // <LogisticRegressionVisualization
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
@@ -154,10 +154,10 @@ export default function Test() {
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-        <RegressionVisualization
-          result={jsonResult.result}
-          explanation={jsonExplanation.result}
-        />
+        // <RegressionVisualization
+        //   result={jsonResult.result}
+        //   explanation={jsonExplanation.result}
+        // />
         // <SupporVectorVisualization
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
