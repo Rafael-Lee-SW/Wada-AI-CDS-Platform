@@ -9,14 +9,12 @@ const useAnalyzingKmeansStyles = makeStyles({
     minHeight: '100vh',
   },
   reportTitle: {
-    fontFamily: 'Poppins, sans-serif', // Modern sans-serif font
     fontWeight: 700,
     color: '#2D3748', // Dark slate color
     marginBottom: '40px',
     textShadow: '1px 1px 2px rgba(0,0,0,0.1)', // Subtle text shadow
   },
   sectionTitle: {
-    fontFamily: 'Poppins, sans-serif',
     fontWeight: 600,
     color: '#2D3748',
     marginBottom: '20px',
@@ -25,7 +23,6 @@ const useAnalyzingKmeansStyles = makeStyles({
     paddingBottom: '5px',
   },
   bodyText: {
-    fontFamily: 'Roboto, sans-serif',
     color: '#4A5568', // Grayish color for better readability
     marginBottom: '20px',
     lineHeight: 1.8,
@@ -46,19 +43,16 @@ const useAnalyzingKmeansStyles = makeStyles({
     padding: '20px',
   },
   cardTitle: {
-    fontFamily: 'Poppins, sans-serif',
     fontWeight: 600,
     color: '#0D47A1', // Strong accent color
     marginBottom: '10px',
   },
   cardSubtitle: {
-    fontFamily: 'Roboto, sans-serif',
     color: '#718096', // Lighter gray for subtitles
     marginBottom: '10px',
     fontStyle: 'italic',
   },
   listItem: {
-    fontFamily: 'Roboto, sans-serif',
     color: '#4A5568',
     marginBottom: '8px',
     fontSize: '0.95rem',
@@ -95,7 +89,6 @@ const useAnalyzingKmeansStyles = makeStyles({
   },
   typographyBody2: {
     color: '#4A5568',
-    fontFamily: 'Roboto, sans-serif',
     fontSize: '0.875rem',
     textAlign: 'center',
     marginTop: '10px',
