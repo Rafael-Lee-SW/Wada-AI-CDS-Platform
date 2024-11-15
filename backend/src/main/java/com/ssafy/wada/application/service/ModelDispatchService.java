@@ -163,7 +163,7 @@ public class ModelDispatchService {
         Document chatRoomDataDoc = mongoTemplate.findOne(query, Document.class, "MongoDB");
 
         if (chatRoomDataDoc == null) {
-            System.out.println("No data found for chatRoomId: " + chatRoomId + ", requestId: " + requestId);
+            log.warn("No data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
             return "데이터를 찾을 수 없습니다.";
         }
         log.info("Step 1: Found MongoDB document for requestId: {}, chatRoomId: {}", requestId, chatRoomId);
@@ -186,7 +186,6 @@ public class ModelDispatchService {
         List<Map<String, Object>> conversationRecord = (List<Map<String, Object>>) chatRoomData.get("ConversationRecord");
         if (conversationRecord == null) {
             conversationRecord = new ArrayList<>();
-            chatRoomData.put("ConversationRecord", conversationRecord);
         }
 
         // Step 5: analysisContext 생성 및 GPT 프롬프트 생성
@@ -211,11 +210,13 @@ public class ModelDispatchService {
         // Step 8: ConversationRecord에 새 Q&A 기록 추가
         conversationRecord.add(qaEntry);
 
-        // Step 9: MongoDB에 업데이트
-        chatRoomData.put("ConversationRecord", conversationRecord);
-        mongoTemplate.save(new Document(chatRoomData), "MongoDB");
+        // Step 9: MongoDB에 업데이트 또는 삽입
+        Update update = new Update()
+            .set("ConversationRecord", conversationRecord);
 
-        log.info("Step 9: ConversationRecord updated with new entry for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
+        mongoTemplate.upsert(query, update, "MongoDB");
+
+        log.info("Step 9: ConversationRecord updated or inserted with new entry for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
         return gptResponse;
     }
