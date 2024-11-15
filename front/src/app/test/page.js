@@ -22,7 +22,7 @@ const LogisticRegressionVisualization = dynamic(
 const ClassifierVisualization = dynamic(
   () =>
     import(
-      "../chat/components/analyzeReport/RandomForestClassifierVisualization.js"
+      "../chat/components/analyzeReport/RandomForestClassifierVisualization.jsx"
     ),
   { ssr: false, loading: () => <p>Loading regression visualization...</p> }
 ); // test Case 2
@@ -30,19 +30,20 @@ const ClassifierVisualization = dynamic(
 const RegressionVisualization = dynamic(
   () =>
     import(
-      "../chat/components/analyzeReport/RandomForestRegressionVisualization.js"
+      "../chat/components/analyzeReport/RandomForestRegressionVisualization.jsx"
     ),
   { ssr: false, loading: () => <p>Loading classification visualization...</p> }
 ); // test Case 1
 
 const SupporVectorVisualization = dynamic(
-  () => import("../chat/components/analyzeReport/SupporVectorVisualization.js"),
+  () =>
+    import("../chat/components/analyzeReport/SupporVectorVisualization.jsx"),
   { ssr: false, loading: () => <p>Loading classification visualization...</p> }
 );
 
 const NeuralNetworkVisualization = dynamic(
   () =>
-    import("../chat/components/analyzeReport/NeuralNetworkVisualization.js"),
+    import("../chat/components/analyzeReport/NeuralNetworkVisualization.jsx"),
   { ssr: false, loading: () => <p>Loading classification visualization...</p> }
 );
 
@@ -65,8 +66,8 @@ export default function Test() {
           // fetch("/json/test_6_explanation.json"),
           // fetch("/json/test_5.json"),
           // fetch("/json/test_5_explanation.json"),
-          fetch("/json/test_4.json"),
-          fetch("/json/test_4_explanation.json"),
+          // fetch("/json/test_4.json"),
+          // fetch("/json/test_4_explanation.json"),
           // fetch("/json/test_3.json"),
           // fetch("/json/test_3_explanation.json"),
           // fetch("/json/test_2.json"), // Classification
@@ -75,8 +76,8 @@ export default function Test() {
           // fetch("/json/test_1_explanation.json"),
           // fetch("/json/test_7.json"),
           // fetch("/json/test_7_explanation.json"),
-          // fetch("/json/test_9.json"),
-          // fetch("/json/test_9_explanation.json"),
+          fetch("/json/test_9.json"),
+          fetch("/json/test_9_explanation.json"),
         ]);
 
         if (!resultResponse.ok || !explanationResponse.ok) {
@@ -146,10 +147,10 @@ export default function Test() {
         //     result={jsonResult.result}
         //     explanation={jsonExplanation.result}
         // />
-        <LogisticRegressionVisualization
-          result={jsonResult.result}
-          explanation={jsonExplanation.result}
-        />
+        // <LogisticRegressionVisualization
+        //   result={jsonResult.result}
+        //   explanation={jsonExplanation.result}
+        // />
         //   <ClassifierVisualization
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
@@ -158,14 +159,14 @@ export default function Test() {
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-        // <SupporVectorVisualization
+        <SupporVectorVisualization
+          result={jsonResult.result}
+          explanation={jsonExplanation.result}
+        />
+        //   <NeuralNetworkVisualization
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
         // />
-      //   <NeuralNetworkVisualization
-      //   result={jsonResult.result}
-      //   explanation={jsonExplanation.result}
-      // />
       )}
     </div>
   );
