@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
-import { fetchChatRoom, fetchChatList, fetchModel, createAnalyze } from "@/api";
+import { fetchChatRoom, fetchChatList, fetchModel, fetchNewModel, createAnalyze } from "@/api";
 import Loading from "./Loading";
 import FileUploader from "./FileUploader";
 import RequirementUploader from "./RequirementUploader";
@@ -25,6 +25,7 @@ export default function Home({ sessionId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
+    const [chatContent, setChatContent] = useState(null);
 
     const handleGoBack = () => {
         if (pageHistory.length > 0) {
@@ -68,17 +69,15 @@ export default function Home({ sessionId }) {
 
         try {
             const response = await fetchChatRoom(chatRoomId, sessionId);
-
-            const fileUrl = response.data.fileUrl;
-            console.log("특정채팅방 내용: ", response.data);
-
-            setSubmittedFile([fileUrl]);  
+            const result = response.data;
+            setChatContent(result);
 
             setPage('chatContent');
+
         } catch (error) {
             console.error("대화 내용 불러오기 실패:", error);
             setIsLoading(false);  
-            setPage('fileUploader');  
+            setPage('newChat');  
         }
     };
 
@@ -141,8 +140,8 @@ export default function Home({ sessionId }) {
             const response = await fetchModel(formData, sessionId);
             const result = response.data;
 
-        console.log("업로드 성공:", result);
-        console.log("requestId: ", result.requestId);
+        console.log("최초 모델 추천 결과: ", result);
+        console.log("최초 모델 추천 requestId: ", result.requestId);
 
         // 추천 모델들, 목적, 요약 저장
         setModels(result.model_recommendations);
@@ -163,6 +162,49 @@ export default function Home({ sessionId }) {
         }
 
     };
+
+    const handleReSubmit = async (requirement, chatRoomId, requestId) => {
+
+        if (!requirement) {
+            return;
+        }
+
+        console.log("추가요청사항: ", requirement);
+        setCurrentStep(1);
+        setIsLoading(true);  
+        setPage('loading');
+
+        try {
+             const data = {
+                "chatRoomId": chatRoomId,
+                "requestId": requestId,
+                "newRequirement": requirement
+            }
+            console.log("추가요청사항으로 보내는 데이터: ", data);
+
+            const response = await fetchNewModel(data, sessionId);
+            const result = response.data;
+            console.log("추가요청 결과: ", result);
+            console.log("추가요청 requestId: ", result.requestId);
+
+            setModels(result.model_recommendations);
+            setPurpose(result.purpose_understanding);
+            setOverview(result.data_overview);
+            setRequestId(result.requestId);
+            handleChangePage('selectML');
+
+            if (response.status != 200) {
+                throw new Error("업로드 실패");
+            }
+
+            } catch (error) {
+                console.error("에러 발생:", error);
+
+            } finally {
+                setIsLoading(false);  
+            }
+        };
+    
 
     const handleModelSelect = async (chatRoomId, requestId, index) => {
 
@@ -186,8 +228,12 @@ export default function Home({ sessionId }) {
             const response = await createAnalyze(data, sessionId); 
             const result = response.data;
 
-            setResult(result); 
+            const chatResponse = await fetchChatRoom(chatRoomId, sessionId);
+            const chatResult = chatResponse.data;
+            setChatContent(chatResult);
             handleChangePage('chatContent')
+
+            setResult(result); 
             console.log("최종 데이터: ", result);
 
         } catch (error) {
@@ -219,7 +265,7 @@ export default function Home({ sessionId }) {
                         chatList.map((chat, index) => (
                             <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId)}>
                                 <img style={styles.arrow} src="/img/arrow.png" alt="arrow" />
-                                <p style={styles.chatList}>{chat.requirement}</p> 
+                                <p style={styles.chatList}>{chat.fileName}</p> 
                             </div>
                         ))
                     ): null }
@@ -240,8 +286,8 @@ export default function Home({ sessionId }) {
             top: '18px',
             display: (page === 'fileUploader' || page === 'newChat') ? 'none' : 'block'
         }}/>
-        {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit}/>}
-        {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedRequirement} result={result}/>}
+        {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit} onReSubmit={handleReSubmit}/>}
+        {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedRequirement} result={result} sessionId={sessionId} chatContent={chatContent}/>}
         {page === 'loading' && <Loading currentStep={currentStep}/>}
         {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles}/>}
         {page === 'requirementUploader' && <RequirementUploader onChangePage={handleChangePage} onSubmitRequirement={handleSubmitRequirement} onSubmit={handleSubmit}/>} 

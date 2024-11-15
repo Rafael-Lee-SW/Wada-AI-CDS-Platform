@@ -67,7 +67,8 @@ const styles = {
         width: '100%',
         cursor: 'pointer',
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        cursor: 'pointer'
     },
     arrow: {
         width: '20px',

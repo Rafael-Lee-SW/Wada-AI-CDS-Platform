@@ -32,6 +32,15 @@ function fetchModel(formData, sessionId) {
   });
 }
 
+// 새로운 요청사항
+function fetchNewModel(data, sessionId) {
+  return instance.post('/recommend/alternative', data, {
+    headers: {
+      'sessionId': sessionId
+    },
+  });
+}
+
 // 선택된 모델로 분석 요청
 function createAnalyze(data, sessionId) {
     return instance.post('/analyzeModel', data, {
@@ -41,10 +50,32 @@ function createAnalyze(data, sessionId) {
     });
 }
 
+// 선택하지 않은 모델 불러오기
+function fetchOtherModel(data, sessionId) {
+    return instance.post('/recommend/again', data, {
+      headers: {
+        'sessionId': sessionId,
+        'Content-Type': 'application/json',
+      },
+  });
+}
+
+// 보고서 기반 채팅
+function createConversation(data, sessionId) {
+  return instance.post('/analyzeModel/conversation', data, {
+    headers: {
+      'sessionId': sessionId
+    }
+  });
+}
+
 export {
     instance,
     fetchChatList,
     fetchChatRoom,
     fetchModel,
-    createAnalyze
+    fetchNewModel,
+    createAnalyze,
+    fetchOtherModel,
+    createConversation
 }
