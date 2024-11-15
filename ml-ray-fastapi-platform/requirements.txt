@@ -17,3 +17,4 @@ tensorflow==2.18.0  # Retained only one version
 uvicorn==0.22.0
 spektral==1.3.1  # Added for GNN support
 scipy==1.14.0
+chardet==5.2.0 # aad for EUC-KR

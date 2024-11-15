@@ -1,0 +1,26 @@
+tests:
+  - id: 12
+    description: "K-Means Clustering Segmentation for 도서관 데이터"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/대전광역시 서구_둔산도서관 보유도서 목록_20210907.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "출판사"
+        - "출판연도"
+      num_clusters: 3
+    expected_status: 200
+
+  - id: 13
+    description: "K-Means Clustering Anomaly Detection for 도서관 데이터"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/대전광역시 서구_둔산도서관 보유도서 목록_20210907.csv"
+      model_choice: "kmeans_clustering_anomaly_detection"
+      feature_columns:
+        - "저자"
+        - "출판사"
+      threshold: 2
+    expected_status: 200
