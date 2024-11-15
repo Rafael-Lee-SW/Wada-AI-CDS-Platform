@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
-import { fetchChatRoom, fetchChatList, fetchModel, fetchNewModel, createAnalyze } from "@/api";
+import { fetchChatRoom, fetchChatList, fetchModel, fetchNewModel, createAnalyze, createConversation } from "@/api";
 import Loading from "./Loading";
 import FileUploader from "./FileUploader";
 import RequirementUploader from "./RequirementUploader";
 import NewChat from "./NewChat";
+import { restyle } from "plotly.js";
 
 export default function Home({ sessionId }) {
     const [pageHistory, setPageHistory] = useState([]);
@@ -26,6 +27,7 @@ export default function Home({ sessionId }) {
     const [files, setFiles] = useState([]);
     const [currentStep, setCurrentStep] = useState(0);
     const [chatContent, setChatContent] = useState(null);
+    const [fileName, setFileName] = useState('');
 
     const handleGoBack = () => {
         if (pageHistory.length > 0) {
@@ -55,6 +57,23 @@ export default function Home({ sessionId }) {
         getChatList(); 
     }, [sessionId]);
 
+    const handleConversation = async (requirement, chatRoomId, requestId, sessionId) => {
+        try {
+            const data = {
+                "requestId": requestId,
+                "chatRoomId": chatRoomId,
+                "text": requirement
+            }
+            console.log("보고서 기반 데이터: ", data);
+            const response = await createConversation(data, sessionId);
+            const result = response.data;
+
+            console.log("추가 대화 답변: ", result.answer);
+        } catch (error) {
+            console.log("보고서 기반 대화 에러: ", error);
+        }
+    }
+
     const handleChatRoomId = () => {
 
         const newChatRoomId = uuidv4();
@@ -62,7 +81,7 @@ export default function Home({ sessionId }) {
         setPage('fileUploader');
     }
 
-    const handleMenuItemClick = async (chatRoomId) => {
+    const handleMenuItemClick = async (chatRoomId, fileName) => {
         
         setIsLoading(true); 
         setPage('loading2');  
@@ -71,7 +90,7 @@ export default function Home({ sessionId }) {
             const response = await fetchChatRoom(chatRoomId, sessionId);
             const result = response.data;
             setChatContent(result);
-
+            setFileName(fileName);
             setPage('chatContent');
 
         } catch (error) {
@@ -263,7 +282,7 @@ export default function Home({ sessionId }) {
                 <div style={styles.chatListContainer}>
                     {chatList.length > 0 ? ( 
                         chatList.map((chat, index) => (
-                            <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId)}>
+                            <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId, chat.fileName)}>
                                 <img style={styles.arrow} src="/img/arrow.png" alt="arrow" />
                                 <p style={styles.chatList}>{chat.fileName}</p> 
                             </div>
@@ -287,7 +306,7 @@ export default function Home({ sessionId }) {
             display: (page === 'fileUploader' || page === 'newChat') ? 'none' : 'block'
         }}/>
         {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit} onReSubmit={handleReSubmit}/>}
-        {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedRequirement} result={result} sessionId={sessionId} chatContent={chatContent}/>}
+        {page === 'chatContent' && <ChatContent fileName={fileName} result={result} sessionId={sessionId} chatContent={chatContent} onModelSelect={handleModelSelect} onSubmit={handleConversation}/>}
         {page === 'loading' && <Loading currentStep={currentStep}/>}
         {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles}/>}
         {page === 'requirementUploader' && <RequirementUploader onChangePage={handleChangePage} onSubmitRequirement={handleSubmitRequirement} onSubmit={handleSubmit}/>} 

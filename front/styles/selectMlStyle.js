@@ -227,7 +227,7 @@ const styles = {
         textAlign: 'center',
         position: 'fixed',
         bottom: '50px',
-    }
+    },
 };
 
 export default styles;
