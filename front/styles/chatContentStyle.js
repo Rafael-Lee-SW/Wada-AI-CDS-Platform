@@ -1,3 +1,4 @@
+
 const styles = {
     chatContainer: {
         display: "flex",
@@ -14,7 +15,8 @@ const styles = {
         transform: "scaleX(1)",
         height: '100vh',
         overflowY: "auto",
-        scrollbarWidth: 'none'
+        scrollbarWidth: 'none',
+        paddingRight: '15px'
     },
     leftSection: {
         width: '40%',
@@ -22,6 +24,7 @@ const styles = {
         overflowY: "auto",
         scrollbarWidth: 'none',
         transition: "width 0.5s ease",
+        paddingBottom: '200px'
     },
     inputContainer: {
         display: 'flex',
@@ -72,11 +75,15 @@ const styles = {
         padding: "50px",
         backgroundColor: "white",
         width: '100%',
-        height: '100vh',
+        maxHeight: '100vh',
+        overflowY: 'auto',
+        scrollbarWidth: 'none',
+        paddingBottom: '150px'
     },
     img: {
         width: '25px',
-        marginRight: '10px'
+        marginRight: '10px',
+        padding: '10px'
     },
     pdfImg: {
         width: '30px',
@@ -95,7 +102,8 @@ const styles = {
         marginLeft: 'auto',
         cursor: 'pointer',
         maxWidth: '100%',
-        wordBreak: 'break-word'
+        wordBreak: 'break-word',
+        gap: '10px'
     },
     user: {
         display: 'flex',                
@@ -111,7 +119,8 @@ const styles = {
     serverContainer: {
         display: 'flex',
         justifyContent: 'flex-start',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: '10px'
     },
     icon: {
         width: '60px'
@@ -126,6 +135,17 @@ const styles = {
         width: 'fit-content',
         cursor: 'pointer',
         fontWeight: 'bold',
+        margin: 0
+    },
+    conversation: {
+        display: 'flex',
+        flexDirection: 'column',        
+        marginBottom: '10px',
+        backgroundColor: '#f0f0f0',    
+        padding: '15px',
+        borderRadius: '10px',
+        width: 'fit-content',
+        cursor: 'pointer',
         margin: 0
     },
     closeButton: {
@@ -146,6 +166,51 @@ const styles = {
         maxHeight: '100vh',
         scrollbarWidth: 'none', 
     },
+    otherModelTitleContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column'
+    },
+    otherModelContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '20px'
+    },
+    modelCard: {
+        border: '1px solid #9370db',
+        borderRadius: '1rem',
+        background: 'linear-gradient(120deg, #dec1de 20%, #d9c5d9 50%, #d9ccd9 80%)',
+        color: '#6c4e82',
+        padding: '10px',
+        cursor: 'pointer',
+        maxWidth: '150px',
+        wordWrap: 'break-word',
+        wordBreak: 'break-all',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    text: {
+        textAlign: 'center',
+        padding: '20px',
+        fontWeight: 'bold'
+    },  
+    imgContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    img: {
+        width: '30px'
+    },
+    modelCardHover: {
+        transform: 'scale(1.05)', // 마우스 오버 시 확대 효과
+        boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)', // 그림자 효과
+    }
 }
 
 export default styles;
