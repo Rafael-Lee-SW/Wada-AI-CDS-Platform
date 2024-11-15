@@ -14,7 +14,7 @@ const KMeansVisualization = dynamic(
 const LogisticRegressionVisualization = dynamic(
   () =>
     import(
-      "../chat/components/analyzeReport/LogisticsRegressionVisualization.js"
+      "../chat/components/analyzeReport/LogisticsRegressionVisualization.jsx"
     ),
   { ssr: false, loading: () => <p>Loading visualization...</p> }
 );
@@ -61,12 +61,12 @@ export default function Test() {
          * 과거 테스트 흔적
          */
         const [resultResponse, explanationResponse] = await Promise.all([
-          fetch("/json/test_6.json"),
-          fetch("/json/test_6_explanation.json"),
+          // fetch("/json/test_6.json"),
+          // fetch("/json/test_6_explanation.json"),
           // fetch("/json/test_5.json"),
           // fetch("/json/test_5_explanation.json"),
-          // fetch("/json/test_4.json"),
-          // fetch("/json/test_4_explanation.json"),
+          fetch("/json/test_4.json"),
+          fetch("/json/test_4_explanation.json"),
           // fetch("/json/test_3.json"),
           // fetch("/json/test_3_explanation.json"),
           // fetch("/json/test_2.json"), // Classification
@@ -142,14 +142,14 @@ export default function Test() {
       {isLoading && <p>Loading visualization...</p>}
       {error && <p>{error}</p>}
       {jsonResult && jsonExplanation && (
-        <KMeansVisualization
-            result={jsonResult.result}
-            explanation={jsonExplanation.result}
-        />
-        // <LogisticRegressionVisualization
-        //   result={jsonResult.result}
-        //   explanation={jsonExplanation.result}
+        // <KMeansVisualization
+        //     result={jsonResult.result}
+        //     explanation={jsonExplanation.result}
         // />
+        <LogisticRegressionVisualization
+          result={jsonResult.result}
+          explanation={jsonExplanation.result}
+        />
         //   <ClassifierVisualization
         //   result={jsonResult.result}
         //   explanation={jsonExplanation.result}
