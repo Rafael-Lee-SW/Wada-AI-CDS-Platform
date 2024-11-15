@@ -20,7 +20,7 @@ from spektral.data import Dataset, Graph
 from spektral.data.loaders import SingleLoader
 import logging
 
-from utils import load_and_preprocess_data, split_data
+from utils import load_and_preprocess_data, split_data, read_csv_with_encoding
 
 # Add these imports
 from typing import Optional, List, Dict, Any
@@ -111,7 +111,7 @@ def neural_network_regression(
 
         # Handle identifiers
         if id_column:
-            df = pd.read_csv(file_path)
+            df = read_csv_with_encoding(file_path)
             if id_column in df.columns:
                 identifiers = df[id_column].loc[X.index]
             else:
@@ -282,7 +282,7 @@ def graph_neural_network_analysis(
         logger.info("Starting Graph Neural Network Analysis...")
 
         # Load the dataset
-        df = pd.read_csv(file_path)
+        df = read_csv_with_encoding(file_path)
         logger.info("Dataset loaded successfully.")
 
         # Apply feature generations if any

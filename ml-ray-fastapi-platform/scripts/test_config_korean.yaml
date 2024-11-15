@@ -4,7 +4,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/대전광역시 서구_둔산도서관 보유도서 목록_20210907.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/57d7cf2d-c87f-43a6-8e46-fa50e7f65899.csv"
       model_choice: "kmeans_clustering_segmentation"
       feature_columns:
         - "출판사"
@@ -17,7 +17,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/대전광역시 서구_둔산도서관 보유도서 목록_20210907.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/57d7cf2d-c87f-43a6-8e46-fa50e7f65899.csv"
       model_choice: "kmeans_clustering_anomaly_detection"
       feature_columns:
         - "저자"
