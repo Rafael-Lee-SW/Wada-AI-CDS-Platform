@@ -2,6 +2,7 @@ package com.ssafy.wada.application.service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,7 @@ public class CsvParsingService {
 		String[] headers = null;
 		List<String[]> filteredRows = new ArrayList<>();
 
-		try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+		try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream(), Charset.forName("EUC-KR")))) {
 			headers = reader.readNext();
 
 			if (headers == null) {
