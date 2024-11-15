@@ -5,20 +5,23 @@ import logging
 from datetime import datetime
 import ray
 from ray import serve
-import time  # Ensure that 'time' is imported
+import time
 from logging.handlers import TimedRotatingFileHandler
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Any
 import numpy as np
 import pandas as pd
+import tempfile
+from pathlib import Path
+import chardet  # 추가된 부분
 
 # Import your model functions
 from models import (
     random_forest_regression,
     random_forest_classification,
     logistic_regression_binary,
-    logistic_regression_multinomial,  # Added this line
+    logistic_regression_multinomial,
     kmeans_clustering_segmentation,
     kmeans_clustering_anomaly_detection,
     neural_network_regression,
@@ -146,6 +149,11 @@ def make_serializable(obj: Any) -> Any:
 # Prediction route
 @app.post("/predict")
 async def predict(request: ModelRequest):
+
+    # 로그에 현재 작업 디렉토리 출력
+    current_working_dir = os.getcwd()
+    logger.info(f"Current Working Directory: {current_working_dir}")
+
     model_choice = request.model_choice
 
     # Map model_choice to the corresponding function
@@ -172,6 +180,65 @@ async def predict(request: ModelRequest):
     kwargs.pop("model_choice", None)
 
     try:
+        # Handle file encoding conversion
+        if "file_path" in kwargs:
+            original_file_path = Path(kwargs["file_path"]).resolve()
+            logger.info(f"Resolved file path: {original_file_path}")
+
+            # Check if the file exists
+            if not original_file_path.is_file():
+                logger.error(f"File '{original_file_path}' does not exist.")
+                raise HTTPException(
+                    status_code=400, detail=f"File '{original_file_path}' not found."
+                )
+
+            # Detect file encoding using chardet
+            with open(original_file_path, 'rb') as f:
+                raw_data = f.read()
+                detected = chardet.detect(raw_data)
+                encoding = detected['encoding']
+                confidence = detected['confidence']
+                logger.info(f"Detected encoding: {encoding} with confidence {confidence}")
+
+            if encoding is None:
+                raise HTTPException(
+                    status_code=400, detail="Unable to detect file encoding."
+                )
+
+            # Define allowed encodings
+            allowed_encodings = ['euc-kr', 'cp949', 'utf-8']
+
+            if encoding.lower() not in allowed_encodings:
+                raise HTTPException(
+                    status_code=400, detail=f"Unsupported file encoding: {encoding}. Please use one of {allowed_encodings}."
+                )
+
+            # Create a temporary file to store UTF-8 encoded data
+            with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", suffix=".csv", delete=False
+            ) as temp_utf8_file:
+                temp_utf8_path = temp_utf8_file.name
+
+                # Read the original file with detected encoding
+                try:
+                    df = pd.read_csv(original_file_path, encoding=encoding)
+                    logger.info(f"Successfully read the file with encoding {encoding}.")
+                except UnicodeDecodeError as e:
+                    logger.error(
+                        f"Failed to decode file '{original_file_path}' with {encoding} encoding: {e}"
+                    )
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Failed to decode the uploaded file with {encoding}. Please ensure it's encoded correctly.",
+                    )
+
+                # Save the DataFrame as UTF-8 encoded CSV
+                df.to_csv(temp_utf8_path, encoding="utf-8", index=False)
+                logger.info(f"Saved UTF-8 encoded file to {temp_utf8_path}.")
+
+            # Update the file path in kwargs to the temporary UTF-8 file
+            kwargs["file_path"] = temp_utf8_path
+
         if model_choice == "graph_neural_network_analysis":
             # Remove parameters that we'll pass explicitly to avoid duplication
             file_path = kwargs.pop("file_path")
@@ -197,8 +264,19 @@ async def predict(request: ModelRequest):
             # For other models, pass all parameters
             results = model_function(**kwargs)
 
+        # Delete the temporary UTF-8 file after processing
+        if "temp_utf8_path" in locals():
+            try:
+                os.remove(temp_utf8_path)
+                logger.info(f"Temporary UTF-8 file '{temp_utf8_path}' removed successfully.")
+            except Exception as e:
+                logger.warning(f"Failed to remove temporary file '{temp_utf8_path}': {e}")
+
         return JSONResponse(content=make_serializable(results))
 
+    except HTTPException as he:
+        # Re-raise HTTPExceptions to be handled by FastAPI
+        raise he
     except Exception as e:
         logger.exception(f"Error occurred while running model '{model_choice}': {e}")
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
@@ -214,7 +292,7 @@ class ModelService:
 if __name__ == "__main__":
     import uvicorn
 
-    # Ray 및 Ray Serve 초기화
+    # Initialize Ray and Ray Serve
     if not ray.is_initialized():
         context = ray.init(
             ignore_reinit_error=True,
@@ -225,8 +303,8 @@ if __name__ == "__main__":
         logging.info("Ray has been initialized.")
         logging.info(context.dashboard_url)
 
-    # Ray Serve에서 FastAPI 배포 (8000 포트)
+    # Deploy FastAPI app with Ray Serve (port 8000)
     serve.run(ModelService.bind(), route_prefix="/")
 
-    # Uvicorn으로 FastAPI 실행 (8080 포트)
+    # Run FastAPI app with Uvicorn (port 8282)
     uvicorn.run("app.main:app", host="0.0.0.0", port=8282)
