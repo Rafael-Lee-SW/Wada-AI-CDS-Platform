@@ -1,0 +1,70 @@
+tests:
+  - id: 1
+    description: "1. Random Forest Regression on C002_MAMA.csv"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/C002_MAMA.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "body_weight"
+      feature_columns:
+        - "water_temp"
+        - "water_do"
+        - "water_ph"
+        - "water_orp"
+        - "tank_lux"
+        - "water_nh3"
+        - "water_no2-"
+        - "feed_type"
+        - "feed_frequency"
+        - "feed_cap"
+        - "photoperiod"
+        - "maturation_period"
+        - "migguri_posture"
+      id_column: "no"
+    expected_status: 200
+
+  - id: 2
+    description: "2. K-Means Clustering Segmentation on C002_MAMA.csv"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/C002_MAMA.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "water_temp"
+        - "water_do"
+        - "water_ph"
+        - "water_orp"
+        - "tank_lux"
+        - "water_nh3"
+        - "water_no2-"
+        - "feed_frequency"
+        - "maturation_period"
+      num_clusters: 3
+    expected_status: 200
+
+  - id: 3
+    description: "3. Logistic Regression Binary Classification on C002_MAMA.csv"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/C002_MAMA.csv"
+      model_choice: "logistic_regression_binary"
+      target_variable: "gsi_health_indicator"  # target_variable 명시
+      feature_columns:
+        - "water_temp"
+        - "water_do"
+        - "water_ph"
+        - "water_orp"
+        - "tank_lux"
+        - "water_nh3"
+        - "water_no2-"
+        - "feed_frequency"
+        - "maturation_period"
+      binary_conditions:
+        - column: "gsi"
+          operator: ">"
+          value: 5
+          target_column: "gsi_health_indicator"  # target_column 명시
+    expected_status: 200
