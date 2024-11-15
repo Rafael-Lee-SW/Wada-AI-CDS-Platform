@@ -248,12 +248,25 @@ async def predict(request: ModelRequest):
             exclude_columns = kwargs.pop("exclude_columns", None)
             sample_size = kwargs.pop("sample_size", 10)
             random_state = kwargs.pop("random_state", 42)
+            relationship_column = kwargs.pop("relationship_column", None)
+            target_column = kwargs.pop("target_column", None)
+            task_type = kwargs.pop("task_type", "classification")
+
+            # Validate that relationship_column is provided
+            if not relationship_column:
+                raise HTTPException(
+                    status_code=400,
+                    detail="`relationship_column` is required for graph_neural_network_analysis.",
+                )
 
             # Now call the function with explicit parameters
             results = model_function(
                 file_path=file_path,
                 id_column=id_column,
                 additional_features=additional_features,
+                relationship_column=relationship_column,
+                task_type=task_type,
+                target_column=target_column,
                 feature_generations=feature_generations,
                 exclude_columns=exclude_columns,
                 sample_size=sample_size,

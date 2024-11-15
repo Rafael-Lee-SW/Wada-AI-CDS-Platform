@@ -208,10 +208,7 @@ def neural_network_regression(
             "architecture": "Dense -> Dropout -> Dense -> Dropout -> Dense",
             "optimizer": "Adam",
             "learning_rate": 0.001,
-            "epochs": len(history.history["loss"]),
             "batch_size": 32,
-            "loss": history.history["loss"],
-            "val_loss": history.history["val_loss"],
             "graph1": graph1,
             "graph2": graph2,
             "graph3": graph3,
@@ -273,11 +270,11 @@ def neural_network_regression(
 def graph_neural_network_analysis(
     file_path: str,
     id_column: str,
+    relationship_column: str,
     additional_features: Optional[List[str]] = None,
     feature_generations: Optional[List[Dict[str, Any]]] = None,
     exclude_columns: Optional[List[str]] = None,
     task_type: str = "classification",
-    relationship_column: str = "ManagerID",
     target_column: str = None,
     **kwargs,
 ):
