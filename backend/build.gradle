@@ -43,6 +43,10 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
 	//s3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("com.github.loki4j:loki-logback-appender:1.5.1")
 }
 
 tasks.named('test') {
