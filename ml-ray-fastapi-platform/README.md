@@ -20,6 +20,7 @@ ml-ray-fastapi-platform
 │  ├─ graph_neural_network.py
 │  ├─ kmeans.py
 │  ├─ logistic_regression.py
+│  ├─ support_vector_machine.py
 │  ├─ neural_network.py
 │  ├─ random_forest.py
 │  └─ __init__.py

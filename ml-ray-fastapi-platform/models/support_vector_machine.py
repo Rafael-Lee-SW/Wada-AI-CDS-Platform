@@ -17,7 +17,7 @@ from sklearn.metrics import (
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.decomposition import PCA
-from utils import load_and_preprocess_data, split_data
+from utils import load_and_preprocess_data, split_data, read_csv_with_encoding
 
 
 def clean_data_for_json(data):
@@ -58,7 +58,7 @@ def support_vector_machine_classification(
     """
     try:
         # Load data and identifiers
-        df = pd.read_csv(file_path)
+        df = read_csv_with_encoding(file_path)
 
         # Handle categorical features
         categorical_features = (
@@ -242,7 +242,7 @@ def support_vector_machine_regression(
     """
     try:
         # Load data and identifiers
-        df = pd.read_csv(file_path)
+        df = read_csv_with_encoding(file_path)
         if id_column and id_column in df.columns:
             identifiers = df[id_column]
         else:

@@ -15,7 +15,7 @@ from sklearn.tree import export_graphviz  # 올바르게 임포트
 import graphviz
 import os
 import json
-from utils import load_and_preprocess_data, split_data
+from utils import load_and_preprocess_data, split_data, read_csv_with_encoding
 
 
 def random_forest_regression(
@@ -36,7 +36,7 @@ def random_forest_regression(
     # ... existing code ...
 
     # Load identifiers and data
-    df = pd.read_csv(file_path)
+    df = read_csv_with_encoding(file_path)
     if id_column and id_column in df.columns:
         identifiers = df[id_column]
     else:
@@ -168,7 +168,7 @@ def random_forest_classification(
     - dict: 모델, 지표, 예측값, 확률, 식별자 등을 포함하는 딕셔너리.
     """
     # 데이터 로드 및 식별자 처리
-    df = pd.read_csv(file_path)
+    df = read_csv_with_encoding(file_path)
     if id_column and id_column in df.columns:
         identifiers = df[id_column]
     else:

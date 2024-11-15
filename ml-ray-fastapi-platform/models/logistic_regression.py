@@ -14,6 +14,7 @@ from utils import (
     load_and_preprocess_data,
     split_data,
     generate_binary_condition,
+    read_csv_with_encoding
 )
 
 
@@ -34,7 +35,7 @@ def logistic_regression_binary(
         raise ValueError("Target variable must be specified for binary classification.")
 
     # Load the dataset
-    df = pd.read_csv(file_path)
+    df = read_csv_with_encoding(file_path)
 
     # Generate binary target variable based on conditions
     if target_variable not in df.columns:
@@ -176,7 +177,7 @@ def logistic_regression_multinomial(
         )
 
     # Load the dataset
-    df = pd.read_csv(file_path)
+    df = read_csv_with_encoding(file_path)
 
     # Load and preprocess data
     X, y = load_and_preprocess_data(

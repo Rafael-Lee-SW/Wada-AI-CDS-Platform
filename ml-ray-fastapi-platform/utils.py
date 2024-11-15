@@ -3,6 +3,36 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+import logging
+
+
+# 다양한 인코딩을 도와주는 함수
+def read_csv_with_encoding(file_path):
+    """
+    Reads a CSV file with appropriate encoding handling.
+    Tries 'euc-kr' first, then 'utf-8' if the first attempt fails.
+
+    Parameters:
+    - file_path (str): Path to the CSV file.
+
+    Returns:
+    - pd.DataFrame: The loaded DataFrame.
+    """
+    try:
+        df = pd.read_csv(file_path, encoding="euc-kr")
+        logging.info(f"File '{file_path}' read successfully with EUC-KR encoding.")
+        return df
+    except UnicodeDecodeError as e:
+        logging.warning(f"EUC-KR decoding failed: {e}. Trying UTF-8 decoding.")
+        try:
+            df = pd.read_csv(file_path, encoding="utf-8")
+            logging.info(f"File '{file_path}' read successfully with UTF-8 encoding.")
+            return df
+        except UnicodeDecodeError as e2:
+            logging.error(
+                f"Failed to decode file '{file_path}' with both EUC-KR and UTF-8: {e2}"
+            )
+            raise e2
 
 
 def load_and_preprocess_data(
@@ -14,7 +44,7 @@ def load_and_preprocess_data(
     fill_missing=True,
 ):
     if isinstance(data, str):
-        df = pd.read_csv(data)
+        df = read_csv_with_encoding(data)
     else:
         df = data.copy()
 
