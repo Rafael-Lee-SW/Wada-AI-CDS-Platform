@@ -14,7 +14,7 @@ from utils import (
     load_and_preprocess_data,
     split_data,
     generate_binary_condition,
-    read_csv_with_encoding
+    read_csv_with_encoding,
 )
 
 
@@ -259,32 +259,60 @@ def logistic_regression_multinomial(
     }
 
     # 모든 클래스 쌍의 결정 경계 라인 계산
+    # 모든 클래스 쌍의 결정 경계 라인 계산
+
     lines = []
     n_classes = len(model.classes_)
-    for i in range(n_classes):
-        for j in range(i + 1, n_classes):
-            # 클래스 i와 클래스 j의 계수 차이 계산
-            w_diff = np.array(model.coef_[i]) - np.array(model.coef_[j])
-            b_diff = model.intercept_[i] - model.intercept_[j]
-            if w_diff[1] != 0:
-                slope = -w_diff[0] / w_diff[1]
-                intercept_line = -b_diff / w_diff[1]
-                lines.append(
-                    {
-                        "class_pair": [model.classes_[i], model.classes_[j]],
-                        "slope": slope,
-                        "intercept": intercept_line,
-                    }
-                )
-            else:
-                # 기울기가 무한대인 경우 (수직선)
-                lines.append(
-                    {
-                        "class_pair": [model.classes_[i], model.classes_[j]],
-                        "slope": np.inf,
-                        "intercept": -b_diff / w_diff[0] if w_diff[0] != 0 else None,
-                    }
-                )
+    if n_classes > 2:
+        for i in range(n_classes):
+            for j in range(i + 1, n_classes):
+                # 클래스 i와 클래스 j의 계수 차이 계산
+                w_diff = np.array(model.coef_[i]) - np.array(model.coef_[j])
+                b_diff = model.intercept_[i] - model.intercept_[j]
+                if w_diff[1] != 0:
+                    slope = -w_diff[0] / w_diff[1]
+                    intercept_line = -b_diff / w_diff[1]
+                    lines.append(
+                        {
+                            "class_pair": [model.classes_[i], model.classes_[j]],
+                            "slope": slope,
+                            "intercept": intercept_line,
+                        }
+                    )
+                else:
+                    # 기울기가 무한대인 경우 (수직선)
+                    lines.append(
+                        {
+                            "class_pair": [model.classes_[i], model.classes_[j]],
+                            "slope": np.inf,
+                            "intercept": (
+                                -b_diff / w_diff[0] if w_diff[0] != 0 else None
+                            ),
+                        }
+                    )
+    else:
+        # 클래스가 두 개인 경우
+        w = model.coef_[0]
+        b = model.intercept_[0]
+        if w[1] != 0:
+            slope = -w[0] / w[1]
+            intercept_line = -b / w[1]
+            lines.append(
+                {
+                    "class_pair": [model.classes_[0], model.classes_[1]],
+                    "slope": slope,
+                    "intercept": intercept_line,
+                }
+            )
+        else:
+            # 기울기가 무한대인 경우 (수직선)
+            lines.append(
+                {
+                    "class_pair": [model.classes_[0], model.classes_[1]],
+                    "slope": np.inf,
+                    "intercept": -b / w[0] if w[0] != 0 else None,
+                }
+            )
 
     # Prepare summary data
     # For summary, sample a smaller subset for visualization

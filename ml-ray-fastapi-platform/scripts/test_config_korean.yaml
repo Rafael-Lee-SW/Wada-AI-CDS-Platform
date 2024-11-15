@@ -1,26 +1,42 @@
 tests:
-  - id: 12
-    description: "K-Means Clustering Segmentation for 도서관 데이터"
-    endpoint: "/predict"
-    method: "POST"
-    payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/57d7cf2d-c87f-43a6-8e46-fa50e7f65899.csv"
-      model_choice: "kmeans_clustering_segmentation"
-      feature_columns:
-        - "출판사"
-        - "출판연도"
-      num_clusters: 3
-    expected_status: 200
+  # - id: 12
+  #   description: "K-Means Clustering Segmentation for 도서관 데이터"
+  #   endpoint: "/predict"
+  #   method: "POST"
+  #   payload:
+  #     file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/57d7cf2d-c87f-43a6-8e46-fa50e7f65899.csv"
+  #     model_choice: "kmeans_clustering_segmentation"
+  #     feature_columns:
+  #       - "출판사"
+  #       - "출판연도"
+  #     num_clusters: 3
+  #   expected_status: 200
 
-  - id: 13
-    description: "K-Means Clustering Anomaly Detection for 도서관 데이터"
+  # - id: 13
+  #   description: "K-Means Clustering Anomaly Detection for 도서관 데이터"
+  #   endpoint: "/predict"
+  #   method: "POST"
+  #   payload:
+  #     file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/57d7cf2d-c87f-43a6-8e46-fa50e7f65899.csv"
+  #     model_choice: "kmeans_clustering_anomaly_detection"
+  #     feature_columns:
+  #       - "저자"
+  #       - "출판사"
+  #     threshold: 2
+  #   expected_status: 200
+
+  - id: 14
+    description: "Logistic Regression Multinomial Model Implementation"
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/57d7cf2d-c87f-43a6-8e46-fa50e7f65899.csv"
-      model_choice: "kmeans_clustering_anomaly_detection"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
+      model_choice: "logistic_regression_multinomial"
       feature_columns:
-        - "저자"
-        - "출판사"
-      threshold: 2
+        - "EngagementSurvey"
+        - "EmpSatisfaction"
+        - "PerformanceScore"
+        - "TenureDays"
+      target_variable: "Termd"
+      id_column: "EmpID"
     expected_status: 200
