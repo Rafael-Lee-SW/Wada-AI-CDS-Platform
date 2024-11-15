@@ -91,7 +91,7 @@ public class ChatRecordService {
             .map(chatRoomData -> {
                 Integer requestId = (Integer) chatRoomData.get("requestId");
                 String requirement = (String) chatRoomData.get("requirement");
-                String fileUrl = (String) chatRoomData.get("fileUrl");
+                List<String> fileUrls= (List<String>) chatRoomData.get("fileUrls");
 
                 Map<String, Object> selectedModel = (Map<String, Object>) chatRoomData.get("SelectedModelFromUser");
                 Map<String, Object> resultFromModel = (Map<String, Object>) chatRoomData.get("ResultFromModel");
@@ -113,7 +113,7 @@ public class ChatRecordService {
                     chatRoomId,
                     requestId,
                     requirement,
-                    fileUrl,
+                    fileUrls,
                     selectedModel,
                     resultFromModel,
                     resultDescription,
