@@ -7,19 +7,15 @@
         </encoder>
     </appender>
 
-    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-        <http>
-            <url>http://54.180.244.252:3100/loki/api/push</url>
-        </http>
-        <format>
-            <label>
-                <pattern>app=wada-server,host=${HOSTNAME},level=%level</pattern>
-                <readMarkers>true</readMarkers>
-            </label>
-            <message>
-                <pattern>${MESSAGE_PATTERN}</pattern>
-            </message>
-        </format>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logs/spring-boot-app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/logs/backend.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MESSAGE_PATTERN}</pattern>
+        </encoder>
     </appender>
 
     <root level="INFO">
@@ -29,7 +25,7 @@
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
-            <appender-ref ref="LOKI" />
+            <appender-ref ref="FILE" />
         </root>
     </springProfile>
 </configuration>
