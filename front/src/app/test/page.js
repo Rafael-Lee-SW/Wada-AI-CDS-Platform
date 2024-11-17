@@ -79,6 +79,12 @@ const visualizationsList = [
     explanationPath: "/json/test_9_explanation.json",
   },
   {
+    name: "Support Vector Machine-2",
+    component: SupportVectorVisualization,
+    resultPath: "/json/test_10.json",
+    explanationPath: "/json/test_10_explanation.json",
+  },
+  {
     name: "Neural Network",
     component: NeuralNetworkVisualization,
     resultPath: "/json/test_7.json",
@@ -160,7 +166,7 @@ export default function Test() {
       <div className="flex justify-center">
         <a
           href={csvDownloadUrl}
-          download
+          download={"거시기"}
           className="px-4 py-2 rounded-md border bg-green-500 text-white border-green-500 hover:bg-green-600 transition duration-200"
         >
           Download CSV

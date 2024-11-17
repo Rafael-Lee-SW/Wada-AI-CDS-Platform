@@ -46,7 +46,7 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
     useEffect(() => {
         if (scrollToBottom && bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' });
-            setScrollToBottom(false); 
+            setScrollToBottom(false);
         }
     }, [scrollToBottom]);
 
@@ -64,81 +64,81 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
     };
 
     const handleDownloadPDF = async () => {
-    const element = printRef.current;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const canvasWidth = element.scrollWidth;
-    const canvasHeight = element.scrollHeight;
+        const element = printRef.current;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const canvasWidth = element.scrollWidth;
+        const canvasHeight = element.scrollHeight;
 
-    let position = 0;
-    let pageCount = 0;
-    const scale = 2;  // 이미지의 해상도를 높이기 위한 스케일
+        let position = 0;
+        let pageCount = 0;
+        const scale = 2;  // 이미지의 해상도를 높이기 위한 스케일
 
-    try {
-        // 캡처할 영역을 전체적으로 한 번에 처리
-        const canvas = await html2canvas(element, {
-            scale: scale,
-            useCORS: true,
-            scrollX: 0,
-            scrollY: 0,
-            width: canvasWidth,
-            height: canvasHeight,
-            windowWidth: canvasWidth,
-            windowHeight: canvasHeight
-        });
-
-        const imgData = canvas.toDataURL('image/png');
-        const totalPages = Math.ceil(canvasHeight / (pdfHeight * scale)); // 전체 페이지 수 계산
-
-        // 첫 번째 페이지 추가
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight * (canvas.height / canvas.width));
-
-        // 추가 페이지가 있을 경우
-        for (let i = 1; i < totalPages; i++) {
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, -(i * pdfHeight * scale), pdfWidth, pdfHeight * (canvas.height / canvas.width));
-        }
-
-        // PDF 파일로 저장
-        pdf.save('report_full.pdf');
-    } catch (error) {
-        console.error('PDF 생성 중 오류 발생:', error);
-        }
-    };
-
-
-
-
-    const handleDownload = async () => {
         try {
-            if (!currentFile) {
-                console.error("파일 URL이 없습니다.");
-                return;
+            // 캡처할 영역을 전체적으로 한 번에 처리
+            const canvas = await html2canvas(element, {
+                scale: scale,
+                useCORS: true,
+                scrollX: 0,
+                scrollY: 0,
+                width: canvasWidth,
+                height: canvasHeight,
+                windowWidth: canvasWidth,
+                windowHeight: canvasHeight
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const totalPages = Math.ceil(canvasHeight / (pdfHeight * scale)); // 전체 페이지 수 계산
+
+            // 첫 번째 페이지 추가
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight * (canvas.height / canvas.width));
+
+            // 추가 페이지가 있을 경우
+            for (let i = 1; i < totalPages; i++) {
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, -(i * pdfHeight * scale), pdfWidth, pdfHeight * (canvas.height / canvas.width));
             }
 
-            const response = await fetch(currentFile);
-
-            if (!response.ok) {
-                throw new Error("파일을 찾을 수 없습니다.");
-            }
-
-            const blob = await response.blob();
-            const link = document.createElement('a');
-            const url = window.URL.createObjectURL(blob);
-
-            link.href = url;
-            link.download = currentFile.split("/").pop(); // 파일 이름 추출
-            document.body.appendChild(link);
-            link.click();
-            
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-
+            // PDF 파일로 저장
+            pdf.save('report_full.pdf');
         } catch (error) {
-            console.error("파일 다운로드 중 에러가 발생했습니다: ", error);
+            console.error('PDF 생성 중 오류 발생:', error);
         }
     };
+
+
+
+
+    // const handleDownload = async () => {
+    //     try {
+    //         if (!currentFile) {
+    //             console.error("파일 URL이 없습니다.");
+    //             return;
+    //         }
+
+    //         const response = await fetch(currentFile);
+
+    //         if (!response.ok) {
+    //             throw new Error("파일을 찾을 수 없습니다.");
+    //         }
+
+    //         const blob = await response.blob();
+    //         const link = document.createElement('a');
+    //         const url = window.URL.createObjectURL(blob);
+
+    //         link.href = url;
+    //         link.download = currentFile.split("/").pop(); // 파일 이름 추출
+    //         document.body.appendChild(link);
+    //         link.click();
+
+    //         document.body.removeChild(link);
+    //         window.URL.revokeObjectURL(url);
+
+    //     } catch (error) {
+    //         console.error("파일 다운로드 중 에러가 발생했습니다: ", error);
+    //     }
+    // };
 
     const handleResultClick = async (result) => {
         setResultFromModel(result);
@@ -181,7 +181,10 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
                 <div style={styles.chatWindow}>
                     <div style={styles.file}>
                         <img src="/img/csv.png" style={styles.img} alt="file icon" />
-                        <span onClick={() => handleDownload()}>{fileName}</span>
+                        {/* Use an <a> tag for direct download */}
+                        <a href={currentFile} download={fileName} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            {fileName}
+                        </a>
                     </div>
 
                     {/* updatedChatContent를 사용하여 자동 업데이트 */}
@@ -192,7 +195,7 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
                                     <span>{requirement.requirement}</span>
                                 </div>
                             )}
-                            
+
                             {requirement.resultFromModel !== null && (
                                 <div style={styles.serverContainer}>
                                     <img src="/img/icon.png" alt="logo" style={styles.icon} />
@@ -231,31 +234,31 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
                             ))}
                         </div>
                     ))}
-                    
+
                     {showResult && (
-                    <div style={styles.otherModelTitleContainer}>
-                        <div
-                        style={{
-                            ...styles.imgContainer,
-                            ...(isHovered && styles.imgContainerHover),
-                        }}
-                        onClick={handleOtherModels}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
-                        >
-                        <img src="/img/change.gif" style={styles.img} />
-                        <p style={styles.text}>다른 모델로 분석하기</p>
+                        <div style={styles.otherModelTitleContainer}>
+                            <div
+                                style={{
+                                    ...styles.imgContainer,
+                                    ...(isHovered && styles.imgContainerHover),
+                                }}
+                                onClick={handleOtherModels}
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                            >
+                                <img src="/img/change.gif" style={styles.img} />
+                                <p style={styles.text}>다른 모델로 분석하기</p>
+                            </div>
                         </div>
-                    </div>
                     )}
                 </div>
             </div>
             {showResult && (
                 <div style={styles.rightSection}>
-                    <img src="/img/pdf.png" alt="pdf" style={styles.pdfImg} onClick={handleDownloadPDF}/>
+                    <img src="/img/pdf.png" alt="pdf" style={styles.pdfImg} onClick={handleDownloadPDF} />
                     <button onClick={handleCloseDashBoard} style={styles.closeButton}>X</button>
                     <div ref={printRef} style={styles.resultContent}>
-                        <Report result={resultFromModel}/>
+                        <Report result={resultFromModel} />
                     </div>
                 </div>
             )}
