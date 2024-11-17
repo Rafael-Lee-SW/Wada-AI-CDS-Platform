@@ -232,7 +232,7 @@ export default function ChatContent({ fileName, sessionId, chatContent, onModelS
                         </div>
                     ))}
                     
-                    {otherModels && models && (
+                    {showResult && (
                     <div style={styles.otherModelTitleContainer}>
                         <div
                         style={{
