@@ -160,9 +160,6 @@ public class MLRecommendationService {
 		String header = "Bearer " + apiKey;
 		String body = PromptGenerator.createRecommendedModelFromLLM(inputDataList, analysisPurpose);
 
-		// 디버깅: GPT 요청 확인
-		log.info("GPT Request Body: {}", body);
-
 		GptRequest.Message message = GptRequest.Message.roleUserMessage(body);
 		GptRequest request = new GptRequest(List.of(message));
 		String gptResponse = null;
