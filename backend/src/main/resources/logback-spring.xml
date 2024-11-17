@@ -8,7 +8,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/spring-boot-app.log</file>
+        <file>/logs/backend.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/logs/backend.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>7</maxHistory>
