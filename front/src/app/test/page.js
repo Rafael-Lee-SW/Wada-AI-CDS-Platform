@@ -135,6 +135,9 @@ export default function Test() {
     fetchData();
   }, [selectedVisualization]);
 
+  // URL of the CSV file to download
+  const csvDownloadUrl = "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/fe692d91-b65e-4239-81a4-8bc70afe1a67.csv";
+
   return (
     <div className="container mx-auto p-4 space-y-8">
       {/* Visualization Selection Buttons */}
@@ -143,16 +146,27 @@ export default function Test() {
           <button
             key={viz.name}
             onClick={() => setSelectedVisualization(viz)}
-            className={`px-4 py-2 rounded-md border ${
-              selectedVisualization.name === viz.name
-                ? "bg-blue-500 text-white border-blue-500"
-                : "bg-white text-blue-500 border-blue-500 hover:bg-blue-50"
-            } transition duration-200`}
+            className={`px-4 py-2 rounded-md border ${selectedVisualization.name === viz.name
+              ? "bg-blue-500 text-white border-blue-500"
+              : "bg-white text-blue-500 border-blue-500 hover:bg-blue-50"
+              } transition duration-200`}
           >
             {viz.name}
           </button>
         ))}
       </div>
+
+      {/* Download CSV Button */}
+      <div className="flex justify-center">
+        <a
+          href={csvDownloadUrl}
+          download
+          className="px-4 py-2 rounded-md border bg-green-500 text-white border-green-500 hover:bg-green-600 transition duration-200"
+        >
+          Download CSV
+        </a>
+      </div>
+
 
       {/* Loading and Error States */}
       {isLoading && <p>Loading visualization...</p>}
