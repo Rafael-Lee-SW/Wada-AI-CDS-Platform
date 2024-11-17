@@ -70,10 +70,20 @@ public class MLRecommendationService {
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, List<MultipartFile> files) {
 
 		log.info("Step 1: Start recommendation process");
-		// Lazy 로딩 방식으로 Guest 조회 및 생성
+		long maxFileSize = 2 * 1024 * 1024; // 2MB
+
+		// 파일 크기 검증
+		for (MultipartFile file : files) {
+			if (file.getSize() > maxFileSize) {
+				log.error("File '{}' exceeds the maximum size of 2MB. Size: {} bytes", file.getOriginalFilename(), file.getSize());
+				return "2MB 이하 파일만 분석 가능 합니다.";
+			}
+		}
+
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
 		log.info("Step 1-1: Guest retrieved or created with sessionId={}", sessionId);
+
 		String fileName = files.get(0).getOriginalFilename();
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
 			.orElseGet(() -> {
@@ -83,7 +93,7 @@ public class MLRecommendationService {
 		log.info("Step 1-2: ChatRoom retrieved or created with chatRoomId={}", chatRoomId);
 
 		List<Map<String, Object>> inputDataList = new ArrayList<>();
-		List<String> fileUrls = new ArrayList<>(); // 파일 URL 저장 리스트
+		List<String> fileUrls = new ArrayList<>();
 
 		// Step 3: CSV 파일 파싱 및 S3 업로드
 		log.info("Step 3: Parsing CSV file and uploading to S3");
@@ -93,19 +103,30 @@ public class MLRecommendationService {
 					CsvResult csvResult = csvParsingService.parse(file);
 					String[] headers = csvResult.headers();
 					List<String[]> rows = csvResult.rows();
+
+					// 디버깅: CSV 파싱 결과 확인
+					log.info("Parsed headers for file '{}': {}", file.getOriginalFilename(), Arrays.toString(headers));
+					log.info("Parsed rows count for file '{}': {}", file.getOriginalFilename(), rows.size());
+
+					if (rows.isEmpty() || headers == null) {
+						log.error("CSV file '{}' contains no valid data or headers are missing.", file.getOriginalFilename());
+						log.info("row is empty for file '{}'", file.getOriginalFilename());
+					}
+
 					List<String[]> randomRows = getRandomRows(rows, RANDOM_SELECT_ROWS);
 					String jsonData = convertToJson(headers, randomRows);
-					log.info("Step 3: Parsed CSV file with headers={} and random rows={}", Arrays.toString(headers), jsonData);
+					log.info("Step 3: Parsed random rows as JSON: {}", jsonData);
 
 					// Step 2: 파일 업로드 및 URL 저장
-					log.info("Step 2: Uploading file to S3");
+					log.info("Step 2: Uploading file '{}' to S3", file.getOriginalFilename());
 					String fileUrl = s3Client.upload(toAttachedFile(file));
 					synchronized (fileUrls) {
-						fileUrls.add(fileUrl); // 업로드된 파일 URL 추가
+						fileUrls.add(fileUrl);
 					}
+
 					File fileEntity = File.create(UUID.randomUUID().toString(), chatRoom, fileUrl);
 					fileRepository.save(fileEntity);
-					log.info("Step 2: File uploaded to S3 with URL={}", fileUrl);
+					log.info("Step 2: File '{}' uploaded to S3 with URL: {}", file.getOriginalFilename(), fileUrl);
 
 					// Step 4: Prompt 생성
 					Map<String, Object> modelParams = new HashMap<>();
@@ -115,9 +136,10 @@ public class MLRecommendationService {
 					synchronized (inputDataList) {
 						inputDataList.add(modelParams);
 					}
-					log.info("Step 4: Generated prompt for GPT model");
+					log.info("Step 4: Generated prompt for GPT model with file: {}", file.getOriginalFilename());
+
 				} catch (Exception e) {
-					log.error("Error processing file: {}", file.getOriginalFilename(), e);
+					log.error("Error processing file '{}': {}", file.getOriginalFilename(), e.getMessage(), e);
 				}
 			})
 		).toList();
@@ -125,24 +147,46 @@ public class MLRecommendationService {
 		// 모든 파일의 병렬 처리 완료 후 결과 대기
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
+		// Step 4.5: 파싱된 값 로그 출력
+		log.info("Step 4.5: Logging parsed data before GPT call");
+		if (inputDataList.isEmpty()) {
+			log.error("Step 4.5: inputDataList is empty. No data to process for GPT call.");
+			return "CSV 파일에 유효한 데이터가 없습니다.";
+		}
+		inputDataList.forEach(data -> log.info("Parsed inputData: {}", data));
+
 		// Step 5: GPT 호출 및 응답 처리
 		log.info("Step 5: Calling GPT model");
 		String header = "Bearer " + apiKey;
 		String body = PromptGenerator.createRecommendedModelFromLLM(inputDataList, analysisPurpose);
+
+		// 디버깅: GPT 요청 확인
+		log.info("GPT Request Body: {}", body);
+
 		GptRequest.Message message = GptRequest.Message.roleUserMessage(body);
 		GptRequest request = new GptRequest(List.of(message));
-		String gptResponse = gptClient.callFunction(header, request);
-		log.info("Step 5: GPT model response received");
+		String gptResponse = null;
+		try {
+			gptResponse = gptClient.callFunction(header, request);
+			log.info("Step 5: GPT model response received");
+		} catch (Exception e) {
+			log.error("Step 5: Error calling GPT model: {}", e.getMessage(), e);
+			return "GPT 모델 호출 중 오류가 발생했습니다.";
+		}
+
+		// GPT 응답 디버깅
+		log.info("GPT Response: {}", gptResponse);
 
 		int requestToken = calculateTokens(body);
 		int responseToken = calculateTokens(gptResponse);
 
 		// Step 6: MongoDB에 GPT 응답 및 파일 URL 리스트 저장
-		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, analysisPurpose, requestToken, responseToken,inputDataList,fileName);
+		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, analysisPurpose, requestToken, responseToken, inputDataList, fileName);
 		log.info("Step 6: GPT response and file paths saved to MongoDB with requestId={}", requestId);
 
 		return createResponse(gptResponse, requestId);
 	}
+
 
 	private int saveGptResponseToMongo(String gptResponse, String chatRoomId,
 		List<String> fileUrls, String requirement, int requestToken,
