@@ -106,56 +106,121 @@ function SVMVisualization({ result, explanation }) {
     const yy = decisionBoundaryData.yy;
     const Z = decisionBoundaryData.Z;
 
+    // Find decision boundary points (z ~ 0)
+    const decisionBoundaryPoints = X_vis.filter((_, index) => {
+      const zValue = Z[Math.floor(index / Z[0].length)][index % Z[0].length];
+      return Math.abs(zValue) < 0.05; // Adjust threshold as needed for better representation
+    });
+
     return (
-      <Plot
-        data={[
-          {
-            x: xx[0],
-            y: yy.map((row) => row[0]),
-            z: Z,
-            type: "contour",
-            contours: {
-              start: -1,
-              end: 1,
-              size: 0.5,
+      <div>
+        <Plot
+          data={[
+            // Contour plot for the decision boundary
+            {
+              x: xx[0],
+              y: yy.map((row) => row[0]),
+              z: Z,
+              type: "contour",
+              contours: {
+                start: -1,
+                end: 1,
+                size: 0.1,
+              },
+              colorscale: [
+                [0, "blue"],
+                [0.5, "white"],
+                [1, "yellow"],
+              ],
+              showscale: true,
+              colorbar: {
+                title: "결정 함수 값 (z)",
+                tickvals: [-1, 0, 1],
+                ticktext: ["Class 2", "Decision Boundary", "Class 1"],
+              },
             },
-            colorscale: "Viridis",
-            showscale: false,
-          },
-          {
-            x: X_vis.map((d) => d[0]),
-            y: X_vis.map((d) => d[1]),
-            mode: "markers",
-            type: "scatter",
-            marker: {
-              color: y_vis,
-              colorscale: "Viridis",
-              showscale: false,
+            // Data points with class colors
+            {
+              x: X_vis.map((d) => d[0]),
+              y: X_vis.map((d) => d[1]),
+              mode: "markers",
+              type: "scatter",
+              marker: {
+                color: y_vis,
+                colorscale: [
+                  [0, "green"],
+                  [1, "red"],
+                ],
+                showscale: true,
+                colorbar: {
+                  title: "데이터 클래스",
+                  tickvals: [0, 1],
+                  ticktext: ["Class 2", "Class 1"],
+                },
+              },
             },
-          },
-        ]}
-        layout={{
-          title:
-            visualizationsInfo[1]?.title || "Decision Boundary Visualization",
-          xaxis: {
-            title:
-              explanation.SupportVectorMachine_case?.Decision_Boundary_Graph[
-                "x-axis_title"
-              ] || "Feature 1",
-          },
-          yaxis: {
-            title:
-              explanation.SupportVectorMachine_case?.Decision_Boundary_Graph[
-                "y-axis_title"
-              ] || "Feature 2",
-          },
-          height: 600,
-          margin: { t: 50, l: 50, r: 50, b: 100 },
-        }}
-        config={{ responsive: true }}
-      />
+            // Decision boundary points (white markers)
+            {
+              x: decisionBoundaryPoints.map((point) => point[0]),
+              y: decisionBoundaryPoints.map((point) => point[1]),
+              mode: "markers",
+              type: "scatter",
+              marker: {
+                color: "white",
+                size: 8,
+                symbol: "circle",
+                line: {
+                  color: "black",
+                  width: 1,
+                },
+              },
+              name: "Decision Boundary Points",
+            },
+          ]}
+          layout={{
+            title: "결정 경계 시각화",
+            xaxis: {
+              title: explanation.SupportVectorMachine_case?.Decision_Boundary_Graph[
+                "x_axis_title"
+              ] || "주성분 1",
+            },
+            yaxis: {
+              title: explanation.SupportVectorMachine_case?.Decision_Boundary_Graph[
+                "y_axis_title"
+              ] || "주성분 2",
+            },
+            height: 600,
+            margin: { t: 50, l: 50, r: 50, b: 100 },
+          }}
+          config={{ responsive: true }}
+        />
+        <div>
+          <h3>해석:</h3>
+          <ul>
+            <li>
+              <strong>결정 경계 (z=0):</strong> 클래스 1과 클래스 2의 분류 경계. 흰색 영역으로 나타남.
+            </li>
+            <li>
+              <strong>양수 영역 (z&gt;0):</strong> 클래스 1로 분류되는 영역 (노란색).
+            </li>
+            <li>
+              <strong>음수 영역 (z&lt;0):</strong> 클래스 2로 분류되는 영역 (파란색).
+            </li>
+            <li>
+              <strong>흰색 점:</strong> 결정 경계 근처에 위치한 데이터 포인트. 모델이 불확실성을 가지며 분류하기 어려운 영역.
+            </li>
+            <li>
+              <strong>녹색 점:</strong> 클래스 2 데이터 포인트.
+            </li>
+            <li>
+              <strong>빨간 점:</strong> 클래스 1 데이터 포인트.
+            </li>
+          </ul>
+        </div>
+      </div>
     );
   };
+
 
   // Render Confusion Matrix
   const renderConfusionMatrix = () => {
