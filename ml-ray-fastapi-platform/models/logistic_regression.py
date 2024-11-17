@@ -187,6 +187,20 @@ def logistic_regression_multinomial(
         task_type="classification",
     )
 
+    # **새로운 단계:** 희소 클래스 병합
+    class_counts = y.value_counts()
+    threshold = 5  # 적절한 임계값 설정
+    classes_to_keep = class_counts[class_counts >= threshold].index
+    y = y.apply(lambda x: x if x in classes_to_keep else "Other")
+
+    # 'Other' 클래스를 포함하지 않도록 필터링 (필요 시)
+    X = X[y != "Other"]
+    y = y[y != "Other"]
+
+    # 클래스별 샘플 수 확인
+    if y.value_counts().min() < 2:
+        raise ValueError("병합 후에도 일부 클래스에 샘플이 2개 미만입니다.")
+
     # Perform PCA for visualization
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
