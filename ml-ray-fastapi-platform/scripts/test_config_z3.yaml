@@ -1,0 +1,43 @@
+tests:
+  - id: 1
+    description: "1. Random Forest Regression"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/한국방송광고진흥공사_광고박물관 이용자 현황_20220731.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "이용자수"
+      feature_columns:
+        - "기준연월"
+        - "이용자구분"
+        - "단체구분"
+      id_column: "번호"
+    expected_status: 200
+
+  - id: 2
+    description: "2. K-Means Clustering - User Segmentation"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/한국방송광고진흥공사_광고박물관 이용자 현황_20220731.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "기준연월"
+        - "이용자구분"
+        - "단체구분"
+      num_clusters: 3
+    expected_status: 200
+
+  - id: 3
+    description: "3. Logistic Regression Multinomial Classification"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/한국방송광고진흥공사_광고박물관 이용자 현황_20220731.csv"
+      model_choice: "logistic_regression_multinomial"
+      target_variable: "이용자구분"
+      feature_columns:
+        - "기준연월"
+        - "기준일_범위"
+        - "단체구분"
+    expected_status: 200

@@ -1,22 +1,27 @@
 # models/support_vector_machine.py
 
-import pandas as pd
-import numpy as np
-from sklearn.svm import SVC, SVR
+import pandas as pd  # pandas 라이브러리 import
+import numpy as np  # numpy 라이브러리 import
+from sklearn.svm import (
+    SVC,
+    SVR,
+)  # Support Vector Classifier와 Regressor 임포트 (SVC and SVR)
 from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    confusion_matrix,
-    mean_squared_error,
-    r2_score,
-    roc_auc_score,
-    precision_recall_curve,
-    auc,
-    roc_curve,
+    accuracy_score,  # 정확도 평가 함수
+    classification_report,  # 분류 Report 생성 함수
+    confusion_matrix,  # 혼동 행렬 생성 함수
+    mean_squared_error,  # 평균 제곱 오차 계산 함수
+    r2_score,  # 결정 계수 계산 함수
+    roc_auc_score,  # ROC AUC 점수 계산 함수
+    precision_recall_curve,  # 정밀도-재현율 곡선 계산 함수
+    auc,  # 면적 계산 함수
+    roc_curve,  # ROC 곡선 계산 함수
 )
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import GridSearchCV
-from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler  # 데이터 스케일링을 위한 스케일러
+from sklearn.model_selection import GridSearchCV  # 그리드 서치 교차 검증
+from sklearn.decomposition import PCA  # 주성분 분석
+
+# 직접 정의한 데이터 가공 함수들
 from utils import load_and_preprocess_data, split_data, read_csv_with_encoding
 
 
@@ -24,20 +29,22 @@ def clean_data_for_json(data):
     """
     Recursively cleans data structures by converting non-serializable types
     and replacing NaN or infinite values with None.
+    -
+    JSON으로 직렬화할 수 없는 타입을 변환하고, NaN 또는 무한대 값을 None으로 대체하여 데이터 구조를 재귀적으로 정리합니다.
     """
     if isinstance(data, dict):
-        return {k: clean_data_for_json(v) for k, v in data.items()}
+        return {k: clean_data_for_json(v) for k, v in data.items()}  # 딕셔너리의 각 값에 대해 재귀 호출
     elif isinstance(data, list):
-        return [clean_data_for_json(v) for v in data]
+        return [clean_data_for_json(v) for v in data]  # 리스트의 각 요소에 대해 재귀 호출
     elif isinstance(data, float):
         if np.isnan(data) or np.isinf(data):
-            return None
+            return None  # NaN 또는 무한대인 경우 None으로 대체
         else:
-            return data
+            return data  # 그렇지 않으면 원래 값 반환
     elif isinstance(data, np.ndarray):
-        return clean_data_for_json(data.tolist())
+        return clean_data_for_json(data.tolist())  # ndarray인 경우 리스트로 변환 후 재귀 호출
     else:
-        return data
+        return data  # 그 외의 경우 원래 값 반환
 
 
 def support_vector_machine_classification(
@@ -55,17 +62,20 @@ def support_vector_machine_classification(
     """
     Train and evaluate a Support Vector Machine model for classification.
     Includes only necessary data for visualizations.
+    -
+    분류를 위한 서포트 벡터 머신 모델을 학습하고 평가
+    시각화를 위해 필요한 데이터만 포함
     """
     try:
-        # Load data and identifiers
-        df = read_csv_with_encoding(file_path)
+        # 데이터 및 식별자 불러오기
+        df = read_csv_with_encoding(file_path)  # 한글파일도 encoding할 수 있도록 직접 정의한 것 활용
 
-        # Handle categorical features
+        # 범주형 특징 처리
         categorical_features = (
             df[feature_columns].select_dtypes(include=["object"]).columns
         )
         if len(categorical_features) > 0:
-            # Remove categorical features
+            # 범주형 특징 제거
             feature_columns = [
                 f for f in feature_columns if f not in categorical_features
             ]
@@ -75,7 +85,7 @@ def support_vector_machine_classification(
         else:
             identifiers = pd.Series(np.arange(len(df)), name="Index")
 
-        # Preprocess data
+        # 데이터 전처리
         X, y = load_and_preprocess_data(
             df,
             target_variable=target_variable,
@@ -83,23 +93,23 @@ def support_vector_machine_classification(
             task_type="classification",
         )
 
-        # Replace infinite values with NaN and then fill with mean
+        # 무한대 값을 NaN으로 대체한 후 평균으로 채움
         X = X.replace([np.inf, -np.inf], np.nan)
         X = X.fillna(X.mean())
 
         identifiers = identifiers.loc[X.index]
 
-        # Split data
+        # 데이터 분할
         X_train, X_test, y_train, y_test, id_train, id_test = split_data(
             X, y, identifiers, return_ids=True, task_type="classification"
         )
 
-        # Feature scaling
+        # 특성 스케일링
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
 
-        # Initialize and train model
+        # 모델 초기화 및 학습
         model = SVC(
             kernel=kernel,
             C=C,
@@ -109,16 +119,16 @@ def support_vector_machine_classification(
         )
         model.fit(X_train_scaled, y_train)
 
-        # Predictions
+        # 예측 수행
         y_pred = model.predict(X_test_scaled)
         y_proba = model.predict_proba(X_test_scaled)
 
-        # Evaluate model
+        # 모델 평가
         accuracy = accuracy_score(y_test, y_pred)
         report = classification_report(y_test, y_pred, output_dict=True)
         confusion = confusion_matrix(y_test, y_pred).tolist()
 
-        # Calculate ROC AUC score and Precision-Recall AUC
+        # ROC AUC 점수 및 정밀도-재현율 AUC 계산
         roc_auc = pr_auc = None
         fpr = tpr = roc_thresholds = precision = recall = pr_thresholds = None
         if len(model.classes_) == 2:
@@ -132,17 +142,19 @@ def support_vector_machine_classification(
             except Exception:
                 pass
 
-        # Prepare data for visualization (reduced size)
-        # PCA 부분 수정
+        # 시각화를 위한 데이터 준비 (크기 축소)
         pca = PCA(n_components=2)
         X_vis = pca.fit_transform(X_test_scaled)  # PCA는 테스트 데이터에만 적용
         y_vis = y_test.tolist()
 
-        # Limit data size for visualization
+        # 시각화를 위한 데이터 크기 제한
         max_points = 200
         if len(X_vis) > max_points:
             X_vis = X_vis[:max_points]
             y_vis = y_vis[:max_points]
+            id_test_sample = id_test.tolist()[:max_points]  # 시각화 데이터에 해당하는 식별자
+        else:
+            id_test_sample = id_test.tolist()  # 시각화 데이터에 해당하는 식별자
 
         # 결정 경계 계산을 위한 그리드 생성
         x_min, x_max = X_vis[:, 0].min() - 1, X_vis[:, 0].max() + 1
@@ -166,7 +178,7 @@ def support_vector_machine_classification(
         Z = svm_vis.decision_function(grid_points)
         Z = Z.reshape(xx.shape)
 
-        # Prepare results
+        # 결과 준비
         result = {
             "model": "SupportVectorMachineClassifier",
             "kernel": kernel,
@@ -184,6 +196,7 @@ def support_vector_machine_classification(
                 "graph_type": "decision_boundary",
                 "X_vis": X_vis.tolist(),
                 "y_vis": y_vis,
+                "ids_vis": id_test_sample,  # 시각화 데이터에 해당하는 식별자 추가
                 "xx": xx.tolist(),
                 "yy": yy.tolist(),
                 "Z": Z.tolist(),
@@ -209,12 +222,16 @@ def support_vector_machine_classification(
                 "graph_type": "decision_boundary",
                 "X_vis": X_vis.tolist(),
                 "y_vis": y_vis,
-                "xx": xx[::10, ::10].tolist(),  # 3단위로 샘플링하여 크기 축소
-                "yy": yy[::10, ::10].tolist(),  # 3단위로 샘플링하여 크기 축소
-                "Z": Z[::10, ::10].tolist(),  # 3단위로 샘플링하여 크기 축소
+                "ids_vis": id_test_sample[:10],  # 시각화 데이터 식별자 중 최대 10개 샘플 포함
+                "xx": xx[::10, ::10].tolist(),  # 그리드 데이터 샘플링 (크기 축소)
+                "yy": yy[::10, ::10].tolist(),
+                "Z": Z[::10, ::10].tolist(),
             },
             "graph3": result["graph3"],
             "graph4": result["graph4"],
+            "identifiers": {
+                "id_vis_sample": id_test_sample[:10],  # 시각화 데이터 식별자 중 10개 샘플 포함
+            },
         }
 
         # Clean data before returning
@@ -239,6 +256,9 @@ def support_vector_machine_regression(
     """
     Train and evaluate a Support Vector Machine model for regression with hyperparameter tuning.
     Includes only necessary data for visualizations.
+    -
+    회귀를 위한 서포트 벡터 머신 모델을 학습하고 평가하며, 하이퍼파라미터 튜닝을 수행합니다.
+    시각화를 위해 필요한 데이터만 포함됩니다.
     """
     try:
         # Load data and identifiers
@@ -312,6 +332,9 @@ def support_vector_machine_regression(
             X_vis = X_vis[:max_points]
             y_vis = y_vis[:max_points]
             y_pred_vis = y_pred_vis[:max_points]
+            id_test_sample = id_test.tolist()[:max_points]  # 시각화 데이터에 해당하는 식별자
+        else:
+            id_test_sample = id_test.tolist()  # 시각화 데이터에 해당하는 식별자
 
         # Prepare results
         result = {
@@ -326,6 +349,7 @@ def support_vector_machine_regression(
                 ),
                 "y_vis": y_vis,
                 "y_pred": y_pred_vis,
+                "ids_vis": id_test_sample,  # 시각화 데이터에 해당하는 식별자 추가
             },
         }
 
@@ -334,6 +358,9 @@ def support_vector_machine_regression(
             "model": "SupportVectorMachineRegressor",
             "r2_score": r2,
             "graph1": result["graph1"],
+            "identifiers": {
+                "id_vis_sample": id_test_sample[:10],  # 시각화 데이터 식별자 중 10개 샘플 포함
+            },
         }
 
         # Clean data before returning
