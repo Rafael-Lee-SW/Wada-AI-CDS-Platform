@@ -1,0 +1,44 @@
+tests:
+  - id: 1
+    description: "1. 랜덤 포레스트 회귀 분석 on example_file.csv"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/C035+C055_BABY+MIDDLE.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "target"
+      feature_columns:
+        - "feature1"
+        - "feature2"
+      id_column: "id"
+    expected_status: 200
+
+  - id: 2
+    description: "2. k-평균 클러스터링 통한 세분화 분석 on example_file.csv"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/C035+C055_BABY+MIDDLE.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "feature1"
+        - "feature2"
+      num_clusters: 3
+    expected_status: 200
+
+  - id: 3
+    description: "3. 이진 로지스틱 회귀 분석 on example_file.csv"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/C035+C055_BABY+MIDDLE.csv"
+      model_choice: "logistic_regression_binary"
+      feature_columns:
+        - "feature1"
+        - "feature2"
+      binary_conditions:
+        - column: "feature1"
+          operator: ">"
+          value: 0
+          target_column: "binary_target"
+    expected_status: 200
