@@ -1,6 +1,6 @@
-import styles from "/styles/loadingStyle";
+import styles from "/styles/loading2Style";
 
-export default function Loading() {
+export default function Loading2() {
     return (
         <div style={styles.loadingContainer}>
             <img
@@ -8,7 +8,7 @@ export default function Loading() {
             alt="motionLogo"
             style={styles.img}
             />
-            <p>잠시만 기다려주세요.</p>
+            <p>답변을 기다리는 중입니다.</p>
         </div>
     );
 }
