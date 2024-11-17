@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid"
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
-import { fetchChatRoom, fetchChatList, fetchModel, fetchNewModel, createAnalyze, createConversation } from "@/api";
+import { fetchChatRoom, fetchChatList, fetchModel, fetchNewModel, createAnalyze, createConversation, fetchOtherModel } from "@/api";
 import Loading from "./Loading";
 import FileUploader from "./FileUploader";
 import RequirementUploader from "./RequirementUploader";
 import NewChat from "./NewChat";
 import { convertEucKrToUtf8, convertUtf8ToArrayBuffer } from '../../../lib/encoding'; // Adjust the path as needed
+import Loading2 from "./Loading2";
 import { restyle } from "plotly.js";
 
 export default function Home({ sessionId }) {
@@ -29,6 +30,8 @@ export default function Home({ sessionId }) {
     const [currentStep, setCurrentStep] = useState(0);
     const [chatContent, setChatContent] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [scrollToBottom, setScrollToBottom] = useState(false);
 
     const handleGoBack = () => {
         if (pageHistory.length > 0) {
@@ -38,8 +41,7 @@ export default function Home({ sessionId }) {
         }
     };
 
-    useEffect(() => {
-        const getChatList = async () => {
+    const getChatList = async () => {
             try {
                 if (!sessionId) return;
 
@@ -55,10 +57,34 @@ export default function Home({ sessionId }) {
             }
         };
 
-        getChatList();
-    }, [sessionId]);
+    useEffect(() => {
+        getChatList(); 
+    },[sessionId]);
+
+    const handleOtherModels = async (resultFromModel) => {
+        try {
+            const data = {
+                chatRoomId: resultFromModel.chatRoomId,
+                requestId: resultFromModel.requestId
+            };
+
+            const response = await fetchOtherModel(data, sessionId);
+            const result = response.data;
+
+            setModels(result.model_recommendations);
+            setPurpose(result.purpose_understanding);
+            setOverview(result.data_overview);
+            setRequestId(result.requestId);
+            handleChangePage('selectML');
+
+        } catch (error) {
+            console.log("선택되지 않은 모델 불러오기 오류: ", error);
+        }
+    }
 
     const handleConversation = async (requirement, chatRoomId, requestId, sessionId) => {
+        setPage('loading2');
+        
         try {
             const data = {
                 "requestId": requestId,
@@ -70,6 +96,10 @@ export default function Home({ sessionId }) {
             const result = response.data;
 
             console.log("추가 대화 답변: ", result.answer);
+            setPage('chatContent');
+            setRefreshKey(prevKey => prevKey + 1);
+            setScrollToBottom(true);
+
         } catch (error) {
             console.log("보고서 기반 대화 에러: ", error);
         }
@@ -83,10 +113,7 @@ export default function Home({ sessionId }) {
     }
 
     const handleMenuItemClick = async (chatRoomId, fileName) => {
-
-        setIsLoading(true);
-        setPage('loading2');
-
+        
         try {
             const response = await fetchChatRoom(chatRoomId, sessionId);
             const result = response.data;
@@ -120,6 +147,7 @@ export default function Home({ sessionId }) {
     const handleSubmitRequirement = async (requirement) => {
         setRequirement(requirement);
         setSubmittedRequirement(requirement);
+        setFileName(files[0].name);
     }
 
     const handleSubmit = async () => {
@@ -267,56 +295,57 @@ export default function Home({ sessionId }) {
 
         } finally {
             setIsLoading('false');
+            getChatList();
         }
     };
 
-    return (
-        <div style={styles.mainContainer}>
-            <div style={styles.sidebar}>
-                <div style={styles.info}>
-                    <img src="/img/icon.png" style={styles.icon} />
-                    <span style={styles.headerMessage} onClick={handleChangeHome}>원하는Da로</span>
+   return (
+    <div style={styles.mainContainer}>
+        <div style={styles.sidebar}>
+            <div style={styles.info}>
+                <img src="/img/icon.png" style={styles.icon}/>
+                <span style={styles.headerMessage} onClick={handleChangeHome}>원하는Da로</span>
+            </div>
+            <div style={styles.menu}>
+                <div style={styles.menuItemTitle}>
+                    <p>분석 기록</p>
                 </div>
-                <div style={styles.menu}>
-                    <div style={styles.menuItemTitle}>
-                        <p>분석 기록</p>
-                    </div>
-                    <div style={styles.newButtonContainer}>
-                        <button style={styles.newButton} onClick={handleChatRoomId}>+ 새 채팅</button>
-                    </div>
-                    <div style={styles.chatListContainer}>
-                        {chatList.length > 0 ? (
-                            chatList.map((chat, index) => (
-                                <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId, chat.fileName)}>
-                                    <img style={styles.arrow} src="/img/arrow.png" alt="arrow" />
-                                    <p style={styles.chatList}>{chat.fileName}</p>
-                                </div>
-                            ))
-                        ) : null}
-                    </div>
+                <div style={styles.newButtonContainer}>
+                    <button style={styles.newButton} onClick={handleChatRoomId}>+ 새 채팅</button>
+                </div>
+                <div style={styles.chatListContainer}>
+                    {chatList.length > 0 ? ( 
+                        chatList.map((chat, index) => (
+                            <div key={index} style={styles.menuItem} onClick={() => handleMenuItemClick(chat.chatRoomId, chat.fileName)}>
+                                <img style={styles.arrow} src="/img/arrow.png" alt="arrow" />
+                                <p style={styles.chatList}>{chat.fileName}</p> 
+                            </div>
+                        ))
+                    ): null }
                 </div>
             </div>
-            <img
-                src="/img/goBack.png"
-                onClick={handleGoBack}
-                style={{
-                    width: '20px',
-                    position: 'absolute',
-                    op: 20,
-                    left: 20,
-                    zIndex: 9999,
-                    position: 'fixed',
-                    left: '200px',
-                    top: '18px',
-                    display: (page === 'fileUploader' || page === 'newChat') ? 'none' : 'block'
-                }} />
-            {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit} onReSubmit={handleReSubmit} />}
-            {page === 'chatContent' && <ChatContent fileName={fileName} result={result} sessionId={sessionId} chatContent={chatContent} onModelSelect={handleModelSelect} onSubmit={handleConversation} />}
-            {page === 'loading' && <Loading currentStep={currentStep} />}
-            {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles} />}
-            {page === 'requirementUploader' && <RequirementUploader onChangePage={handleChangePage} onSubmitRequirement={handleSubmitRequirement} onSubmit={handleSubmit} />}
-            {page === 'loading2' && <Loading />}
-            {page === 'newChat' && <NewChat />}
         </div>
+        <img 
+        src="/img/goBack.png" 
+        onClick={handleGoBack} 
+        style={{ 
+            width: '20px', 
+            position: 'absolute', 
+            op: 20, 
+            left: 20, 
+            zIndex: 9999, 
+            position: 'fixed', 
+            left: '200px', 
+            top: '18px',
+            display: (page === 'fileUploader' || page === 'newChat') ? 'none' : 'block'
+        }}/>
+        {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit} onReSubmit={handleReSubmit}/>}
+        {page === 'chatContent' && <ChatContent fileName={fileName} result={result} sessionId={sessionId} chatContent={chatContent} onModelSelect={handleModelSelect} onSubmit={handleConversation} onOtherModels={handleOtherModels} onChangePage={handleChangePage} refreshKey={refreshKey} onMenuClick={handleMenuItemClick} setScrollToBottom={setScrollToBottom} scrollToBottom={scrollToBottom}/>}
+        {page === 'loading' && <Loading currentStep={currentStep}/>}
+        {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles}/>}
+        {page === 'requirementUploader' && <RequirementUploader onChangePage={handleChangePage} onSubmitRequirement={handleSubmitRequirement} onSubmit={handleSubmit}/>} 
+        {page === 'loading2' && <Loading2/>}
+        {page === 'newChat' && <NewChat/>}
+    </div>
     );
 }

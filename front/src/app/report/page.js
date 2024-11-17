@@ -4,7 +4,6 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-
 // Dynamically import of 보고서 형식들
 const KMeansVisualization = dynamic(
   () => import("../chat/components/analyzeReport/KMeansVisualization.js"),
@@ -36,7 +35,6 @@ const RegressionVisualization = dynamic(
 ); // test Case 1
 
 export default function Report({ result }) {
-
 
   const [jsonResult, setJsonResult] = useState(null);
   const [jsonExplanation, setJsonExplanation] = useState(null);
@@ -137,28 +135,30 @@ export default function Report({ result }) {
 
   return (
     <div>
-      {isLoading && <p>Loading visualization...</p>}
-      {error && <p>{error}</p>}
-      {jsonResult && jsonExplanation && (
-        // <KMeansVisualization
-        //     result={jsonResult.result}
-        //     explanation={jsonExplanation.result}
-        // />
-        // <LogisticRegressionVisualization
-        //   result={jsonResult.result}
-        //   explanation={jsonExplanation.result}
-        // />
-        //   <ClassifierVisualization
-        //   result={jsonResult.result}
-        //   explanation={jsonExplanation.result}
-        // />
-        <>
-        {model === 'LogisticRegressionBinary' && <LogisticRegressionVisualization result={jsonResult} explanation={jsonExplanation}/>}
-        {model === 'RandomForestClassifier' && <ClassifierVisualization result={jsonResult} explanation={jsonExplanation}/> }
-        {model === 'RandomForestRegression' && <RegressionVisualization result={jsonResult} explanation={jsonExplanation}/> }
-        {model === 'KmeansClusteringSegmentation' && <KMeansVisualization result={jsonResult} explanation={jsonExplanation}/>}
-        </>
-      )}
+      <div>
+        {isLoading && <p>Loading visualization...</p>}
+        {error && <p>{error}</p>}
+        {jsonResult && jsonExplanation && (
+          // <KMeansVisualization
+          //     result={jsonResult.result}
+          //     explanation={jsonExplanation.result}
+          // />
+          // <LogisticRegressionVisualization
+          //   result={jsonResult.result}
+          //   explanation={jsonExplanation.result}
+          // />
+          //   <ClassifierVisualization
+          //   result={jsonResult.result}
+          //   explanation={jsonExplanation.result}
+          // />
+          <>
+          {model === 'LogisticRegressionBinary' && <LogisticRegressionVisualization result={jsonResult} explanation={jsonExplanation}/>}
+          {model === 'RandomForestClassifier' && <ClassifierVisualization result={jsonResult} explanation={jsonExplanation}/> }
+          {model === 'RandomForestRegression' && <RegressionVisualization result={jsonResult} explanation={jsonExplanation}/> }
+          {model === 'KmeansClusteringSegmentation' && <KMeansVisualization result={jsonResult} explanation={jsonExplanation}/>}
+          </>
+        )}
+      </div>
     </div>
   );
 }

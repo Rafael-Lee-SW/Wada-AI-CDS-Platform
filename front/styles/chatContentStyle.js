@@ -16,7 +16,6 @@ const styles = {
         height: '100vh',
         overflowY: "auto",
         scrollbarWidth: 'none',
-        paddingRight: '15px'
     },
     leftSection: {
         width: '40%',
@@ -195,21 +194,29 @@ const styles = {
     },
     text: {
         textAlign: 'center',
-        padding: '20px',
+        padding: '15px',
         fontWeight: 'bold'
     },  
     imgContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        border: '1px solid #9370db',
+        borderRadius: '12px',
+        cursor: 'pointer',
+        marginTop: '10px'
+    },
+    imgContainerHover: {
+        transform: 'scale(1.05)', 
     },
     img: {
-        width: '30px'
+        width: '30px',
+        marginLeft: '10px'
     },
     modelCardHover: {
-        transform: 'scale(1.05)', // 마우스 오버 시 확대 효과
-        boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)', // 그림자 효과
+        transform: 'scale(1.05)', 
+        boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)', 
     }
 }
 
