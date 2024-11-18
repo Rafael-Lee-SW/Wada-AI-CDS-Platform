@@ -52,6 +52,29 @@ const styles = {
         width: '60px',
         padding: '10px'
     },
+    otherReplyContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingTop: '20px',
+        paddingBottom: '20px'
+    },
+    otherReply: {
+        wordWrap: 'break-word',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'keep-all',
+        overflowWrap: 'break-word',
+        maxWidth: '70%', // 최대 너비를 부모 요소에 맞추기
+        lineHeight: '1.6',
+        textAlign: 'center',
+        fontSize: '18px',
+        color: '#6c4e82'
+    },
+    replyImg: {
+        width: '40px',
+        padding: '10px'
+    },
     infoBox: {
         padding: '20px'
     },

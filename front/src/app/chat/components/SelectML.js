@@ -2,7 +2,7 @@ import styles from "/styles/selectMlStyle";
 import { useState, useRef } from "react";
 import InputChat from "./components/InputChat";
 
-export default function SelectML({ chatRoomId, models, purpose, overview, requestId, onModelSelect, onSubmit, onReSubmit }) {
+export default function SelectML({ chatRoomId, models, purpose, overview, requestId, onModelSelect, onSubmit, onReSubmit, otherReply }) {
     const [isHovered1, setIsHovered1] = useState(false);
     const [isHovered2, setIsHovered2] = useState(false);
     const [hoveredCard, setHoveredCard] = useState(null); 
@@ -33,6 +33,13 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                     <img src="/img/news.gif" alt="icon" style={styles.icon} />
                     <p style={styles.iconText}>사전 분석</p>
                 </div>
+                {otherReply && otherReply.trim() !== "" && (
+                    <div style={styles.otherReplyContainer}>
+                        <img src="/img/left.png" style={styles.replyImg}/>
+                        <p style={styles.otherReply}>{otherReply}</p>
+                        <img src="/img/right.png" style={styles.replyImg}/>
+                    </div>
+                )}
                 <div style={styles.preCardContainer}>
                     <div style={styles.preContentContainer}>
                         <div style={styles.card}>
@@ -113,13 +120,30 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                                                 transition: 'transform 0.3s',
                                             }}
                                         >
-                                            <p style={styles.title1}>{model.implementation_request.model_choice}</p>
-                                            {Object.entries(reason).map(([key, value]) => (
-                                                <div style={styles.modelContent} key={key}>
-                                                    <p style={styles.title}><strong>{key}</strong></p>
-                                                    <p style={styles.reason}>{value}</p>
-                                                </div>
-                                            ))}
+                                            <p style={styles.title1}>{model.analysis_name}</p>
+                                            {Object.entries(reason).map(([key, value]) => {                                                const renderKey = () => {
+                                                    switch (key) {
+                                                        case 'model_selection_reason':
+                                                            return '모델 선택 이유';
+                                                        case 'business_value':
+                                                            return '사업적 가치';
+                                                        case 'expected_results':
+                                                            return '예상 결과';
+                                                        case 'considerations':
+                                                            return '고려사항';
+                                                        case 'model_advantages':
+                                                            return '장점';
+                                                        default:
+                                                            return key; 
+                                                    }
+                                                };
+                                                return (
+                                                    <div style={styles.modelContent} key={key}>
+                                                        <p style={styles.title}><strong>{renderKey()}</strong></p>
+                                                        <p style={styles.reason}>{value}</p>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>

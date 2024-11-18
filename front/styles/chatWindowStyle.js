@@ -1,3 +1,4 @@
+
 const styles = {
     mainContainer: {
         display: 'flex',
@@ -95,6 +96,8 @@ const styles = {
         fontSize: '16px',
         color: '#545454',
         cursor: 'pointer',
+        fontWeight: 'bold',
+        color: '#9370db'
     },
     contentContainer: {
         display: 'flex',

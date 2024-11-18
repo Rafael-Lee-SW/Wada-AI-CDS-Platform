@@ -215,22 +215,18 @@ export default function Report({ result }) {
     <div>
       {/* PDF Download Button */}
       {jsonResult && jsonExplanation && (
-        <div style={{ marginTop: "20px", textAlign: "right" }}>
-          <button
+        <div style={{ textAlign: "left" }}>
+          <img
+            src="/img/pdf.png"
             onClick={handleDownloadPDF}
-            disabled={isGenerating}
             style={{
               padding: "10px 20px",
-              backgroundColor: isGenerating ? "#ccc" : "#4CAF50",
-              color: "white",
+              width: '80px',
               border: "none",
               borderRadius: "5px",
-              cursor: isGenerating ? "not-allowed" : "pointer",
-              fontSize: "16px",
+              cursor: "pointer",
             }}
-          >
-            {isGenerating ? "Generating PDF..." : "Download PDF"}
-          </button>
+          />
         </div>
       )}
       <div>
