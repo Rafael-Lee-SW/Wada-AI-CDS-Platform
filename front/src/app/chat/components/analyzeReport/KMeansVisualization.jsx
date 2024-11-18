@@ -38,6 +38,10 @@ export default function KMeansVisualization({ result, explanation }) {
     ? result.feature_columns_used
     : [];
 
+  // Determine model type directly from props
+  const modelType = (result.model || "").toLowerCase();
+  const isAnomalyDetection = modelType.includes("anomalydetection");
+
   // State variables
   const [clusters, setClusters] = useState([]);
   const [clusterColorMap, setClusterColorMap] = useState({});
@@ -46,7 +50,6 @@ export default function KMeansVisualization({ result, explanation }) {
   const [clusterCentersPca, setClusterCentersPca] = useState([]);
   const [anomalies, setAnomalies] = useState([]);
   const [numAnomalies, setNumAnomalies] = useState(2);
-  const [isAnomalyDetection, setIsAnomalyDetection] = useState(false); // Default to false
   const [error, setError] = useState(null);
   const [showInset, setShowInset] = useState(true);
 
@@ -69,6 +72,16 @@ export default function KMeansVisualization({ result, explanation }) {
     cluster_title: clusterGroupTitle,
     cluster_description: clusterGroupDescription,
   } = explanation;
+
+  // State to control active tab
+  const [activeTab, setActiveTab] = useState(
+    isAnomalyDetection ? "anomalies" : "clusters_graph"
+  );
+
+  // Update activeTab if isAnomalyDetection changes
+  useEffect(() => {
+    setActiveTab(isAnomalyDetection ? "anomalies" : "clusters_graph");
+  }, [isAnomalyDetection]);
 
   // Generate a consistent color map for clusters
   const generateClusterColorMap = (clusters, colors) => {
@@ -95,10 +108,6 @@ export default function KMeansVisualization({ result, explanation }) {
       const scalerMean = result.scaler_mean || [];
       const scalerScale = result.scaler_scale || [];
       const clusterCenters = result.cluster_centers || [];
-      const modelName = result.model.toLowerCase();
-
-      // Determine if anomaly detection is enabled
-      setIsAnomalyDetection(modelName.includes("anomalydetection"));
 
       // Extract clustered samples
       const dfSample = [];
@@ -125,7 +134,9 @@ export default function KMeansVisualization({ result, explanation }) {
       }
 
       // Prepare data for PCA
-      const X = dfSample.map((row) => featureColumns.map((col) => row[col]));
+      const X = dfSample.map((row) =>
+        featureColumns.map((col) => row[col])
+      );
 
       if (X.length === 0 || X[0].length === 0) {
         setError("데이터가 비어 있거나 형식이 잘못되었습니다.");
@@ -276,7 +287,9 @@ export default function KMeansVisualization({ result, explanation }) {
           layout={{
             title: visualizationsInfo[0]?.title || "클러스터별 수",
             xaxis: {
-              title: xAxisTitle || "클러스터",
+              title:
+                xAxisTitle ||
+                (isAnomalyDetection ? "클러스터" : "클러스터 그래프"),
               tickfont: { size: 14 },
               titlefont: { size: 16, family: "Arial, sans-serif" },
             },
@@ -306,8 +319,7 @@ export default function KMeansVisualization({ result, explanation }) {
               gutterBottom
               className={classes.axisDescription}
             >
-              <strong>{`${xAxisTitle} (x)`}</strong>: 같은 성격을 지닌
-              그룹입니다.
+              <strong>{`${xAxisTitle} (x)`}</strong>: 같은 성격을 지닌 그룹입니다.
             </Typography>
           )}
           {yAxisTitle && yAxisDescription && (
@@ -316,8 +328,7 @@ export default function KMeansVisualization({ result, explanation }) {
               gutterBottom
               className={classes.axisDescription}
             >
-              <strong>{`${yAxisTitle} (y)`}</strong>: 각 그룹이 몇 개의 인자로
-              구성되어 있는지 나타냅니다.
+              <strong>{`${yAxisTitle} (y)`}</strong>: 각 그룹이 몇 개의 인자로 구성되어 있는지 나타냅니다.
             </Typography>
           )}
         </div>
@@ -392,7 +403,9 @@ export default function KMeansVisualization({ result, explanation }) {
 
       if (points.length >= 3) {
         const hullIndices = convexHull(points);
-        const hullPoints = hullIndices.map((indexPair) => points[indexPair[0]]);
+        const hullPoints = hullIndices.map(
+          (indexPair) => points[indexPair[0]]
+        );
 
         // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
@@ -469,7 +482,8 @@ export default function KMeansVisualization({ result, explanation }) {
           const featureInfo = featureColumns
             .map((col) => `${col}: ${a[col]}`)
             .join("<br>");
-          const clusterName = clusterTitles[a[clusterLabel]] || a[clusterLabel];
+          const clusterName =
+            clusterTitles[a[clusterLabel]] || a[clusterLabel];
           return `${featureInfo}<br>PC1: ${a.PC1.toFixed(
             2
           )}<br>PC2: ${a.PC2.toFixed(2)}<br>클러스터: ${clusterName}`;
@@ -636,6 +650,54 @@ export default function KMeansVisualization({ result, explanation }) {
             {clusterGroupDescription}
           </Typography>
         )}
+      </div>
+    );
+  };
+
+  // Dynamically generate columns based on data keys, excluding specific columns if needed
+  const renderClusteredDataTable = () => {
+    if (!clusterData.length) return null;
+
+    const excludeColumns = ["Cluster_Anomaly"]; // 필요에 따라 제외할 열 설정
+    const dataKeys = Object.keys(clusterData[0]).filter(
+      (key) => !excludeColumns.includes(key)
+    );
+
+    const columns = dataKeys.map((key) => ({
+      field: key,
+      headerName: key,
+      flex: 1,
+      minWidth: 150,
+    }));
+
+    // Optionally include excluded columns separately
+    excludeColumns.forEach((key) => {
+      columns.push({
+        field: key,
+        headerName: key.replace("_", " "),
+        flex: 1,
+        minWidth: 100,
+        type: "number",
+      });
+    });
+
+    const rows = clusterData.map((row, index) => ({ id: index, ...row }));
+
+    // 로그: columns과 rows 확인
+    console.log("DataGrid Columns:", columns);
+    console.log("DataGrid Rows:", rows);
+
+    return (
+      <div style={{ height: 500, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={20}
+          rowsPerPageOptions={[20, 50, 100]}
+          checkboxSelection
+          disableSelectionOnClick
+          className={classes.dataGrid}
+        />
       </div>
     );
   };
@@ -914,54 +976,6 @@ export default function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // Dynamically generate columns based on data keys, excluding specific columns if needed
-  const renderClusteredDataTable = () => {
-    if (!clusterData.length) return null;
-
-    const excludeColumns = ["Cluster_Anomaly"]; // 필요에 따라 제외할 열 설정
-    const dataKeys = Object.keys(clusterData[0]).filter(
-      (key) => !excludeColumns.includes(key)
-    );
-
-    const columns = dataKeys.map((key) => ({
-      field: key,
-      headerName: key,
-      flex: 1,
-      minWidth: 150,
-    }));
-
-    // Optionally include excluded columns separately
-    excludeColumns.forEach((key) => {
-      columns.push({
-        field: key,
-        headerName: key.replace("_", " "),
-        flex: 1,
-        minWidth: 100,
-        type: "number",
-      });
-    });
-
-    const rows = clusterData.map((row, index) => ({ id: index, ...row }));
-
-    // 로그: columns과 rows 확인
-    console.log("DataGrid Columns:", columns);
-    console.log("DataGrid Rows:", rows);
-
-    return (
-      <div style={{ height: 500, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={20}
-          rowsPerPageOptions={[20, 50, 100]}
-          checkboxSelection
-          disableSelectionOnClick
-          className={classes.dataGrid}
-        />
-      </div>
-    );
-  };
-
   return (
     <div className="container mx-auto p-4 space-y-8">
       {error && (
@@ -975,7 +989,7 @@ export default function KMeansVisualization({ result, explanation }) {
             {explanation.report_title || "AI 모델 분석 보고서"}
           </h1>
 
-          {/* 3. Add Overview and Model Performance Sections */}
+          {/* Overview Section */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -1000,23 +1014,24 @@ export default function KMeansVisualization({ result, explanation }) {
               </Typography>
             </CardContent>
           </Card>
+
+          {/* Tabs Section */}
           <Tabs
-            defaultValue={isAnomalyDetection ? "anomalies" : "clusters"}
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value)}
             className="w-full"
           >
-            <TabsList
-              className={`grid w-full ${
-                isAnomalyDetection ? "grid-cols-3" : "grid-cols-2"
-              }`}
-            >
-              {isAnomalyDetection && (
+            <TabsList className="grid grid-cols-3 w-full">
+              {isAnomalyDetection ? (
                 <TabsTrigger value="anomalies">이상치</TabsTrigger>
+              ) : (
+                <TabsTrigger value="clusters_graph">클러스터 그래프</TabsTrigger>
               )}
-              <TabsTrigger value="clusters">군집 분포</TabsTrigger>
+              <TabsTrigger value="clusters_distribution">군집 분포</TabsTrigger>
               <TabsTrigger value="data">모든 데이터 확인하기</TabsTrigger>
             </TabsList>
 
-            {/* Anomalies Tab Content 먼저 배치 */}
+            {/* Anomalies Tab Content */}
             {isAnomalyDetection && (
               <TabsContent value="anomalies">
                 <Card>
@@ -1068,8 +1083,28 @@ export default function KMeansVisualization({ result, explanation }) {
               </TabsContent>
             )}
 
-            {/* Clusters Tab Content 다음에 배치 */}
-            <TabsContent value="clusters">
+            {/* Clusters Graph Tab Content */}
+            {!isAnomalyDetection && (
+              <TabsContent value="clusters_graph">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      {visualizationsInfo[1]?.title || "클러스터 그래프"}
+                    </CardTitle>
+                    <CardDescription>
+                      {visualizationsInfo[1]?.description ||
+                        "2D 공간에서 클러스터를 시각화합니다."}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    {renderClusterScatterPlot()}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+
+            {/* Clusters Distribution Tab Content */}
+            <TabsContent value="clusters_distribution">
               <Card>
                 <CardHeader>
                   <CardTitle>
@@ -1086,7 +1121,7 @@ export default function KMeansVisualization({ result, explanation }) {
               </Card>
             </TabsContent>
 
-            {/* Data Table Tab Content 마지막에 배치 */}
+            {/* Data Table Tab Content */}
             <TabsContent value="data">
               <Card>
                 <CardHeader>
@@ -1102,7 +1137,7 @@ export default function KMeansVisualization({ result, explanation }) {
             </TabsContent>
           </Tabs>
 
-          {/* 클러스터 정보 카드 추가 */}
+          {/* Cluster Information Card */}
           {renderClusterInformation()}
 
           {/* Key Findings and Recommendations */}
@@ -1147,58 +1182,61 @@ export default function KMeansVisualization({ result, explanation }) {
               </CardContent>
             </Card>
           </div>
+
+          {/* Model Performance Section */}
+          {modelPerformance.metrics && modelPerformance.metrics.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {explanation.model_performance_section_title || "모델 성능"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Render Metrics */}
+                <Typography variant="h6">주요 메트릭</Typography>
+                {modelPerformance.metrics.map((metric, index) => (
+                  <div key={index} className="mb-2">
+                    <Typography variant="body1">
+                      <strong>{metric.metric_name}:</strong> {metric.metric_value}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {metric.interpretation}
+                    </Typography>
+                  </div>
+                ))}
+
+                {/* Render Prediction Analysis */}
+                {modelPerformance.prediction_analysis && (
+                  <>
+                    <Typography variant="h6" className="mt-4">
+                      예측 분석
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                      <strong>전체 정확도:</strong>{" "}
+                      {modelPerformance.prediction_analysis.overall_accuracy}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>주목할 만한 패턴:</strong>
+                    </Typography>
+                    <ul className="list-disc pl-5">
+                      {modelPerformance.prediction_analysis.notable_patterns.map(
+                        (pattern, idx) => (
+                          <li key={idx}>
+                            <Typography variant="body2">{pattern}</Typography>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
 
-      {/* Model Performance Section */}
-      {modelPerformance.metrics && modelPerformance.metrics.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {explanation.model_performance_section_title || "모델 성능"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* Render Metrics */}
-            <Typography variant="h6">주요 메트릭</Typography>
-            {modelPerformance.metrics.map((metric, index) => (
-              <div key={index} className="mb-2">
-                <Typography variant="body1">
-                  <strong>{metric.metric_name}:</strong> {metric.metric_value}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {metric.interpretation}
-                </Typography>
-              </div>
-            ))}
-
-            {/* Render Prediction Analysis */}
-            {modelPerformance.prediction_analysis && (
-              <>
-                <Typography variant="h6" className="mt-4">
-                  예측 분석
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  <strong>전체 정확도:</strong>{" "}
-                  {modelPerformance.prediction_analysis.overall_accuracy}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>주목할 만한 패턴:</strong>
-                </Typography>
-                <ul className="list-disc pl-5">
-                  {modelPerformance.prediction_analysis.notable_patterns.map(
-                    (pattern, idx) => (
-                      <li key={idx}>
-                        <Typography variant="body2">{pattern}</Typography>
-                      </li>
-                    )
-                  )}
-                </ul>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      {/* Model Performance Section for Segmentation Models */}
+      {/* Optional: If you want to separate Model Performance from the main content, adjust placement accordingly */}
     </div>
   );
 }
