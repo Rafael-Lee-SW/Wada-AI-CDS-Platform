@@ -340,8 +340,7 @@ public class PromptGenerator {
 
         // UserPrompt 생성 메서드
         public static String createUserPromptForResult(Map<String, Object> fastApiResult) {
-            return String.format(
-                """
+            return """
        # Role and Context
        You are an expert data analyst who specializes in explaining complex ML/DL analysis results to non-technical stakeholders. Your task is to create a comprehensive analysis report in Korean based on the provided machine learning analysis results.
 
@@ -413,12 +412,11 @@ public class PromptGenerator {
                 ],
                 "further_analysis": [
                     "추가 분석이 필요한 영역"
-                ],
+                ]
             },
             "model_specific_details": {
                 "model_type": "모델 타입",
                 "details": {
-                    // RandomForest Case (regression & classification)
                     "random_forest_case": {
                         "report_title": "보고서 제목",
                         "x_axis_title": "실제 값 축 제목",
@@ -426,8 +424,6 @@ public class PromptGenerator {
                         "y_axis_title": "예측 값 축 제목",
                         "y_axis_description": "예측 값 설명"
                     },
-               
-                    // LogisticRegression Case (binary & multinomial)
                     "logistic_regression_case": {
                         "report_title": "보고서 제목",
                         "classes": {
@@ -443,8 +439,6 @@ public class PromptGenerator {
                             "boundary_line_description": ["경계선 1 설명", ...]
                         }
                     },
-               
-                    // KMeans Case (segmentation & anomaly)
                     "kmeans_clustering_case": {
                         "report_title": "보고서 제목",
                         "x_axis_title": "PC1 축 제목",
@@ -457,174 +451,48 @@ public class PromptGenerator {
                             "cluster_title": ["클러스터 1 제목", "클러스터 2 제목", ...],
                             "cluster_description": ["클러스터 1 설명", "클러스터 2 설명", ...]
                         }
-                    },
-               
-                    // Support Vector Machine Case (classification & regression)
-                                  "support_vector_machine_case": {
-                                    "report_title": "SVM 분석 결과를 설명하는 이해하기 쉬운 보고서 제목",
-                                    "decision_boundary_graph": {
-                                      "title": "결정 경계 그래프: 클래스 간 구분 시각화",
-                                      "x_axis_title": "주성분 1 (e.g. 근속일수)",
-                                      "x_axis_description": "주성분 분석(PCA) 결과의 첫 번째 축으로, 데이터의 가장 큰 분산을 설명하는 주요 특징.",
-                                      "y_axis_title": "주성분 2 (e.g. 프로젝트 참여율)",
-                                      "y_axis_description": "주성분 분석(PCA) 결과의 두 번째 축으로, 첫 번째 주성분 이후의 분산을 설명.",
-                                      "z_axis_title": "결정 함수 값 (e.g. 클래스 소속 가능성)",
-                                      "z_axis_description": "결정 경계 수준. 0은 클래스 경계이며, 양수는 Class 1, 음수는 Class 2에 속할 가능성을 나타냄.",
-                                      "color_mapping": {
-                                        "positive_values": "양수 값: Class 1과 가까운 데이터 포인트를 나타냄 (예: 이직 가능성 낮음).",
-                                        "negative_values": "음수 값: Class 2와 가까운 데이터 포인트를 나타냄 (예: 이직 가능성 높음).",
-                                        "zero_values": "결정 경계: 모델이 불확실성을 가지는 경계선으로 두 클래스 간 구분 영역."
-                                      },
-                                      "data_point_colors": {
-                                        "green": "Class 1 (예: 안정적인 직원)에 속하는 데이터 포인트.",
-                                        "red": "Class 2 (예: 이직 가능성이 높은 직원)에 속하는 데이터 포인트.",
-                                        "white": "결정 경계 근처의 데이터 포인트로, 모델이 분류를 확신하지 못하는 영역."
-                                      }
-                                    }
-                                  },
-               
-                    // Neural Network Case (regression & graph)
-                    "neural_network_case": {
-                        "report_title": "보고서 제목",
-                        "predictions_vs_actual": {
-                            "title": "예측/실제 비교 그래프 제목",
-                            "x_axis_title": "실제 값 축 제목",
-                            "x_axis_description": "실제 값 설명",
-                            "y_axis_title": "예측 값 축 제목",
-                            "y_axis_description": "예측 값 설명"
-                        }
                     }
                 }
             }
         }
         ```
-               
+
         # Guidelines:
         1. Language and Communication:
            - Use simple, conversational Korean language avoiding technical jargon
            - When technical terms must be used, provide clear explanations with everyday examples
            - Maintain original format for technical terms, column names, and model names
            - Write as if explaining to a friend who has no technical background
-               
+
         2. Explanation Depth:
            - Start with a high-level overview before diving into details
            - Provide step-by-step explanations for complex concepts
            - Use relatable real-world analogies and examples
            - Include "For example, ..." sections to illustrate key points
            - Explain both "what" the results show and "why" they matter
-               
+
         3. Business Context:
            - Focus on practical business implications and value
            - Connect technical findings to business outcomes
            - Provide actionable insights that can be implemented
            - Explain potential business impacts in monetary or operational terms
            - Include industry-specific examples when relevant
-               
+
         4. Visualization and Understanding:
            - Describe complex patterns in simple, visual terms
            - Use everyday analogies to explain statistical concepts
            - Suggest clear visual representations for important findings
            - Explain what patterns or trends mean in practical terms
-               
-        5. Confidence and Transparency:
-           - Clearly communicate levels of certainty in findings
-           - Explain limitations and assumptions in simple terms
-           - Be honest about areas of uncertainty
-           - Provide context for statistical measures
-           - Include caveats where appropriate
-               
-        6. Structure and Readability:
+
+        5. Structure and Readability:
            - Use bullet points and numbered lists for clarity
            - Break down complex ideas into digestible chunks
            - Provide summary points for each section
            - Use consistent terminology throughout
            - Include "Key Takeaway" sections for important points
-               
-        7. Customer Focus:
-           - Anticipate and address potential questions
-           - Provide context for why each finding matters
-           - Include practical next steps and recommendations
-           - Use encouraging and constructive language
-           - Emphasize positive insights while being honest about challenges
-               
-        8. Comprehensive Support:
-           - Offer multiple perspectives on important findings
-           - Provide both short-term and long-term recommendations
-           - Include success metrics for suggested actions
-           - Suggest ways to monitor and measure progress
-           - Outline potential implementation strategies
-          \s
-        9. Model-Specific Visualization Explanations:
-           - Create visualization titles and descriptions that align with business context
-           - Replace technical terms (PC1, PC2, Feature) with their actual business meanings
-           - Clearly explain what each axis and element means in real business terms
-               
-           a) RandomForest Visualization:
-              - Explain the relationship between actual and predicted values in simple terms
-              - Include units and ranges in axis descriptions
-              Example:\s
-                "제목: 실제 연봉과 예측 연봉의 비교 분석"
-                "x축: 실제 연봉 (단위: 만원, 범위: 3000-8000만원)"
-                "y축: 모델이 예측한 연봉 (예측 신뢰구간 포함)"
-               
-           b) LogisticRegression Visualization:
-              - Explain what each class represents in real groups
-              - Interpret decision boundaries from a business perspective
-              Example:
-                "제목: 직원 이직 위험도 분류"
-                "클래스 설명: 안정 그룹(이직위험 낮음), 관리필요 그룹(이직위험 보통), 집중관리 그룹(이직위험 높음)"
-                "경계선 설명: 성과와 근속년수에 따른 이직 위험 구분선"
-               
-           c) KMeans Clustering:
-              - Describe cluster characteristics using business terminology
-              - Explain cluster differences from a practical perspective
-              Example:
-                "제목: 직원 특성에 따른 그룹 분류"
-                "클러스터 1: 고성과 장기근속 그룹 - 안정적인 업무 성과와 높은 충성도"
-                "클러스터 2: 성장잠재력 그룹 - 짧은 근속기간but 가파른 성과 향상"
-               
-           d) SVM Visualization:
-              - Explain decision boundaries in terms of business decision-making
-              - Interpret feature axes as actual business metrics
-              Example:
-                "제목: 성과 지표별 승진 가능성 분석"
-                "x축: 분기별 업무 성과 점수 (0-100점)"
-                "y축: 프로젝트 참여도 (0-100%)"
-                "경계선: 승진 가능성이 높은 구간과 낮은 구간의 구분선"
-               
-           e) Neural Network Visualization:
-              - Connect predictions to actual business situations
-              - Provide business interpretation for difference areas
-              Example:
-                "제목: 생산성 예측 정확도 분석"
-                "x축: 실제 시간당 생산량 (단위: 개)"
-                "y축: 예측된 시간당 생산량 (단위: 개)"
-                "특이점 설명: 성수기/비수기에 따른 예측 편차 구간 해석"
-               
-        10. Visualization Context Guidelines:
-            - Frame all graph titles as question/answer pairs
-              Example: "핵심 질문: 어떤 직원들이 이직 위험이 높은가?"
-                       "답변 시각화: 근속기간과 성과에 따른 이직 위험도 분포"
-            - Include why each metric matters in axis descriptions
-              Example: "업무 성과 지표 (팀 전체 생산성에 30% 영향을 미치는 핵심 지표)"
-            - Explain legends and boundaries in ways that aid decision-making
-              Example: "빨간 구간: 즉시 관리가 필요한 구간 (이직 확률 70% 이상)"
-               
-        Note: All explanations in the actual output should be in Korean except for technical terms, while maintaining the professional and user-friendly tone described in these guidelines.
-               
-        # Additional Output Requirements
-               
-        1. Strict JSON Compliance:
-           - Must be parseable by standard JSON parsers
-           - No comments in the final JSON output
-           - No trailing commas
-           - All string values must be in double quotes
-               
+
         Remember: The goal is to make the customer feel informed, empowered, and confident in understanding the analysis results and their implications for their business.
-               
-        Your response should be a single valid JSON object following the above format, with all values provided in Korean except for technical terms.
-       """, covertToJsonFromMap(fastApiResult)
-            );
+       """.formatted(covertToJsonFromMap(fastApiResult));
         }
 
     public static String covertToJsonFromMap(Map<String, Object> map) {
@@ -649,7 +517,7 @@ public class PromptGenerator {
     }
 
     public static String createSystemPromptForConversation(Map<String, Object> analysisContext) {
-        return String.format("""
+        return """
         {
             "Role": "You are an expert in explaining complex ML/DL analysis reports to non-technical stakeholders. Your task is to answer follow-up questions based on the analysis results and previous reports, providing clear and insightful answers in Korean that connect technical findings to business implications.",
             "Key Principles": [
@@ -674,17 +542,18 @@ public class PromptGenerator {
             "Example": {
                 "User Question": "예측 정확도가 높다는 것은 무엇을 의미하나요?",
                 "Required JSON Response": {
-                    "answer": "예측 정확도가 높다는 것은 모델이 실제 데이터와 가까운 결과를 산출하고 있다는 의미입니다. 예를 들어, 이 모델이 환경 배출량을 예측하는데 90% 이상의 정확도를 보인다면, 정책 수립 시 더 신뢰할 수 있는 수치를 참고할 수 있습니다.",
+                    "answer": "예측 정확도가 높다는 것은 모델이 실제 데이터와 가까운 결과를 산출하고 있다는 의미입니다. 예를 들어, 이 모델이 환경 배출량을 예측하는데 90%% 이상의 정확도를 보인다면, 정책 수립 시 더 신뢰할 수 있는 수치를 참고할 수 있습니다.",
                     "previous_QA_summary": "User asked about the significance of high prediction accuracy, and it was explained that high accuracy means close alignment with real data, making the results reliable for policy-making."
                 }
             }
         }
-        """,
-                analysisContext.get("analysis_results"),
-                analysisContext.get("report_summary"),
-                analysisContext.getOrDefault("previous_QA_summary", "")
+        """.formatted(
+            analysisContext.get("analysis_results"),
+            analysisContext.get("report_summary"),
+            analysisContext.getOrDefault("previous_QA_summary", "")
         );
     }
+
 
     // User Prompt 생성 메서드
     public static String createUserPromptForConversation(String userQuestion) {

@@ -81,11 +81,12 @@ public class ModelDispatchService {
         // 모델 상세 정보를 FastAPI로 전달
         log.info("Step 5 FastAPI 전달");
         Map<String, Object> analysisResult = fastApiService.sendToFastApi(fileUrl, selectedModel);
+        log.info("요까지");
         Map<String, Object> fastApiResult = (Map<String, Object>) analysisResult.get("result");
 
         // GPT Api 호출 결과받기 (SystemPrompt UserPrompt)
         Map<String, Object> gptResultResponse = getGptResponse(selectedModel, fastApiResult);
-
+        log.info("요까지22");
         // MongoDB에 최종 데이터 저장
         saveToMongoDB(query, updatedRecommendedModelFromLLM, selectedModel, fastApiResult, gptResultResponse, chatRoomId);
 

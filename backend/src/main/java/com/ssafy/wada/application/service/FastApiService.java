@@ -34,8 +34,8 @@ public class FastApiService {
 
         log.info("fetch PastAPI DATA {}:",requestBody);
         // FastAPI에 요청 전송
-        //String s = restTemplate.postForObject(apiUrl, requestBody, String.class);
-        //log.info("string response {}", s);
+        String s = restTemplate.postForObject(apiUrl, requestBody, String.class);
+        log.info("string response {}", s);
 
         Map<String, Object> response = restTemplate.postForObject(apiUrl, requestBody, Map.class);
 
