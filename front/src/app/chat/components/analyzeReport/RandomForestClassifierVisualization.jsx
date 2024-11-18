@@ -453,7 +453,7 @@ export default function RandomForestClassifierVisualization({
           </TabsTrigger>
         </TabsList>
         {/* 특성 중요도 탭 내용 */}
-        <TabsContent value="feature_importance" className={classes.plotContainer}>
+        <TabsContent value="feature_importance">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -464,7 +464,7 @@ export default function RandomForestClassifierVisualization({
                   "분석에 있어서 각 특성이 얼마나 영향을 발휘하는지를 나타냅니다."}
               </CardDescription>
             </CardHeader>
-            <CardContent>{renderFeatureImportances()}</CardContent>
+            <CardContent className={classes.plotContainer}>{renderFeatureImportances()}</CardContent>
           </Card>
         </TabsContent>
 
@@ -494,7 +494,7 @@ export default function RandomForestClassifierVisualization({
                   "실제 값과 예측 값 간의 혼동 행렬을 나타냅니다."}
               </CardDescription>
             </CardHeader>
-            <CardContent>{renderConfusionMatrix()}</CardContent>
+            <CardContent className={classes.plotContainer}>{renderConfusionMatrix()}</CardContent>
           </Card>
         </TabsContent>
 
@@ -510,7 +510,7 @@ export default function RandomForestClassifierVisualization({
                   "각 멤버의 클래스 1에 대한 예측 확률을 나타냅니다."}
               </CardDescription>
             </CardHeader>
-            <CardContent>{renderClassificationProbabilities()}</CardContent>
+            <CardContent className={classes.plotContainer}>{renderClassificationProbabilities()}</CardContent>
           </Card>
         </TabsContent>
 

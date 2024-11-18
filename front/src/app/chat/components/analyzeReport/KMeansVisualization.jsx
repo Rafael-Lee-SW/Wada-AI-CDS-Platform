@@ -1053,7 +1053,7 @@ export default function KMeansVisualization({ result, explanation }) {
             {/* Anomalies Tab Content */}
             {isAnomalyDetection && (
               <TabsContent value="anomalies">
-              <Card style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <Card>
                 <CardHeader>
                   <CardTitle>
                     {explanation.anomaly_plot_title || "이상치 탐지"}
@@ -1178,7 +1178,7 @@ export default function KMeansVisualization({ result, explanation }) {
             </Card>
             <Card style={{ padding: '10px'}}>
               <CardHeader>
-                <CardTitle style={{ padding: '15px 10px 0' }}>
+                <CardTitle style={{ padding: '5px 10px 0' }}>
                   {explanation.recommendations_section_title || "권장 사항"}
                 </CardTitle>
               </CardHeader>
@@ -1226,15 +1226,15 @@ export default function KMeansVisualization({ result, explanation }) {
                 {/* Render Prediction Analysis */}
                 {modelPerformance.prediction_analysis && (
                   <>
-                    <Typography variant="h6" className="mt-4" style={{ paddingBottom: '10px' }}>
+                    <Typography variant="h6" className="mt-4" style={{ paddingBottom: '10px', paddingTop: '10px' }}>
                       ◾ 예측 분석
                     </Typography>
                     <Typography variant="body1" gutterBottom>
                       <strong>전체 정확도:</strong>{" "}
                       {modelPerformance.prediction_analysis.overall_accuracy}
                     </Typography>
-                    <Typography variant="body1" style={{ color: '#8770b4', padding: '10px 0', fontSize: '18px'}}>
-                      <strong>주목할 만한 패턴:</strong>
+                    <Typography variant="body1" style={{ color: '#8770b4', padding: '15px 0 10px', fontSize: '18px'}}>
+                      <strong>◾ 주목할 만한 패턴:</strong>
                     </Typography>
                     <ul className="list-disc pl-5">
                       {modelPerformance.prediction_analysis.notable_patterns.map(

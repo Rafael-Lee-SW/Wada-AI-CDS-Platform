@@ -24,8 +24,11 @@ import {
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+import useVisualizationStyles from "/styles/analyzingSvmStyle.js"
 
 function SVMVisualization({ result, explanation }) {
+
+  const classes = useVisualizationStyles();
   // Extract necessary data from the result prop
   const modelType = result.model.toLowerCase();
   const isClassification = modelType.includes("classifier");
@@ -392,7 +395,7 @@ function SVMVisualization({ result, explanation }) {
 
       {/* Overview */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Analysis Overview</h2>
+        <h2 className="text-2xl font-bold mb-4">분석 요약</h2>
         <p>{overview?.analysis_purpose}</p>
         <p>{overview?.data_description}</p>
         <p>{overview?.models_used?.model_description}</p>
@@ -400,32 +403,46 @@ function SVMVisualization({ result, explanation }) {
 
       {/* Tabs */}
       <Tabs defaultValue="roc_curve" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 space-x-4">
           {isClassification && (
             <>
-              <TabsTrigger value="roc_curve">
+              <TabsTrigger
+                value="roc_curve"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizationsInfo[0]?.title || "ROC Curve"}
               </TabsTrigger>
-              <TabsTrigger value="decision_boundary">
+              <TabsTrigger
+                value="decision_boundary"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizationsInfo[1]?.title || "Decision Boundary"}
               </TabsTrigger>
-              <TabsTrigger value="confusion_matrix">
+              <TabsTrigger
+                value="confusion_matrix"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizationsInfo[2]?.title || "Confusion Matrix"}
               </TabsTrigger>
             </>
           )}
           {isRegression && (
             <>
-              <TabsTrigger value="regression_plot">
+              <TabsTrigger
+                value="regression_plot"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {"Actual vs Predicted"}
               </TabsTrigger>
-              <TabsTrigger value="regression_metrics">
+              <TabsTrigger
+                value="regression_metrics"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {"Regression Metrics"}
               </TabsTrigger>
             </>
           )}
         </TabsList>
-
         {/* Classification Tabs */}
         {isClassification && (
           <>
@@ -441,7 +458,7 @@ function SVMVisualization({ result, explanation }) {
                       "Receiver Operating Characteristic Curve"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>{renderRocCurve()}</CardContent>
+                <CardContent className={classes.plotContainer}>{renderRocCurve()}</CardContent>
               </Card>
             </TabsContent>
 
@@ -457,7 +474,7 @@ function SVMVisualization({ result, explanation }) {
                       "Visualization of decision boundaries"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>{renderDecisionBoundary()}</CardContent>
+                <CardContent className={classes.plotContainer}>{renderDecisionBoundary()}</CardContent>
               </Card>
             </TabsContent>
 
@@ -473,7 +490,7 @@ function SVMVisualization({ result, explanation }) {
                       "Confusion matrix of classification results"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>{renderConfusionMatrix()}</CardContent>
+                <CardContent className={classes.plotContainer}>{renderConfusionMatrix()}</CardContent>
               </Card>
             </TabsContent>
           </>
@@ -509,7 +526,7 @@ function SVMVisualization({ result, explanation }) {
       {isClassification && (
         <Card>
           <CardHeader>
-            <CardTitle>Classification Report</CardTitle>
+            <CardTitle>분류 리포트</CardTitle>
           </CardHeader>
           <CardContent>{renderClassificationReport()}</CardContent>
         </Card>
@@ -520,7 +537,7 @@ function SVMVisualization({ result, explanation }) {
         {/* Key Findings */}
         <Card>
           <CardHeader>
-            <CardTitle>Key Findings</CardTitle>
+            <CardTitle style={{ color: '#8770b4'}}>주목할만한 부분</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
@@ -536,14 +553,14 @@ function SVMVisualization({ result, explanation }) {
         {/* Recommendations */}
         <Card>
           <CardHeader>
-            <CardTitle>Recommendations</CardTitle>
+            <CardTitle>추천</CardTitle>
           </CardHeader>
           <CardContent>
             {recommendations.immediate_actions &&
               recommendations.immediate_actions.length > 0 && (
                 <>
                   <h3 className="text-lg font-semibold mb-2">
-                    Immediate Actions
+                    즉각적인 조치
                   </h3>
                   <ul className="list-disc pl-5 space-y-2">
                     {recommendations.immediate_actions.map((action, index) => (
@@ -556,7 +573,7 @@ function SVMVisualization({ result, explanation }) {
               recommendations.further_analysis.length > 0 && (
                 <>
                   <h3 className="text-lg font-semibold mb-2">
-                    Further Analysis
+                    추가 분석
                   </h3>
                   <ul className="list-disc pl-5 space-y-2">
                     {recommendations.further_analysis.map((action, index) => (
