@@ -75,18 +75,16 @@ public class ModelDispatchService {
         // step4 선택된 모델 추출 선택된 모델 isSelected없애기
         List<Map<String, Object>> recommendedModels = getRecommendedModels(chatRoomData, chatRoomId, requestId);
         Map<String, Object> selectedModel = selectModelByIndex(recommendedModels, selectedModelIndex);
-        log.info("Step 4  IsSelected true로 변경, 인덱스로 selectedModel 추출 , 빈값 null로 삽입  selectedModel: {}", selectedModel);
-        log.info("Step 4 true 변경 반영 확인 recommendedModels: {}", recommendedModels);
+        log.info("Step 4  IsSelected true로 변경, 인덱스로 selectedModel 추출 , 빈값 null로 삽입 ");
+
 
         // 모델 상세 정보를 FastAPI로 전달
         log.info("Step 5 FastAPI 전달");
         Map<String, Object> analysisResult = fastApiService.sendToFastApi(fileUrl, selectedModel);
-        log.info("요까지");
         Map<String, Object> fastApiResult = (Map<String, Object>) analysisResult.get("result");
 
         // GPT Api 호출 결과받기 (SystemPrompt UserPrompt)
         Map<String, Object> gptResultResponse = getGptResponse(selectedModel, fastApiResult);
-        log.info("요까지22");
         // MongoDB에 최종 데이터 저장
         saveToMongoDB(query, updatedRecommendedModelFromLLM, selectedModel, fastApiResult, gptResultResponse, chatRoomId);
 

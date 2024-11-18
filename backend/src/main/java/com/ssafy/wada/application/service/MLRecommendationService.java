@@ -105,8 +105,6 @@ public class MLRecommendationService {
 					List<String[]> rows = csvResult.rows();
 
 					// 디버깅: CSV 파싱 결과 확인
-					log.info("Parsed headers for file '{}': {}", file.getOriginalFilename(), Arrays.toString(headers));
-					log.info("Parsed rows count for file '{}': {}", file.getOriginalFilename(), rows.size());
 
 					if (rows.isEmpty() || headers == null) {
 						log.error("CSV file '{}' contains no valid data or headers are missing.", file.getOriginalFilename());
@@ -136,7 +134,6 @@ public class MLRecommendationService {
 					synchronized (inputDataList) {
 						inputDataList.add(modelParams);
 					}
-					log.info("Step 4: Generated prompt for GPT model with file: {}", file.getOriginalFilename());
 
 				} catch (Exception e) {
 					log.error("Error processing file '{}': {}", file.getOriginalFilename(), e.getMessage(), e);
