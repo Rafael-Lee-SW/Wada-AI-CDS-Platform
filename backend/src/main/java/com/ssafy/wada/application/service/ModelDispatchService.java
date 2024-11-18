@@ -224,15 +224,11 @@ public class ModelDispatchService {
 
     private String changeGptStringToApiString(String gptString) {
         try {
-            JSONObject jsonObject = new JSONObject(gptString);
-            String answerContent = jsonObject
-                .getJSONArray("choices")
-                .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content");
-
-            JSONObject contentObject = new JSONObject(answerContent);
-			return contentObject.getString("answer");
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(gptString);
+            String content = rootNode.at("/choices/0/message/content").asText();
+            JsonNode contentNode = objectMapper.readTree(content);
+			return contentNode.get("answer").asText();
         } catch (Exception e) {
             log.warn(e.getMessage());
             throw new RuntimeException(e);
