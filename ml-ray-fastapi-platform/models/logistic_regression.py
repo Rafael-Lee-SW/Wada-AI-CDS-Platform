@@ -31,8 +31,32 @@ def logistic_regression_binary(
     Train and evaluate a Logistic Regression model on a binary classification task.
     Prepares data for interactive visualization.
     """
-    if not target_variable:
-        raise ValueError("Target variable must be specified for binary classification.")
+    # New Logic Start: Check and set target_variable from binary_conditions if needed
+    if target_variable is None:
+        if binary_conditions and isinstance(binary_conditions, list):
+            # Attempt to extract 'target_column' from the list of conditions
+            target_columns = [
+                condition["target_column"]
+                for condition in binary_conditions
+                if "target_column" in condition
+            ]
+            if not target_columns:
+                raise ValueError(
+                    "No 'target_column' found in binary_conditions. Target variable must be specified for binary classification."
+                )
+            if len(set(target_columns)) > 1:
+                raise ValueError(
+                    "Multiple 'target_column' values found in binary_conditions. Please ensure only one target_column is specified."
+                )
+            target_variable = target_columns[0]
+            print(
+                f"Using 'target_column' from binary_conditions as target_variable: '{target_variable}'"
+            )
+        else:
+            raise ValueError(
+                "Target variable must be specified for binary classification."
+            )
+    # New Logic End
 
     # Load the dataset
     df = read_csv_with_encoding(file_path)
