@@ -108,8 +108,8 @@ const styles = {
         fontSize: '22px',
         fontWeight: 'bold',
         color: '#6c4e82',
-        marginTop: 0,
-        paddingBottom: '15px'
+        marginTop: '10px',
+        paddingBottom: '15px',
     },
     card: {
         display: 'flex',
@@ -123,12 +123,12 @@ const styles = {
         textAlign: 'center',
         overflowY: 'auto',
         scrollbarWidth: 'none',
-        maxHeight: '220px',
+        maxHeight: '250px',
         padding: '15px 20px 20px',
     },
     cardContent: {
         textAlign: 'start',
-        paddingTop: '10px'
+        paddingTop: '10px',
     },
     modelContent: {
         paddingTop: '10px'
