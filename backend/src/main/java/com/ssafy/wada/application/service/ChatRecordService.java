@@ -1,5 +1,7 @@
 package com.ssafy.wada.application.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.wada.application.domain.Guest;
 import com.ssafy.wada.application.repository.GuestRepository;
 import com.ssafy.wada.presentation.response.ChatHistoryDetailResponse;
@@ -98,6 +100,15 @@ public class ChatRecordService {
                 Map<String, Object> resultDescription = (Map<String, Object>) chatRoomData.get("ResultDescriptionFromLLM");
                 List<Map<String, Object>> conversationRecord = (List<Map<String, Object>>) chatRoomData.get("ConversationRecord");
 
+                if(conversationRecord != null){
+                    for (Map<String, Object> record : conversationRecord){
+                        if (record.containsKey("answer") && record.get("answer") != null) {
+                            String gptString = (String) record.get("answer");
+                            String transformedAnswer = changeGptStringToApiString(gptString);
+                            record.put("answer", transformedAnswer);
+                        }
+                    }
+                }
                 // MongoDB에서 생성 시간을 가져와 LocalDateTime으로 변환
                 LocalDateTime createdTime = null;
                 if (chatRoomData.get("createdTime") != null) {
@@ -123,5 +134,18 @@ public class ChatRecordService {
             }).collect(Collectors.toList());
 
         return chatHistoryDetails;
+    }
+
+    private String changeGptStringToApiString(String gptString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(gptString);
+            String content = rootNode.at("/choices/0/message/content").asText();
+            JsonNode contentNode = objectMapper.readTree(content);
+            return contentNode.get("answer").asText();
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }
