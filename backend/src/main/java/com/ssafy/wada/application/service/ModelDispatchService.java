@@ -225,7 +225,7 @@ public class ModelDispatchService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(gptString);
-			return rootNode.at("/choices/0/message/content").asText();
+			return rootNode.at("/choices/0/message/content/answer").asText();
         } catch (Exception e) {
             log.warn(e.getMessage());
             e.printStackTrace();
