@@ -68,8 +68,8 @@ const visualizationsList = [
   {
     name: "Logistic Regression-binary",
     component: LogisticRegressionVisualization,
-    resultPath: "/json/test_4.json",
-    explanationPath: "/json/test_4_explanation.json",
+    resultPath: "/json/test_3.json",
+    explanationPath: "/json/test_3_explanation.json",
   },
   {
     name: "Logistic Regression-multi",

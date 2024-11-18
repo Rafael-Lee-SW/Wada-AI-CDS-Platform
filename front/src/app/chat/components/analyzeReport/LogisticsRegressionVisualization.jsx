@@ -4,10 +4,9 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
-import { PCA } from "ml-pca";
 
-// Import custom UI components from your template
-import { Slider } from "../ui/silder";
+// UI Components from your template
+import { Slider } from "../ui/silder"; // Corrected import from "silder" to "slider"
 import {
   Card,
   CardContent,
@@ -16,32 +15,42 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Button } from "../ui/button";
 import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
+  TableBody,
   TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
 } from "../ui/table";
+import { Button } from "../ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { Typography } from "@mui/material";
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-function LogisticRegressionVisualization({ result, explanation }) {
+// Custom Styles
+import useLogisticRegressionStyles from "/styles/analyzingLogisticStyle.js";
+
+export default function LogisticRegressionVisualization({
+  result,
+  explanation,
+}) {
+  const classes = useLogisticRegressionStyles();
+
   // State variables
   const [decisionBoundaryData, setDecisionBoundaryData] = useState(null);
-  const [classificationReportData, setClassificationReportData] = useState(null);
+  const [classificationReportData, setClassificationReportData] =
+    useState(null);
   const [accuracy, setAccuracy] = useState(null);
-  const [confusionMatrixData, setConfusionMatrixData] = useState(null);
+  const [dataTable, setDataTable] = useState([]);
   const [boundaryLinesTitles, setBoundaryLinesTitles] = useState([]);
   const [error, setError] = useState(null);
-  const [tabValue, setTabValue] = useState("decision_boundary");
+  const [showInset, setShowInset] = useState(true);
 
-  // Extract relevant sections from explanation prop
+  // Extract explanations
   const {
     overview,
     model_performance,
@@ -54,31 +63,38 @@ function LogisticRegressionVisualization({ result, explanation }) {
 
   // Extract report titles and descriptions
   const reportTitle =
-    LogisticRegression_Case?.report_title || "AI Model Analysis Report";
+    LogisticRegression_Case?.report_title || "AI 모델 분석 보고서";
   const classesInfo = LogisticRegression_Case?.classes || {};
   const boundaryLines = LogisticRegression_Case?.boundary_lines || {};
   const xAxisTitle = explanation["x-axis_title"] || "PC1";
   const xAxisDescription =
     explanation["x-axis_description"] ||
-    "PC1 is the first principal component influencing employee performance.";
+    "PC1은 데이터의 첫 번째 주성분으로, 주요 요인을 대표합니다.";
   const yAxisTitle = explanation["y-axis_title"] || "PC2";
   const yAxisDescription =
     explanation["y-axis_description"] ||
-    "PC2 is the second principal component detailing aspects of performance.";
+    "PC2는 데이터의 두 번째 주성분으로, 첫번째 주성분간의 추가적인 변동성을 설명합니다.";
+
+  // State to control active tab
+  const [activeTab, setActiveTab] = useState("decision_boundary");
+
+  // Color mapping for classes
+  const [colorMapping, setColorMapping] = useState({});
 
   // Process the result prop to extract necessary data
   useEffect(() => {
     try {
       if (!result) {
-        setError("No result data available.");
+        setError("시각화를 위한 데이터가 없습니다.");
         return;
       }
 
-      const { graph1, graph3, graph4 } = result;
+      const { graph1, graph3 } = result;
 
       // --- Decision Boundary Plot ---
       if (graph1 && graph1.graph_type === "decision_boundary") {
-        const { X_pca, y, coefficients, intercept, classes } = graph1;
+        const { X_pca, y, coefficients, intercept, classes, original_data } =
+          graph1;
 
         if (
           !X_pca ||
@@ -89,7 +105,7 @@ function LogisticRegressionVisualization({ result, explanation }) {
           X_pca.length === 0 ||
           y.length === 0
         ) {
-          setError("Incomplete data for Decision Boundary Plot.");
+          setError("결정 경계 시각화를 위한 데이터가 불완전합니다.");
         } else {
           const figure = createDecisionBoundaryPlot(
             X_pca,
@@ -100,30 +116,41 @@ function LogisticRegressionVisualization({ result, explanation }) {
             boundaryLines
           );
           setDecisionBoundaryData(figure);
+
+          // Prepare data table if original data is available
+          if (original_data && Array.isArray(original_data)) {
+            setDataTable(
+              original_data.map((dataPoint, index) => ({
+                id: index,
+                ...dataPoint,
+                Predicted_Class: y[index],
+              }))
+            );
+          } else {
+            // If original data is not available, create a basic table
+            setDataTable(
+              X_pca.map((point, index) => ({
+                id: index,
+                PC1: point[0].toFixed(2),
+                PC2: point[1].toFixed(2),
+                Predicted_Class: y[index],
+              }))
+            );
+          }
         }
       } else {
-        setError("No Decision Boundary data available.");
+        setError("결정 경계 시각화를 위한 데이터가 없습니다.");
       }
 
       // --- Classification Report ---
       if (graph3 && graph3.classification_report) {
         const report = graph3.classification_report;
-        const { reportRows, overallAccuracy } = transformClassificationReport(
-          report
-        );
+        const { reportRows, overallAccuracy } =
+          transformClassificationReport(report);
         setClassificationReportData(reportRows);
         setAccuracy(overallAccuracy);
       } else {
-        setError("No Classification Report data available.");
-      }
-
-      // --- Confusion Matrix ---
-      if (graph4 && graph4.confusion_matrix && graph4.labels) {
-        const { confusion_matrix, labels } = graph4;
-        const figure = createConfusionMatrixPlot(confusion_matrix, labels);
-        setConfusionMatrixData(figure);
-      } else {
-        setError("No Confusion Matrix data available.");
+        setError("분류 보고서를 위한 데이터가 없습니다.");
       }
 
       // --- Boundary Lines Titles ---
@@ -137,8 +164,8 @@ function LogisticRegressionVisualization({ result, explanation }) {
       // Clear any previous errors if data is processed successfully
       setError(null);
     } catch (e) {
-      console.error("Error processing visualization data:", e);
-      setError("Failed to process visualization data.");
+      console.error("시각화 데이터 처리 중 오류 발생:", e);
+      setError("시각화 데이터 처리에 실패했습니다.");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
@@ -152,27 +179,61 @@ function LogisticRegressionVisualization({ result, explanation }) {
     classes,
     boundaryLines
   ) => {
+    // Handle y being either class indices (numbers) or class titles (strings)
+    // Map y indices to class titles
+    const mappedY = y.map((cls) => {
+      // Check the model type and adjust mapping logic accordingly
+      if (overview.models_used.model_name === "LogisticRegressionBinary") {
+        // Use 'cls' directly for binary classification
+        return classesInfo.classTitle[cls] || `Class ${cls}`;
+      } else if (
+        overview.models_used.model_name === "LogisticRegressionMultinomial"
+      ) {
+        // Adjust for multinomial classification
+        return classesInfo.classTitle[cls - 1] || `Class ${cls - 1}`;
+      } else {
+        // Default handling for other models
+        return `Unknown Class (${cls})`;
+      }
+    });
+
+    // Define color palette
+    const palette = d3.schemeCategory10;
+    const uniqueClasses = [...new Set(mappedY)];
+    const mapping = {};
+
+    uniqueClasses.forEach((cls, idx) => {
+      mapping[cls] = palette[idx % palette.length];
+    });
+
+    setColorMapping(mapping);
+
     const fig = {
       data: [],
       layout: {
-        title: visualizations[0]?.title || "Decision Boundary",
+        title: visualizations[0]?.title || "결정 경계 시각화",
         xaxis: {
-          title: xAxisTitle || "PC1",
+          title: xAxisTitle || "주성분 1번 축",
           zeroline: false,
           showgrid: true,
           gridcolor: "#e5e5e5",
+          tickfont: { size: 14 },
+          titlefont: { size: 16, family: "Arial, sans-serif" },
         },
         yaxis: {
-          title: yAxisTitle || "PC2",
+          title: yAxisTitle || "주성분 2번 축",
           zeroline: false,
           showgrid: true,
           gridcolor: "#e5e5e5",
+          tickfont: { size: 14 },
+          titlefont: { size: 16, family: "Arial, sans-serif" },
         },
         legend: {
-          title: { text: "Classes" },
+          title: { text: "계층" },
           orientation: "h",
           x: 0,
           y: -0.2,
+          font: { size: 12 },
         },
         plot_bgcolor: "#f9f9f9",
         paper_bgcolor: "#f9f9f9",
@@ -184,26 +245,33 @@ function LogisticRegressionVisualization({ result, explanation }) {
       },
     };
 
-    // Add scatter plot for data points
-    fig.data.push({
-      x: X_pca.map((point) => point[0]),
-      y: X_pca.map((point) => point[1]),
-      mode: "markers",
-      type: "scatter",
-      marker: {
-        color: y,
-        colorscale: "RdBu",
-        showscale: false,
-        line: { width: 1, color: "black" },
-      },
-      name: "Data Points",
-      hoverinfo: "text",
-      text: y.map(
-        (label, idx) =>
-          `Class: ${label}<br>PC1: ${X_pca[idx][0].toFixed(
-            2
-          )}<br>PC2: ${X_pca[idx][1].toFixed(2)}`
-      ),
+    // Add scatter plot for each class
+    uniqueClasses.forEach((cls) => {
+      const indices = mappedY.reduce((acc, val, idx) => {
+        if (val === cls) acc.push(idx);
+        return acc;
+      }, []);
+
+      fig.data.push({
+        x: indices.map((idx) => X_pca[idx][0]),
+        y: indices.map((idx) => X_pca[idx][1]),
+        mode: "markers",
+        type: "scatter",
+        marker: {
+          color: mapping[cls],
+          size: 6,
+          opacity: 0.8,
+          line: { width: 1, color: "black" },
+        },
+        name: cls,
+        hoverinfo: "text",
+        text: indices.map(
+          (idx) =>
+            `클래스: ${cls}<br>PC1: ${X_pca[idx][0].toFixed(2)}<br>PC2: ${X_pca[
+              idx
+            ][1].toFixed(2)}`
+        ),
+      });
     });
 
     // Compute and plot decision boundaries
@@ -212,6 +280,7 @@ function LogisticRegressionVisualization({ result, explanation }) {
     const xVals = d3.range(xMin, xMax, (xMax - xMin) / 200);
 
     const annotations = [];
+    let boundaryIndex = 0; // Initialize boundary line index
 
     if (classes.length === 2) {
       // Binary classification
@@ -224,7 +293,8 @@ function LogisticRegressionVisualization({ result, explanation }) {
           y: yVals,
           mode: "lines",
           line: { color: "black", width: 2 },
-          name: "Decision Boundary",
+          name: "결정 경계",
+          showlegend: true, // Ensure legend is shown
         });
         // Add annotation for the boundary line
         annotations.push({
@@ -232,7 +302,7 @@ function LogisticRegressionVisualization({ result, explanation }) {
           y: (-b - w[0] * ((xMin + xMax) / 2)) / w[1],
           xref: "x",
           yref: "y",
-          text: "Decision Boundary",
+          text: "결정 경계",
           showarrow: false,
           font: { color: "black", size: 12 },
         });
@@ -247,13 +317,18 @@ function LogisticRegressionVisualization({ result, explanation }) {
           ];
           const b_diff = intercept[i] - intercept[j];
           if (w_diff[1] !== 0) {
-            const yVals = xVals.map((x) => (-b_diff - w_diff[0] * x) / w_diff[1]);
+            const yVals = xVals.map(
+              (x) => (-b_diff - w_diff[0] * x) / w_diff[1]
+            );
             fig.data.push({
               x: xVals,
               y: yVals,
               mode: "lines",
               line: { color: "gray", width: 2, dash: "dash" },
-              name: `Boundary ${classes[i]} vs ${classes[j]}`,
+              name: `경계선 ${getClassName(classes[i])} vs ${getClassName(
+                classes[j]
+              )}`,
+              showlegend: true, // Ensure legend is shown
             });
 
             // Calculate midpoint for annotation
@@ -262,9 +337,10 @@ function LogisticRegressionVisualization({ result, explanation }) {
 
             // Retrieve the corresponding boundary line title
             const boundaryTitle =
-              boundaryLines.boundary_line_title?.[
-                (i * classes.length + j) - (i + 1) * (i / 2)
-              ] || `Boundary ${classes[i]} vs ${classes[j]}`;
+              boundaryLines.boundary_line_title?.[boundaryIndex] ||
+              `경계선 ${getClassName(classes[i])} vs ${getClassName(
+                classes[j]
+              )}`;
 
             // Add annotation for the boundary line
             annotations.push({
@@ -276,6 +352,8 @@ function LogisticRegressionVisualization({ result, explanation }) {
               showarrow: false,
               font: { color: "gray", size: 12 },
             });
+
+            boundaryIndex++; // Increment boundary line index
           }
         }
       }
@@ -284,6 +362,14 @@ function LogisticRegressionVisualization({ result, explanation }) {
     fig.layout.annotations = annotations;
 
     return fig;
+  };
+
+  // Helper function to get class name based on class label
+  const getClassName = (cls) => {
+    // Use class index to get the title
+    return (
+      LogisticRegression_Case?.classes?.classTitle?.[cls] || `Class ${cls}`
+    );
   };
 
   // Helper function to transform Classification Report into DataFrame-like structure
@@ -344,37 +430,6 @@ function LogisticRegressionVisualization({ result, explanation }) {
     return { reportRows: rows, overallAccuracy };
   };
 
-  // Helper function to create Confusion Matrix Plot
-  const createConfusionMatrixPlot = (confusionMatrix, labels) => {
-    const fig = {
-      data: [
-        {
-          z: confusionMatrix,
-          x: labels,
-          y: labels,
-          type: "heatmap",
-          colorscale: "Blues",
-          showscale: true,
-          hoverongaps: false,
-          text: confusionMatrix.map((row) => row.join(", ")),
-          hovertemplate:
-            "True: %{y}<br>Predicted: %{x}<br>Count: %{z}<extra></extra>",
-        },
-      ],
-      layout: {
-        title: visualizations[1]?.title || "Confusion Matrix",
-        xaxis: { title: "Predicted Label", zeroline: false },
-        yaxis: { title: "True Label", zeroline: false },
-        plot_bgcolor: "#f9f9f9",
-        paper_bgcolor: "#f9f9f9",
-        height: 600,
-        margin: { t: 50, l: 50, r: 50, b: 100 },
-        font: { family: "Arial, sans-serif", color: "#1D1D1F" },
-      },
-    };
-    return fig;
-  };
-
   // Render Classification Report as a table
   const renderClassificationReport = () => {
     if (!classificationReportData) return null;
@@ -384,11 +439,11 @@ function LogisticRegressionVisualization({ result, explanation }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Class</TableHead>
-              <TableHead>Precision</TableHead>
-              <TableHead>Recall</TableHead>
-              <TableHead>F1-Score</TableHead>
-              <TableHead>Support</TableHead>
+              <TableHead>클래스</TableHead>
+              <TableHead>정밀도</TableHead>
+              <TableHead>재현율</TableHead>
+              <TableHead>F1-스코어</TableHead>
+              <TableHead>지원</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -407,9 +462,65 @@ function LogisticRegressionVisualization({ result, explanation }) {
     );
   };
 
+  // Render Data Table for All Spots
+  const renderDataTable = () => {
+    if (!dataTable.length) return null;
+
+    // Dynamically generate columns based on data keys, excluding 'id' if necessary
+    const excludeColumns = ["id"];
+    const dataKeys = Object.keys(dataTable[0]).filter(
+      (key) => !excludeColumns.includes(key)
+    );
+
+    const columns = dataKeys.map((key) => ({
+      field: key,
+      headerName: key.replace("_", " "),
+      flex: 1,
+      minWidth: 150,
+    }));
+
+    const rows = dataTable.map((row) => ({ id: row.id, ...row }));
+
+    return (
+      <div className="overflow-auto">
+        <Table>
+          <TableCaption>모든 데이터 포인트의 상세 정보</TableCaption>
+          <TableHeader>
+            <TableRow>
+              {columns.map((col) => (
+                <TableHead key={col.field}>{col.headerName}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.id}>
+                {columns.map((col) => (
+                  <TableCell key={col.field}>
+                    {col.field === "Predicted_Class" ? (
+                      <span
+                        className="inline-block w-4 h-4 mr-2 rounded-full"
+                        style={{
+                          backgroundColor:
+                            colorMapping[row[col.field]] || "#000", // Default to black if undefined
+                        }}
+                        title={row[col.field]}
+                      ></span>
+                    ) : null}
+                    {row[col.field]}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  };
+
   // Handle tab change
   const handleTabChange = (value) => {
-    setTabValue(value);
+    setActiveTab(value);
   };
 
   // Render the component
@@ -423,32 +534,62 @@ function LogisticRegressionVisualization({ result, explanation }) {
       {!error && (
         <>
           {/* Report Title */}
-          <h1 className="text-4xl font-bold text-center mb-8">{reportTitle}</h1>
+          <h1 className="text-4xl font-bold text-center mb-8">
+            {reportTitle || "AI 모델 분석 보고서"}
+          </h1>
 
-          {/* Tabs */}
-          <Tabs value={tabValue} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="decision_boundary">
-                Decision Boundary
-              </TabsTrigger>
+          {/* Overview Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {explanation.overview_section_title || "개요"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Typography variant="h6">분석 목적</Typography>
+              <Typography variant="body1" gutterBottom>
+                {overview?.analysis_purpose ||
+                  "분석 목적이 제공되지 않았습니다."}
+              </Typography>
+
+              <Typography variant="h6">데이터 설명</Typography>
+              <Typography variant="body1" gutterBottom>
+                {overview?.data_description ||
+                  "데이터 설명이 제공되지 않았습니다."}
+              </Typography>
+
+              <Typography variant="h6">사용된 모델</Typography>
+              <Typography variant="body1" gutterBottom>
+                {overview?.models_used?.model_description ||
+                  "모델 설명이 제공되지 않았습니다."}
+              </Typography>
+            </CardContent>
+          </Card>
+
+          {/* Tabs Section */}
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value)}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-3 w-full">
+              <TabsTrigger value="decision_boundary">결정 경계</TabsTrigger>
               <TabsTrigger value="classification_report">
-                Classification Report
+                분류 보고서
               </TabsTrigger>
-              <TabsTrigger value="confusion_matrix">
-                Confusion Matrix
-              </TabsTrigger>
+              <TabsTrigger value="data_table">데이터 테이블</TabsTrigger>
             </TabsList>
 
-            {/* Decision Boundary Tab */}
+            {/* Decision Boundary Tab Content */}
             <TabsContent value="decision_boundary">
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizations[0]?.title || "Decision Boundary"}
+                    {visualizations[0]?.title || "결정 경계 시각화"}
                   </CardTitle>
                   <CardDescription>
                     {visualizations[0]?.description ||
-                      "Visualization of decision boundaries in 2D space"}
+                      "PC1과 PC2의 분포를 통해 각 클래스 간 경계를 보여줍니다."}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -461,71 +602,94 @@ function LogisticRegressionVisualization({ result, explanation }) {
                   )}
                   {/* Axis Descriptions */}
                   {xAxisDescription && (
-                    <p className="text-sm text-gray-600 mt-2">{xAxisDescription}</p>
+                    <Typography
+                      variant="body2"
+                      gutterBottom
+                      className={classes.typographyBody2}
+                    >
+                      <strong>{`${xAxisTitle} (x)`}</strong>: {xAxisDescription}
+                    </Typography>
                   )}
                   {yAxisDescription && (
-                    <p className="text-sm text-gray-600 mt-2">{yAxisDescription}</p>
+                    <Typography
+                      variant="body2"
+                      gutterBottom
+                      className={classes.typographyBody2}
+                    >
+                      <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
+                    </Typography>
                   )}
                   {/* Class Descriptions and Boundary Lines Descriptions */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {/* Class Descriptions */}
                     <div>
                       <h3 className="text-lg font-semibold mb-2">
-                        Class Descriptions
+                        클래스 설명
                       </h3>
                       {classesInfo.classTitle &&
                         classesInfo.classDescription &&
                         classesInfo.classTitle.map((title, index) => (
-                          <Card key={index}>
-                            <CardHeader>
-                              <CardTitle>{title}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <p>{classesInfo.classDescription[index]}</p>
-                            </CardContent>
+                          <Card key={index} className="flex items-center p-2">
+                            <span
+                              className="inline-block w-4 h-4 mr-2 rounded-full"
+                              style={{
+                                backgroundColor: colorMapping[title] || "#000", // Use class title as key
+                              }}
+                            ></span>
+                            <div>
+                              <CardTitle className="text-sm">{title}</CardTitle>
+                              <CardContent className="p-0">
+                                <Typography variant="body2">
+                                  {classesInfo.classDescription[index] ||
+                                    "설명이 제공되지 않았습니다."}
+                                </Typography>
+                              </CardContent>
+                            </div>
                           </Card>
                         ))}
                     </div>
                     {/* Boundary Lines Descriptions */}
                     <div>
                       <h3 className="text-lg font-semibold mb-2">
-                        Decision Boundary Descriptions
+                        결정 경계 설명
                       </h3>
                       {boundaryLines.boundary_line_description &&
-                        boundaryLines.boundary_line_description.map((desc, index) => (
-                          <Card key={index}>
-                            <CardHeader>
-                              <CardTitle>
-                                {boundaryLines.boundary_line_title[index] ||
-                                  `Boundary ${index + 1}`}
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <p>{desc}</p>
-                            </CardContent>
-                          </Card>
-                        ))}
+                        boundaryLines.boundary_line_description.map(
+                          (desc, index) => (
+                            <Card key={index} className="p-2">
+                              <CardHeader>
+                                <CardTitle>
+                                  {boundaryLines.boundary_line_title[index] ||
+                                    `경계선 ${index + 1}`}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <Typography variant="body2">{desc}</Typography>
+                              </CardContent>
+                            </Card>
+                          )
+                        )}
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Classification Report Tab */}
+            {/* Classification Report Tab Content */}
             <TabsContent value="classification_report">
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizations[0]?.description || "Classification Report"}
+                    {visualizations[0]?.description || "분류 보고서"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   {/* Display Overall Accuracy */}
                   {accuracy !== null && (
                     <div className="mb-4">
-                      <h3 className="text-lg font-semibold">
-                        Overall Accuracy: {accuracy.toFixed(4)}
-                      </h3>
+                      <Typography variant="h6">
+                        전체 정확도: {accuracy.toFixed(4)}
+                      </Typography>
                     </div>
                   )}
                   {/* Render Classification Report Table */}
@@ -534,125 +698,193 @@ function LogisticRegressionVisualization({ result, explanation }) {
               </Card>
             </TabsContent>
 
-            {/* Confusion Matrix Tab */}
-            <TabsContent value="confusion_matrix">
+            {/* Data Table Tab Content */}
+            <TabsContent value="data_table">
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizations[1]?.title || "Confusion Matrix"}
+                    {explanation.data_table_title || "모든 데이터 포인트"}
                   </CardTitle>
                   <CardDescription>
-                    {visualizations[1]?.description ||
-                      "Visualization of the confusion matrix"}
+                    {explanation.data_table_description ||
+                      "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  {confusionMatrixData && (
-                    <Plot
-                      data={confusionMatrixData.data}
-                      layout={confusionMatrixData.layout}
-                      config={{ responsive: true }}
-                    />
-                  )}
-                  {/* Insights for Confusion Matrix */}
-                  {visualizations[1]?.insights && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      {visualizations[1].insights}
-                    </p>
-                  )}
-                </CardContent>
+                <CardContent className="pt-6">{renderDataTable()}</CardContent>
               </Card>
             </TabsContent>
           </Tabs>
 
           {/* Feature Importance */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">
-              {feature_importance?.key_features_title || "Feature Importance"}
-            </h2>
-            {feature_importance?.key_features.map((feature, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle>{feature.feature_name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{feature.business_impact}</p>
-                </CardContent>
-              </Card>
-            ))}
-            {feature_importance?.relationships.map((rel, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle>Relationship {index + 1}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{rel.description}</p>
-                  <p>{rel.business_insight}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {feature_importance?.key_features_title || "특성 중요도"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {feature_importance?.key_features.map((feature, index) => (
+                <Card key={index} className="mb-4 p-2">
+                  <CardHeader className="flex items-center">
+                    <span
+                      className="inline-block w-4 h-4 mr-2 rounded-full"
+                      style={{
+                        backgroundColor: "#6b7280", // Neutral color for feature name
+                      }}
+                    ></span>
+                    <CardTitle className="text-sm">
+                      {feature.feature_name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <Typography variant="body2">
+                      중요도 점수:{" "}
+                      {feature.importance_score !== null
+                        ? feature.importance_score
+                        : "N/A"}
+                    </Typography>
+                    <Typography variant="body2">
+                      비즈니스 영향: {feature.business_impact}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+              {feature_importance?.relationships.map((rel, index) => (
+                <Card key={index} className="mb-4 p-2">
+                  <CardHeader>
+                    <CardTitle>관계 {index + 1}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Typography variant="body2">
+                      설명: {rel.description}
+                    </Typography>
+                    <Typography variant="body2">
+                      비즈니스 인사이트: {rel.business_insight}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </CardContent>
+          </Card>
 
           {/* Key Findings */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">
-              {explanation.key_findings_section_title || "Key Findings"}
-            </h2>
-            {key_findings.map((finding, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle>{finding.finding}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    <strong>{finding.impact_label || "Impact"}:</strong>{" "}
-                    {finding.impact}
-                  </p>
-                  <p>
-                    <strong>
-                      {finding.recommendation_label || "Recommendation"}:
-                    </strong>{" "}
-                    {finding.recommendation}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {explanation.key_findings_section_title || "주요 발견사항"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="list-disc pl-5 space-y-2">
+                {key_findings.map((finding, index) => (
+                  <li key={index} className={classes.listItem}>
+                    <Typography variant="h6">{finding.finding}</Typography>
+                    <Typography variant="body1">
+                      <strong>{finding.impact_label || "영향"}:</strong>{" "}
+                      {finding.impact}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>
+                        {finding.recommendation_label || "권장 사항"}:
+                      </strong>{" "}
+                      {finding.recommendation}
+                    </Typography>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
 
           {/* Recommendations */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">
-              {explanation.recommendations_section_title || "Recommendations"}
-            </h2>
-            {recommendations.immediate_actions &&
-              recommendations.immediate_actions.length > 0 && (
-                <>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {recommendations.immediate_actions_title ||
-                      "Immediate Actions"}
-                  </h3>
-                  <ul className="list-disc pl-5 space-y-2">
-                    {recommendations.immediate_actions.map((action, index) => (
-                      <li key={index}>{action}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            {recommendations.further_analysis &&
-              recommendations.further_analysis.length > 0 && (
-                <>
-                  <h3 className="text-lg font-semibold mb-2">
-                    {recommendations.further_analysis_title ||
-                      "Further Analysis"}
-                  </h3>
-                  <ul className="list-disc pl-5 space-y-2">
-                    {recommendations.further_analysis.map((action, index) => (
-                      <li key={index}>{action}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {explanation.recommendations_section_title || "권장 사항"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {recommendations.immediate_actions &&
+                recommendations.immediate_actions.length > 0 && (
+                  <>
+                    <Typography variant="h6" className="mb-2">
+                      {recommendations.immediate_actions_title ||
+                        "즉각적인 조치"}
+                    </Typography>
+                    <ul className="list-disc pl-5 space-y-2">
+                      {recommendations.immediate_actions.map(
+                        (action, index) => (
+                          <li key={index}>{action}</li>
+                        )
+                      )}
+                    </ul>
+                  </>
+                )}
+              {recommendations.further_analysis &&
+                recommendations.further_analysis.length > 0 && (
+                  <>
+                    <Typography variant="h6" className="mt-4 mb-2">
+                      {recommendations.further_analysis_title || "추가 분석"}
+                    </Typography>
+                    <ul className="list-disc pl-5 space-y-2">
+                      {recommendations.further_analysis.map((action, index) => (
+                        <li key={index}>{action}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+            </CardContent>
+          </Card>
+
+          {/* Model Performance Section */}
+          {model_performance.metrics &&
+            model_performance.metrics.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {explanation.model_performance_section_title || "모델 성능"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Render Metrics */}
+                  {model_performance.metrics.map((metric, index) => (
+                    <div key={index} className="mb-2">
+                      <Typography variant="body1">
+                        <strong>{metric.metric_name}:</strong>{" "}
+                        {metric.metric_value}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {metric.interpretation}
+                      </Typography>
+                    </div>
+                  ))}
+
+                  {/* Render Prediction Analysis */}
+                  {model_performance.prediction_analysis && (
+                    <>
+                      <Typography variant="h6" className="mt-4">
+                        예측 분석
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        <strong>전체 정확도:</strong>{" "}
+                        {model_performance.prediction_analysis.overall_accuracy}
+                      </Typography>
+                      <Typography variant="body1">
+                        <strong>주목할 만한 패턴:</strong>
+                      </Typography>
+                      <ul className="list-disc pl-5">
+                        {model_performance.prediction_analysis.notable_patterns.map(
+                          (pattern, idx) => (
+                            <li key={idx}>
+                              <Typography variant="body2">{pattern}</Typography>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            )}
         </>
       )}
     </div>
@@ -662,14 +894,16 @@ function LogisticRegressionVisualization({ result, explanation }) {
 // Define PropTypes for type checking
 LogisticRegressionVisualization.propTypes = {
   result: PropTypes.shape({
-    cluster_label: PropTypes.string,
     graph1: PropTypes.shape({
       graph_type: PropTypes.string,
       X_pca: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
-      y: PropTypes.arrayOf(PropTypes.number),
+      y: PropTypes.arrayOf(
+        PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      ), // Changed to handle both strings and numbers
       coefficients: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
       intercept: PropTypes.arrayOf(PropTypes.number),
-      classes: PropTypes.arrayOf(PropTypes.number),
+      classes: PropTypes.arrayOf(PropTypes.string), // Changed to string for class titles
+      original_data: PropTypes.arrayOf(PropTypes.object), // Added for data table
     }),
     graph3: PropTypes.shape({
       graph_type: PropTypes.string,
@@ -694,7 +928,10 @@ LogisticRegressionVisualization.propTypes = {
       metrics: PropTypes.arrayOf(
         PropTypes.shape({
           metric_name: PropTypes.string,
-          metric_value: PropTypes.number,
+          metric_value: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number,
+          ]),
           interpretation: PropTypes.string,
         })
       ),
@@ -707,7 +944,10 @@ LogisticRegressionVisualization.propTypes = {
       key_features: PropTypes.arrayOf(
         PropTypes.shape({
           feature_name: PropTypes.string,
-          importance_score: PropTypes.number,
+          importance_score: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number,
+          ]),
           business_impact: PropTypes.string,
         })
       ),
@@ -760,7 +1000,6 @@ LogisticRegressionVisualization.propTypes = {
     key_findings_section_title: PropTypes.string,
     recommendations_section_title: PropTypes.string,
     data_table_title: PropTypes.string,
+    data_table_description: PropTypes.string, // Added for data table description
   }).isRequired,
 };
-
-export default LogisticRegressionVisualization;
