@@ -103,7 +103,7 @@ def random_forest_regression(
 
     # Build the summary
     summary = {
-        "model": "RandomForestRegressor",
+        "model": "RandomForestRegression",
         "n_estimators": model.n_estimators,
         "max_depth": str(model.max_depth),
         "mse": mse,
@@ -125,7 +125,7 @@ def random_forest_regression(
     return {
         "status": "success",
         "result": {
-            "model": "RandomForestRegressor",
+            "model": "RandomForestRegression",
             "n_estimators": model.n_estimators,
             "max_depth": str(model.max_depth),
             "mse": mse,
