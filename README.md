@@ -176,7 +176,7 @@
               <img src="/READMEfile/Jihwan.jpg" width="100">
         </td>
         <td style="min-width: 250px;">
-               <img src="/READMEfile/Seungjin.jpg width="100">
+               <img src="/READMEfile/Seungjin.jpg" width="100">
         </td>
     </tr>
     <tr align="center">
