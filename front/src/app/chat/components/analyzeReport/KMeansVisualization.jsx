@@ -1053,7 +1053,7 @@ export default function KMeansVisualization({ result, explanation }) {
             {/* Anomalies Tab Content */}
             {isAnomalyDetection && (
               <TabsContent value="anomalies">
-              <Card>
+              <Card style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <CardHeader>
                   <CardTitle>
                     {explanation.anomaly_plot_title || "이상치 탐지"}

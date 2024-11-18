@@ -546,19 +546,19 @@ export default function LogisticRegressionVisualization({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Typography variant="h6">분석 목적</Typography>
+              <Typography variant="h6" style={{ paddingBottom: '10px' }}>◾ 분석 목적</Typography>
               <Typography variant="body1" gutterBottom>
                 {overview?.analysis_purpose ||
                   "분석 목적이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6">데이터 설명</Typography>
+              <Typography variant="h6" style={{ paddingBottom: '10px' }}>◾ 데이터 설명</Typography>
               <Typography variant="body1" gutterBottom>
                 {overview?.data_description ||
                   "데이터 설명이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6">사용된 모델</Typography>
+              <Typography variant="h6" style={{ paddingBottom: '10px' }}>◾ 사용된 모델</Typography>
               <Typography variant="body1" gutterBottom>
                 {overview?.models_used?.model_description ||
                   "모델 설명이 제공되지 않았습니다."}
@@ -572,14 +572,26 @@ export default function LogisticRegressionVisualization({
             onValueChange={(value) => setActiveTab(value)}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="decision_boundary">결정 경계</TabsTrigger>
-              <TabsTrigger value="classification_report">
+            <TabsList className="grid grid-cols-3 w-full space-x-4">
+              <TabsTrigger
+                value="decision_boundary"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                결정 경계
+              </TabsTrigger>
+              <TabsTrigger
+                value="classification_report"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 분류 보고서
               </TabsTrigger>
-              <TabsTrigger value="data_table">데이터 테이블</TabsTrigger>
+              <TabsTrigger
+                value="data_table"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                데이터 테이블
+              </TabsTrigger>
             </TabsList>
-
             {/* Decision Boundary Tab Content */}
             <TabsContent value="decision_boundary">
               <Card>
@@ -592,7 +604,8 @@ export default function LogisticRegressionVisualization({
                       "PC1과 PC2의 분포를 통해 각 클래스 간 경계를 보여줍니다."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent>
+                  <div className={classes.plotContainer}>
                   {decisionBoundaryData && (
                     <Plot
                       data={decisionBoundaryData.data}
@@ -619,17 +632,18 @@ export default function LogisticRegressionVisualization({
                       <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
                     </Typography>
                   )}
+                  </div>
                   {/* Class Descriptions and Boundary Lines Descriptions */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {/* Class Descriptions */}
-                    <div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
                       <h3 className="text-lg font-semibold mb-2">
                         클래스 설명
                       </h3>
                       {classesInfo.classTitle &&
                         classesInfo.classDescription &&
                         classesInfo.classTitle.map((title, index) => (
-                          <Card key={index} className="flex items-center p-2">
+                          <Card key={index} className="flex items-center p-2" style={{ padding:'10px'}}>
                             <span
                               className="inline-block w-4 h-4 mr-2 rounded-full"
                               style={{
@@ -637,8 +651,8 @@ export default function LogisticRegressionVisualization({
                               }}
                             ></span>
                             <div>
-                              <CardTitle className="text-sm">{title}</CardTitle>
-                              <CardContent className="p-0">
+                              <CardTitle className="text-sm" style={{ textAlign: 'start', padding: '10px 0' }}>{title}</CardTitle>
+                              <CardContent className="p-0" style={{ textAlign: 'start', padding: 0}}>
                                 <Typography variant="body2">
                                   {classesInfo.classDescription[index] ||
                                     "설명이 제공되지 않았습니다."}
@@ -650,7 +664,7 @@ export default function LogisticRegressionVisualization({
                     </div>
                     {/* Boundary Lines Descriptions */}
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">
+                      <h3 className="text-lg font-semibold mb-2" style={{ paddingBottom: '10px'}}>
                         결정 경계 설명
                       </h3>
                       {boundaryLines.boundary_line_description &&
@@ -658,7 +672,7 @@ export default function LogisticRegressionVisualization({
                           (desc, index) => (
                             <Card key={index} className="p-2">
                               <CardHeader>
-                                <CardTitle>
+                                <CardTitle style={{ color: '#8770b4'}}>
                                   {boundaryLines.boundary_line_title[index] ||
                                     `경계선 ${index + 1}`}
                                 </CardTitle>
@@ -737,14 +751,14 @@ export default function LogisticRegressionVisualization({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <Typography variant="body2">
+                    <Typography variant="body2" style={{ fontSize: '18px', fontWeight: 'bold', color: '#8770b4', paddingBottom: '10px'}}>
                       중요도 점수:{" "}
                       {feature.importance_score !== null
                         ? feature.importance_score
                         : "N/A"}
                     </Typography>
                     <Typography variant="body2">
-                      비즈니스 영향: {feature.business_impact}
+                      <strong>비즈니스 영향: </strong>{feature.business_impact}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -755,7 +769,7 @@ export default function LogisticRegressionVisualization({
                     <CardTitle>관계 {index + 1}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Typography variant="body2">
+                    <Typography variant="body2" style={{ paddingBottom: '10px'}}>
                       설명: {rel.description}
                     </Typography>
                     <Typography variant="body2">
@@ -778,8 +792,8 @@ export default function LogisticRegressionVisualization({
               <ul className="list-disc pl-5 space-y-2">
                 {key_findings.map((finding, index) => (
                   <li key={index} className={classes.listItem}>
-                    <Typography variant="h6">{finding.finding}</Typography>
-                    <Typography variant="body1">
+                    <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px'}}>{finding.finding}</Typography>
+                    <Typography variant="body1" style={{ paddingBottom: '10px'}}>
                       <strong>{finding.impact_label || "영향"}:</strong>{" "}
                       {finding.impact}
                     </Typography>
@@ -787,7 +801,7 @@ export default function LogisticRegressionVisualization({
                       <strong>
                         {finding.recommendation_label || "권장 사항"}:
                       </strong>{" "}
-                      {finding.recommendation}
+                      ◾{finding.recommendation}
                     </Typography>
                   </li>
                 ))}
@@ -806,7 +820,7 @@ export default function LogisticRegressionVisualization({
               {recommendations.immediate_actions &&
                 recommendations.immediate_actions.length > 0 && (
                   <>
-                    <Typography variant="h6" className="mb-2">
+                    <Typography variant="h6" className="mb-2" style={{ paddingBottom: '10px'}}>
                       {recommendations.immediate_actions_title ||
                         "즉각적인 조치"}
                     </Typography>
@@ -822,7 +836,7 @@ export default function LogisticRegressionVisualization({
               {recommendations.further_analysis &&
                 recommendations.further_analysis.length > 0 && (
                   <>
-                    <Typography variant="h6" className="mt-4 mb-2">
+                    <Typography variant="h6" className="mt-4 mb-2" style={{ paddingBottom: '10px', paddingTop: '10px' }}>
                       {recommendations.further_analysis_title || "추가 분석"}
                     </Typography>
                     <ul className="list-disc pl-5 space-y-2">
@@ -861,14 +875,14 @@ export default function LogisticRegressionVisualization({
                   {/* Render Prediction Analysis */}
                   {model_performance.prediction_analysis && (
                     <>
-                      <Typography variant="h6" className="mt-4">
-                        예측 분석
+                      <Typography variant="h6" className="mt-4" style={{ paddingTop: '10px', paddingBottom: '10px', color: '#8770b4', fontWeight: 'bold' }}>
+                        ◾ 예측 분석
                       </Typography>
                       <Typography variant="body1" gutterBottom>
                         <strong>전체 정확도:</strong>{" "}
                         {model_performance.prediction_analysis.overall_accuracy}
                       </Typography>
-                      <Typography variant="body1">
+                      <Typography variant="body1" style={{ paddingBottom: '10px'}}>
                         <strong>주목할 만한 패턴:</strong>
                       </Typography>
                       <ul className="list-disc pl-5">
