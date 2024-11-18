@@ -14,6 +14,9 @@ const useAnalyzingKmeansStyles = makeStyles({
     marginBottom: "40px",
     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
   },
+  subTitle: {
+    fontSize: '30px'
+  },
   sectionTitle: {
     fontWeight: 600,
     color: "#2D3748",
@@ -131,7 +134,7 @@ const useAnalyzingKmeansStyles = makeStyles({
   clusterInfoCard: {
     marginTop: "40px",
     borderRadius: "16px",
-    background: "linear-gradient(145deg, #ffffff, #e6e6e6)",
+    background: "white",
     boxShadow: "8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff",
     padding: "20px",
   },
@@ -140,7 +143,7 @@ const useAnalyzingKmeansStyles = makeStyles({
     alignItems: "center",
     padding: "10px",
     borderRadius: "8px",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#ebe7f1",
   },
   clusterTitle: {
     fontWeight: 600,

@@ -26,6 +26,7 @@ import { Typography } from "@mui/material";
 
 // Custom Styles
 import useAnalyzingKmeansStyles from "/styles/analyzingKmeansStyle.js";
+import { purple } from "@mui/material/colors";
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
@@ -985,10 +986,9 @@ export default function KMeansVisualization({ result, explanation }) {
       )}
       {!error && (
         <>
-          <h1 className="text-4xl font-bold text-center mb-8">
+          <p className="text-4xl font-bold text-center mb-8">
             {explanation.report_title || "AI 모델 분석 보고서"}
-          </h1>
-
+          </p>
           {/* Overview Section */}
           <Card>
             <CardHeader>
@@ -997,17 +997,17 @@ export default function KMeansVisualization({ result, explanation }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Typography variant="h6">분석 목적</Typography>
+              <Typography variant="h6" sx={{fontSize: '20px', padding: '10px 0'}}>◾ 분석 목적</Typography>
               <Typography variant="body1" gutterBottom>
                 {analysis_purpose || "분석 목적이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6">데이터 설명</Typography>
+              <Typography variant="h6" sx={{fontSize: '20px', padding: '10px 0'}}>◾ 데이터 설명</Typography>
               <Typography variant="body1" gutterBottom>
                 {data_description || "데이터 설명이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6">사용된 모델</Typography>
+              <Typography variant="h6" sx={{fontSize: '20px', padding: '10px 0'}}>◾ 사용된 모델</Typography>
               <Typography variant="body1" gutterBottom>
                 {models_used?.model_description ||
                   "모델 설명이 제공되지 않았습니다."}
@@ -1021,66 +1021,84 @@ export default function KMeansVisualization({ result, explanation }) {
             onValueChange={(value) => setActiveTab(value)}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-3 w-full">
+            <TabsList className="grid grid-cols-3 w-full space-x-4">
               {isAnomalyDetection ? (
-                <TabsTrigger value="anomalies">이상치</TabsTrigger>
+                <TabsTrigger
+                  value="anomalies"
+                  className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  이상치
+                </TabsTrigger>
               ) : (
-                <TabsTrigger value="clusters_graph">클러스터 그래프</TabsTrigger>
+                <TabsTrigger
+                  value="clusters_graph"
+                  className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  클러스터 그래프
+                </TabsTrigger>
               )}
-              <TabsTrigger value="clusters_distribution">군집 분포</TabsTrigger>
-              <TabsTrigger value="data">모든 데이터 확인하기</TabsTrigger>
+              <TabsTrigger
+                value="clusters_distribution"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                군집 분포
+              </TabsTrigger>
+              <TabsTrigger
+                value="data"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                모든 데이터 확인하기
+              </TabsTrigger>
             </TabsList>
-
             {/* Anomalies Tab Content */}
             {isAnomalyDetection && (
               <TabsContent value="anomalies">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {explanation.anomaly_plot_title || "이상치 탐지"}
-                    </CardTitle>
-                    <CardDescription>
-                      {visualizationsInfo[2]?.description ||
-                        "클러스터 내에서 감지된 이상치를 시각화합니다."}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="anomaly-slider"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        {explanation.slider_title || "클러스터 당 이상치 수"}:{" "}
-                        {numAnomalies}
-                      </label>
-                      <Slider
-                        id="anomaly-slider"
-                        min={1}
-                        max={10}
-                        step={1}
-                        value={[numAnomalies]}
-                        onValueChange={handleNumAnomaliesChange}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="relative">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="absolute top-2 right-2 z-10"
-                        onClick={() => setShowInset(!showInset)}
-                      >
-                        {showInset ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                      {renderAnomalyScatterPlot()}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {explanation.anomaly_plot_title || "이상치 탐지"}
+                  </CardTitle>
+                  <CardDescription className="p-4">
+                    {visualizationsInfo[2]?.description ||
+                      "클러스터 내에서 감지된 이상치를 시각화합니다."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-6">
+                    <label
+                      htmlFor="anomaly-slider"
+                      className="block text-lg font-semibold text-gray-700 mb-2"
+                    >
+                      {explanation.slider_title || "클러스터 당 이상치 수"}: {numAnomalies}
+                    </label>
+                    <Slider
+                      id="anomaly-slider"
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[numAnomalies]}
+                      onValueChange={handleNumAnomaliesChange}
+                    />
+                  </div>
+                  <div className="relative">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="absolute top-2 right-2 z-10"
+                      onClick={() => setShowInset(!showInset)}
+                    >
+                      {showInset ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                    {renderAnomalyScatterPlot()}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             )}
 
             {/* Clusters Graph Tab Content */}
@@ -1144,7 +1162,7 @@ export default function KMeansVisualization({ result, explanation }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>
+                <CardTitle style={{ color: '#8770b4', padding: '15px 10px 0' }}>
                   {explanation.key_findings_section_title || "주목할만한 부분"}
                 </CardTitle>
               </CardHeader>
@@ -1158,9 +1176,9 @@ export default function KMeansVisualization({ result, explanation }) {
                 </ul>
               </CardContent>
             </Card>
-            <Card>
+            <Card style={{ padding: '10px'}}>
               <CardHeader>
-                <CardTitle>
+                <CardTitle style={{ padding: '15px 10px 0' }}>
                   {explanation.recommendations_section_title || "권장 사항"}
                 </CardTitle>
               </CardHeader>
@@ -1187,19 +1205,19 @@ export default function KMeansVisualization({ result, explanation }) {
           {modelPerformance.metrics && modelPerformance.metrics.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>
+                <CardTitle style={{ padding: '15px 10px 0' }}>
                   {explanation.model_performance_section_title || "모델 성능"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {/* Render Metrics */}
-                <Typography variant="h6">주요 메트릭</Typography>
+                <Typography variant="h6" style={{ paddingBottom: '10px'}}>◾ 주요 메트릭</Typography>
                 {modelPerformance.metrics.map((metric, index) => (
-                  <div key={index} className="mb-2">
+                  <div key={index} className="mb-2" style={{ gap: '10px'}}>
                     <Typography variant="body1">
                       <strong>{metric.metric_name}:</strong> {metric.metric_value}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="black">
                       {metric.interpretation}
                     </Typography>
                   </div>
@@ -1208,14 +1226,14 @@ export default function KMeansVisualization({ result, explanation }) {
                 {/* Render Prediction Analysis */}
                 {modelPerformance.prediction_analysis && (
                   <>
-                    <Typography variant="h6" className="mt-4">
-                      예측 분석
+                    <Typography variant="h6" className="mt-4" style={{ paddingBottom: '10px' }}>
+                      ◾ 예측 분석
                     </Typography>
                     <Typography variant="body1" gutterBottom>
                       <strong>전체 정확도:</strong>{" "}
                       {modelPerformance.prediction_analysis.overall_accuracy}
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" style={{ color: '#8770b4', padding: '10px 0', fontSize: '18px'}}>
                       <strong>주목할 만한 패턴:</strong>
                     </Typography>
                     <ul className="list-disc pl-5">
