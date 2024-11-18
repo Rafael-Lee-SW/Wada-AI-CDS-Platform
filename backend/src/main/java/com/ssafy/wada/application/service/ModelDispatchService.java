@@ -19,6 +19,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -223,12 +224,17 @@ public class ModelDispatchService {
 
     private String changeGptStringToApiString(String gptString) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(gptString);
-			return rootNode.at("/choices/0/message/content/answer").asText();
+            JSONObject jsonObject = new JSONObject(gptString);
+            String answerContent = jsonObject
+                .getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content");
+
+            JSONObject contentObject = new JSONObject(answerContent);
+			return contentObject.getString("answer");
         } catch (Exception e) {
             log.warn(e.getMessage());
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
 	}
