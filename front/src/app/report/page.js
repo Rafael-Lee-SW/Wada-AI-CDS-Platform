@@ -173,6 +173,8 @@ export default function Report({ result }) {
         console.log("백엔드에서 전달되는 데이터 : ", data);
 
         const resultData = data.resultFromModel;
+        
+        console.log("최종적으로 보고서에 전달되는 데이터 : ", resultData);
         setModel(resultData.model);
         // 여기 수완님 코드
         // ResultFromModel 추출 (ML 서버에서 온 결과)
