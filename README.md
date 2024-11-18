@@ -141,7 +141,7 @@
     </tr>
     <tr align="center">
         <td>
-        <b>Team Leader</b><b><br/>Backend<br></b>모델 추천 데이터 전송, MongoDB Control
+        <b>Team Leader</b><b><br/>Backend<br></b>모델 추천 데이터 전송,<br/> MongoDB Control
         </td>
         <td>
         <b>Backend</b><br/> <b>Frontend</b><br/>웹 사이트 디자인 총괄<br/>User Service 구현<br/>
@@ -176,12 +176,12 @@
               <img src="/READMEfile/Jihwan.jpg" width="100">
         </td>
         <td style="min-width: 250px;">
-               <img src="/READMEfile/Seungjin.jpg width="100">
+               <img src="/READMEfile/Seungjin.jpg" width="100">
         </td>
     </tr>
     <tr align="center">
         <td>
-        <b>Backend <br/> ModelPrompt </b><br/><br/>LLM Prompt 생성 및 모델 검증, 모델 서버 배포 <br/>비즈니스 로직 구현<br/>
+        <b>Backend <br/> ModelPrompt </b><br/><br/>LLM Prompt 생성 및 모델 검증,<br/> 모델 서버 배포 <br/>비즈니스 로직 구현<br/>
         </td>
         <td>
         <b>Backend</b><br/><b>Model Recommand </b><br/> Backend 환경 구축 <br/>모델 추천 서비스 구현<br/> <br/>
