@@ -1,7 +1,7 @@
 
 #  Auto Store Project : 무인 매장 관리 시스템
 
-<img src="/READMEfile/unmanndestore.jpg" alt="AUTOSTORE Image" width="1000">
+<img src="/READMEfile/unmanndestore.jpeg" alt="AUTOSTORE Image" width="1000">
 
 
 # 목차
