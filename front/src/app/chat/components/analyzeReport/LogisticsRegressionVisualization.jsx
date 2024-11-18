@@ -182,18 +182,17 @@ export default function LogisticRegressionVisualization({
     // Handle y being either class indices (numbers) or class titles (strings)
     // Map y indices to class titles
     const mappedY = y.map((cls) => {
-      // Check the model type and adjust mapping logic accordingly
-      if (overview.models_used.model_name === "LogisticRegressionBinary") {
-        // Use 'cls' directly for binary classification
-        return classesInfo.classTitle[cls] || `Class ${cls}`;
-      } else if (
-        overview.models_used.model_name === "LogisticRegressionMultinomial"
-      ) {
-        // Adjust for multinomial classification
-        return classesInfo.classTitle[cls - 1] || `Class ${cls - 1}`;
+      const isBinary =
+        overview.models_used.model_name === "LogisticRegressionBinary";
+      const isMultinomial =
+        overview.models_used.model_name === "LogisticRegressionMultinomial";
+
+      if (isBinary) {
+        return classesInfo.classTitle?.[cls] || `Class ${cls}`;
+      } else if (isMultinomial) {
+        return classesInfo.classTitle?.[cls - 1] || `Class ${cls}`;
       } else {
-        // Default handling for other models
-        return `Unknown Class (${cls})`;
+        return classesInfo.classTitle?.[cls] || `Class ${cls}`;
       }
     });
 
