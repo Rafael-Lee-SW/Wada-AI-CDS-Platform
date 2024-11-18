@@ -121,29 +121,47 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                                             }}
                                         >
                                             <p style={styles.title1}>{model.analysis_name}</p>
-                                            {Object.entries(reason).map(([key, value]) => {                                                const renderKey = () => {
-                                                    switch (key) {
-                                                        case 'model_selection_reason':
-                                                            return '모델 선택 이유';
-                                                        case 'business_value':
-                                                            return '사업적 가치';
-                                                        case 'expected_results':
-                                                            return '예상 결과';
-                                                        case 'considerations':
-                                                            return '고려사항';
-                                                        case 'model_advantages':
-                                                            return '장점';
-                                                        default:
-                                                            return key; 
-                                                    }
-                                                };
-                                                return (
-                                                    <div style={styles.modelContent} key={key}>
+                                            {Object.entries(reason).map(([key, value]) => {                                                
+                                            const renderKey = () => {
+                                                switch (key) {
+                                                    case 'model_selection_reason':
+                                                        return '모델 선택 이유';
+                                                    case 'business_value':
+                                                        return '사업적 가치';
+                                                    case 'expected_results':
+                                                        return '예상 결과';
+                                                    case 'considerations':
+                                                        return '고려사항';
+                                                    case 'model_advantages':
+                                                        return '장점';
+                                                    default:
+                                                        return key; 
+                                                }
+                                            };
+
+                                            // `model_advantages` 항목일 경우 숫자)로 나눠서 줄바꿈 처리
+                                            const renderValue = (key, value) => {
+                                                if (key === 'model_advantages') {
+                                                    return value.split(/(?=\d\))/).map((item, index) => (
+                                                        <p key={index} style={{ marginBottom: '8px' }}>{item.trim()}</p>
+                                                    ));
+                                                }
+                                                return <p>{value}</p>;
+                                            };
+
+                                            return (
+                                                <div style={styles.modelContent} key={key}>
+                                                    <div style={styles.imgContainer}>
+                                                        <img style={{ width: '30px' }} src="/img/notice.png" />
                                                         <p style={styles.title}><strong>{renderKey()}</strong></p>
-                                                        <p style={styles.reason}>{value}</p>
                                                     </div>
-                                                );
-                                            })}
+                                                    <div style={styles.reason}>
+                                                        {renderValue(key, value)}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+
                                         </div>
                                     </div>
                                 </div>
