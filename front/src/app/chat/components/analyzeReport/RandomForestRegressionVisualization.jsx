@@ -461,7 +461,7 @@ export default function RandomForestRegressorVisualization({
                     실제 값과 예측값의 차이를 그래프로 나타냅니다. (실제 값 - 예측 값)
                   </CardDescription>
                 </CardHeader>
-                <CardContent>{renderResidualsPlot()}</CardContent>
+                <CardContent className={classes.plotContainer}>{renderResidualsPlot()}</CardContent>
               </Card>
             </TabsContent>
 
@@ -484,12 +484,12 @@ export default function RandomForestRegressorVisualization({
             {/* Key Findings */}
             <Card>
               <CardHeader>
-                <CardTitle>
+                <CardTitle style={{ color: '#8770b4'}}>
                   {explanation.key_findings_section_title || "주목할만한 부분"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc pl-5 space-y-2">
+                <ul className="list-disc pl-5 space-y-2" style={{ paddingTop: '10px'}}>
                   {key_findings.map((finding, index) => (
                     <li key={index} className={classes.listItem}>
                       <strong>{finding.finding}</strong>: {finding.impact}
@@ -528,7 +528,7 @@ export default function RandomForestRegressorVisualization({
                 {recommendations.further_analysis &&
                   recommendations.further_analysis.length > 0 && (
                     <>
-                      <h3 className="text-lg font-semibold mb-2">
+                      <h3 className="text-lg font-semibold mb-2" style={{ paddingTop: '10px'}}>
                         향후 분석 가능성
                       </h3>
                       <ul className="list-disc pl-5 space-y-2">
@@ -559,7 +559,7 @@ export default function RandomForestRegressorVisualization({
           </CardHeader>
           <CardContent>
             {/* Render Metrics */}
-            <Typography variant="h6">중요 지표</Typography>
+            <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px'}}>◾ 중요 지표</Typography>
             {explanation.model_performance.metrics.map((metric, index) => (
               <div key={index} className="mb-2">
                 <Typography variant="body1">
@@ -574,8 +574,8 @@ export default function RandomForestRegressorVisualization({
             {/* Render Prediction Analysis */}
             {explanation.model_performance.prediction_analysis && (
               <>
-                <Typography variant="h6" className="mt-4">
-                  예측 모델 분석
+                <Typography variant="h6" className="mt-4" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px'}}>
+                  ◾ 예측 모델 분석
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   <strong>정확도:</strong>{" "}
