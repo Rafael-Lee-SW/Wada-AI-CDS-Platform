@@ -1,5 +1,5 @@
 
-#  Auto Store Project : 무인 매장 관리 시스템
+# 말하는 Da(이터)로 : 파일 머신러닝 분석 서비스
 
 <img src="/READMEfile/unmanndestore.jpeg" alt="AUTOSTORE Image" width="1000">
 
