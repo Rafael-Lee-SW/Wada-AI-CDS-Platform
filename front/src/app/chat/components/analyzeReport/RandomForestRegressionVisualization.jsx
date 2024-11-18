@@ -41,12 +41,25 @@ export default function RandomForestRegressorVisualization({
     key_findings = [],
     recommendations = {},
     visualizations = [],
+    model_specific_details = {},
     report_title = "랜덤 포레스트 AI 모델 분석 보고서",
     "x-axis_title": xAxisTitle = "",
     "x-axis_description": xAxisDescription = "",
     "y-axis_title": yAxisTitle = "",
     "y-axis_description": yAxisDescription = "",
   } = explanation;
+
+  // Extract RandomForest_case details
+  const rfCase =
+    model_specific_details?.details?.random_forest_case || {};
+
+  const {
+    report_title: rfReportTitle = report_title,
+    x_axis_title: rfXAxisTitle = xAxisTitle,
+    x_axis_description: rfXAxisDescription = xAxisDescription,
+    y_axis_title: rfYAxisTitle = yAxisTitle,
+    y_axis_description: rfYAxisDescription = yAxisDescription,
+  } = rfCase;
 
   // Render Feature Importances Bar Chart
   const renderFeatureImportances = () => {
@@ -113,7 +126,7 @@ export default function RandomForestRegressorVisualization({
     const r2 = result.r2;
 
     if (typeof mse !== "number" || typeof r2 !== "number") {
-      console.error("유효하지 않은 특성 중요도 데이터:", mse, r2);
+      console.error("유효하지 않은 회귀 메트릭 데이터:", mse, r2);
       return null;
     }
 
@@ -191,8 +204,14 @@ export default function RandomForestRegressorVisualization({
           {
             type: "scatter",
             mode: "lines",
-            x: [Math.min(...y_test, ...y_pred), Math.max(...y_test, ...y_pred)],
-            y: [Math.min(...y_test, ...y_pred), Math.max(...y_test, ...y_pred)],
+            x: [
+              Math.min(...y_test, ...y_pred),
+              Math.max(...y_test, ...y_pred),
+            ],
+            y: [
+              Math.min(...y_test, ...y_pred),
+              Math.max(...y_test, ...y_pred),
+            ],
             name: "완벽한 예측",
             line: { color: "red", dash: "dash" },
           },
@@ -200,11 +219,11 @@ export default function RandomForestRegressorVisualization({
         layout={{
           title: visualizations[1]?.title || "실제 값 vs 예측 값",
           xaxis: {
-            title: "실제 값",
+            title: rfXAxisTitle || "실제 월급",
             automargin: true,
           },
           yaxis: {
-            title: "예측 값",
+            title: rfYAxisTitle || "예측 월급",
             automargin: true,
           },
           height: 600,
@@ -339,30 +358,36 @@ export default function RandomForestRegressorVisualization({
       {result && explanation && (
         <>
           <h1 className="text-4xl font-bold text-center mb-8">
-            {report_title || "회귀 모델 분석 보고서"}
+            {rfReportTitle}
           </h1>
 
           {/* Overview Section */}
           <Card>
             <CardHeader>
               <CardTitle>
-                {explanation.overview_section_title || "개요"}
+                {rfCase.overview_section_title || "개요"}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Typography variant="h6" style={{ padding: '0 0 10px'}}>◾ 분석 목적</Typography>
+              <Typography variant="h6" style={{ padding: '0 0 10px' }}>
+                ◾ 분석 목적
+              </Typography>
               <Typography variant="body1" gutterBottom>
                 {overview.analysis_purpose ||
                   "분석 목적이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6" style={{ padding: '10px 0 10px'}}>◾ 데이터 설명</Typography>
+              <Typography variant="h6" style={{ padding: '10px 0 10px' }}>
+                ◾ 데이터 설명
+              </Typography>
               <Typography variant="body1" gutterBottom>
                 {overview.data_description ||
                   "데이터 설명이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6" style={{ padding: '10px 0 10px'}}>◾ 사용된 모델</Typography>
+              <Typography variant="h6" style={{ padding: '10px 0 10px' }}>
+                ◾ 사용된 모델
+              </Typography>
               <Typography variant="body1" gutterBottom>
                 {overview.models_used?.model_description ||
                   "모델 설명이 제공되지 않았습니다."}
@@ -411,12 +436,14 @@ export default function RandomForestRegressorVisualization({
                   <CardTitle>
                     {visualizations[0]?.title || "특성 중요도"}
                   </CardTitle>
-                  <CardDescription style={{ paddingTop: '10px'}}>
+                  <CardDescription style={{ paddingTop: '10px' }}>
                     {visualizations[0]?.description ||
                       "분석에 있어서 각 특성이 얼마나 영향을 발휘하는 지를 나타냅니다."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className={classes.plotContainer}>{renderFeatureImportances()}</CardContent>
+                <CardContent className={classes.plotContainer}>
+                  {renderFeatureImportances()}
+                </CardContent>
               </Card>
             </TabsContent>
 
@@ -437,7 +464,7 @@ export default function RandomForestRegressorVisualization({
             </TabsContent>
 
             {/* Actual vs Predicted Tab Content */}
-            <TabsContent value="실제 값 vs 예측 값">
+            <TabsContent value="actual_vs_predicted">
               <Card>
                 <CardHeader>
                   <CardTitle>
@@ -461,7 +488,9 @@ export default function RandomForestRegressorVisualization({
                     실제 값과 예측값의 차이를 그래프로 나타냅니다. (실제 값 - 예측 값)
                   </CardDescription>
                 </CardHeader>
-                <CardContent className={classes.plotContainer}>{renderResidualsPlot()}</CardContent>
+                <CardContent className={classes.plotContainer}>
+                  {renderResidualsPlot()}
+                </CardContent>
               </Card>
             </TabsContent>
 
@@ -484,12 +513,12 @@ export default function RandomForestRegressorVisualization({
             {/* Key Findings */}
             <Card>
               <CardHeader>
-                <CardTitle style={{ color: '#8770b4'}}>
+                <CardTitle style={{ color: '#8770b4' }}>
                   {explanation.key_findings_section_title || "주목할만한 부분"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc pl-5 space-y-2" style={{ paddingTop: '10px'}}>
+                <ul className="list-disc pl-5 space-y-2" style={{ paddingTop: '10px' }}>
                   {key_findings.map((finding, index) => (
                     <li key={index} className={classes.listItem}>
                       <strong>{finding.finding}</strong>: {finding.impact}
@@ -528,7 +557,7 @@ export default function RandomForestRegressorVisualization({
                 {recommendations.further_analysis &&
                   recommendations.further_analysis.length > 0 && (
                     <>
-                      <h3 className="text-lg font-semibold mb-2" style={{ paddingTop: '10px'}}>
+                      <h3 className="text-lg font-semibold mb-2" style={{ paddingTop: '10px' }}>
                         향후 분석 가능성
                       </h3>
                       <ul className="list-disc pl-5 space-y-2">
@@ -559,7 +588,9 @@ export default function RandomForestRegressorVisualization({
           </CardHeader>
           <CardContent>
             {/* Render Metrics */}
-            <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px'}}>◾ 중요 지표</Typography>
+            <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}>
+              ◾ 중요 지표
+            </Typography>
             {explanation.model_performance.metrics.map((metric, index) => (
               <div key={index} className="mb-2">
                 <Typography variant="body1">
@@ -574,7 +605,11 @@ export default function RandomForestRegressorVisualization({
             {/* Render Prediction Analysis */}
             {explanation.model_performance.prediction_analysis && (
               <>
-                <Typography variant="h6" className="mt-4" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px'}}>
+                <Typography
+                  variant="h6"
+                  className="mt-4"
+                  style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}
+                >
                   ◾ 예측 모델 분석
                 </Typography>
                 <Typography variant="body1" gutterBottom>
@@ -652,25 +687,22 @@ RandomForestRegressorVisualization.propTypes = {
         insights: PropTypes.string,
       })
     ).isRequired,
+    model_specific_details: PropTypes.shape({
+      details: PropTypes.shape({
+        random_forest_case: PropTypes.shape({
+          report_title: PropTypes.string,
+          x_axis_title: PropTypes.string,
+          x_axis_description: PropTypes.string,
+          y_axis_title: PropTypes.string,
+          y_axis_description: PropTypes.string,
+        }),
+      }),
+    }),
     report_title: PropTypes.string,
     "x-axis_title": PropTypes.string,
     "x-axis_description": PropTypes.string,
     "y-axis_title": PropTypes.string,
     "y-axis_description": PropTypes.string,
-    model_performance: PropTypes.shape({
-      metrics: PropTypes.arrayOf(
-        PropTypes.shape({
-          metric_name: PropTypes.string.isRequired,
-          metric_value: PropTypes.string.isRequired,
-          interpretation: PropTypes.string.isRequired,
-        })
-      ).isRequired,
-      prediction_analysis: PropTypes.shape({
-        overall_accuracy: PropTypes.string,
-        notable_patterns: PropTypes.arrayOf(PropTypes.string),
-      }),
-      model_performance_section_title: PropTypes.string,
-    }),
     overview_section_title: PropTypes.string,
     model_performance_section_title: PropTypes.string,
     key_findings_section_title: PropTypes.string,

@@ -80,14 +80,14 @@ const visualizationsList = [
   {
     name: "Random Forest Classifier",
     component: ClassifierVisualization,
-    resultPath: "/json/test_2.json",
-    explanationPath: "/json/test_2_explanation.json",
+    resultPath: "/json/test_2_up.json",
+    explanationPath: "/json/test_2_up_explanation.json",
   },
   {
     name: "Random Forest Regressor",
     component: RegressionVisualization,
-    resultPath: "/json/test_1.json",
-    explanationPath: "/json/test_1_explanation.json",
+    resultPath: "/json/test_1_up.json",
+    explanationPath: "/json/test_1_up_explanation.json",
   },
   {
     name: "Support Vector Machine",
@@ -153,6 +153,10 @@ export default function Test() {
 
         setJsonResult(resultData);
         setJsonExplanation(explanationData);
+
+        console.log(resultData)
+        console.log(explanationData)
+
       } catch (err) {
         console.error("Failed to fetch JSON data:", err);
         setError("Failed to load analysis results.");
@@ -176,11 +180,10 @@ export default function Test() {
           <button
             key={viz.name}
             onClick={() => setSelectedVisualization(viz)}
-            className={`px-4 py-2 rounded-md border ${
-              selectedVisualization.name === viz.name
-                ? "bg-blue-500 text-white border-blue-500"
-                : "bg-white text-blue-500 border-blue-500 hover:bg-blue-50"
-            } transition duration-200`}
+            className={`px-4 py-2 rounded-md border ${selectedVisualization.name === viz.name
+              ? "bg-blue-500 text-white border-blue-500"
+              : "bg-white text-blue-500 border-blue-500 hover:bg-blue-50"
+              } transition duration-200`}
           >
             {viz.name}
           </button>
@@ -205,7 +208,7 @@ export default function Test() {
       {/* Render the selected visualization component when data is available */}
       {jsonResult && jsonExplanation && (
         <selectedVisualization.component
-          result={jsonResult.result}
+          result={(jsonResult.result)}
           explanation={jsonExplanation.result}
         />
       )}

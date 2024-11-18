@@ -25,18 +25,56 @@ import {
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
+// Custom Styles (Assuming you have a similar styles file)
+import useNeuralNetworkStyles from "/styles/analyzingNNStyle.js";
+
 function NeuralNetworkVisualization({ result, explanation }) {
+  const classes = useNeuralNetworkStyles();
+
   // Destructure data from result and explanation
   const { graph1, graph2, graph3, model, architecture } = result || {};
 
+  // Destructure explanation with deeper nesting
   const {
     overview = {},
     model_performance = {},
     visualizations = [],
     key_findings = [],
     recommendations = {},
-    Neural_Network = {},
+    model_specific_details = {},
+    overview_section_title = "개요",
+    key_findings_section_title = "주요 발견 사항",
+    recommendations_section_title = "권장 사항",
+    data_table_title = "모든 데이터 포인트",
+    data_table_description = "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다.",
   } = explanation || {};
+
+  // Extract Neural_Network_case from nested structure
+  const neuralNetworkCase =
+    model_specific_details?.details?.neural_network_case || {};
+
+  const {
+    report_title: neuralReportTitle = "Neural Network Regressor Analysis Report",
+    Predictions_vs_Actual: predictionsVsActual = {},
+  } = neuralNetworkCase;
+
+  // Extract axis titles and descriptions from nested Neural_Network_case
+  const xAxisTitle =
+    neuralNetworkCase?.["x-axis_title"] ||
+    predictionsVsActual?.["x-axis_title"] ||
+    "Actual Values";
+  const xAxisDescription =
+    neuralNetworkCase?.["x-axis_description"] ||
+    predictionsVsActual?.["x-axis_description"] ||
+    "실제 값은 모델이 예측한 값과 비교되는 실제 데이터 포인트입니다.";
+  const yAxisTitle =
+    neuralNetworkCase?.["y-axis_title"] ||
+    predictionsVsActual?.["y-axis_title"] ||
+    "Predicted Values";
+  const yAxisDescription =
+    neuralNetworkCase?.["y-axis_description"] ||
+    predictionsVsActual?.["y-axis_description"] ||
+    "예측 값은 모델이 실제 값에 기반하여 예측한 결과입니다.";
 
   // --- Visualization functions ---
 
@@ -46,7 +84,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
     if (!graph1 || !graph1.loss || !graph1.val_loss || !graph1.epochs) {
       return (
         <p className="text-red-500">
-          Cannot render loss curve. Data is missing.
+          Loss curve를 렌더링할 수 없습니다. 데이터가 누락되었습니다.
         </p>
       );
     }
@@ -64,7 +102,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
     ) {
       return (
         <p className="text-red-500">
-          Cannot render loss curve. Data contains non-numeric values.
+          Loss curve를 렌더링할 수 없습니다. 데이터에 숫자가 아닌 값이 포함되어 있습니다.
         </p>
       );
     }
@@ -127,7 +165,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
     if (!y_test || !y_pred) {
       return (
         <p className="text-red-500">
-          Prediction data is not available.
+          예측 그래프를 렌더링할 수 없습니다. 데이터가 누락되었습니다.
         </p>
       );
     }
@@ -140,7 +178,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
     if (yTestData.some(isNaN) || yPredData.some(isNaN)) {
       return (
         <p className="text-red-500">
-          Cannot render prediction graph. Data contains non-numeric values.
+          예측 그래프를 렌더링할 수 없습니다. 데이터에 숫자가 아닌 값이 포함되어 있습니다.
         </p>
       );
     }
@@ -175,18 +213,13 @@ function NeuralNetworkVisualization({ result, explanation }) {
         ]}
         layout={{
           title:
-            Neural_Network?.Predictions_vs_Actual
-              ?.Predictions_vs_Actual_title ||
+            predictionsVsActual?.Predictions_vs_Actual_title ||
             "Predicted vs Actual Values",
           xaxis: {
-            title:
-              Neural_Network?.Predictions_vs_Actual?.["x-axis_title"] ||
-              "Actual Values",
+            title: xAxisTitle || "Actual Values",
           },
           yaxis: {
-            title:
-              Neural_Network?.Predictions_vs_Actual?.["y-axis_title"] ||
-              "Predicted Values",
+            title: yAxisTitle || "Predicted Values",
           },
           legend: {
             x: 0,
@@ -249,22 +282,83 @@ function NeuralNetworkVisualization({ result, explanation }) {
     );
   };
 
+  // Render the data table for all spots
+  const renderDataTable = () => {
+    if (!graph2 || !graph2.identifiers || !graph2.y_test || !graph2.y_pred)
+      return null;
+
+    const { identifiers, y_test, y_pred } = graph2;
+
+    const dataTable = identifiers.map((id, index) => ({
+      id: index,
+      Identifier: id,
+      Actual: y_test[index],
+      Predicted: y_pred[index],
+    }));
+
+    return (
+      <div className="overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Identifier</TableHead>
+              <TableHead>Actual Value</TableHead>
+              <TableHead>Predicted Value</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataTable.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.Identifier}</TableCell>
+                <TableCell>{row.Actual}</TableCell>
+                <TableCell>{row.Predicted}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  };
+
   // --- Final return ---
   return (
     <div className="container mx-auto p-4 space-y-8">
       {/* Report Title */}
       <h1 className="text-4xl font-bold text-center mb-8">
-        {Neural_Network?.report_title ||
-          "Neural Network Regressor Analysis Report"}
+        {neuralReportTitle || "Neural Network Regressor Analysis Report"}
       </h1>
 
       {/* Overview */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Overview</h2>
-        <p>{overview?.analysis_purpose}</p>
-        <p>{overview?.data_description}</p>
-        <p>{overview?.models_used?.model_description}</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{overview_section_title || "개요"}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Typography variant="h6" style={{ paddingBottom: "10px" }}>
+            ◾ 분석 목적
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {overview?.analysis_purpose ||
+              "분석 목적이 제공되지 않았습니다."}
+          </Typography>
+
+          <Typography variant="h6" style={{ paddingBottom: "10px" }}>
+            ◾ 데이터 설명
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {overview?.data_description ||
+              "데이터 설명이 제공되지 않았습니다."}
+          </Typography>
+
+          <Typography variant="h6" style={{ paddingBottom: "10px" }}>
+            ◾ 사용된 모델
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {overview?.models_used?.model_description ||
+              "모델 설명이 제공되지 않았습니다."}
+          </Typography>
+        </CardContent>
+      </Card>
 
       {/* Tabs */}
       <Tabs defaultValue="loss_curve" className="w-full">
@@ -273,10 +367,12 @@ function NeuralNetworkVisualization({ result, explanation }) {
             {visualizations?.[0]?.title || "Loss Curve"}
           </TabsTrigger>
           <TabsTrigger value="predictions">
-            {Neural_Network?.Predictions_vs_Actual
-              ?.Predictions_vs_Actual_title || "Predictions vs Actual"}
+            {predictionsVsActual?.Predictions_vs_Actual_title ||
+              "Predictions vs Actual"}
           </TabsTrigger>
-          <TabsTrigger value="metrics">Performance Metrics</TabsTrigger>
+          <TabsTrigger value="metrics">
+            {visualizations?.[2]?.title || "Performance Metrics"}
+          </TabsTrigger>
         </TabsList>
 
         {/* Loss Curve Tab */}
@@ -300,8 +396,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
           <Card>
             <CardHeader>
               <CardTitle>
-                {Neural_Network?.Predictions_vs_Actual
-                  ?.Predictions_vs_Actual_title ||
+                {predictionsVsActual?.Predictions_vs_Actual_title ||
                   "Predicted vs Actual Values"}
               </CardTitle>
               <CardDescription>
@@ -317,7 +412,13 @@ function NeuralNetworkVisualization({ result, explanation }) {
         <TabsContent value="metrics">
           <Card>
             <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
+              <CardTitle>
+                {visualizations?.[2]?.title || "Performance Metrics"}
+              </CardTitle>
+              <CardDescription>
+                {visualizations?.[2]?.description ||
+                  "Detailed performance metrics of the model."}
+              </CardDescription>
             </CardHeader>
             <CardContent>{renderMetricsTable()}</CardContent>
           </Card>
@@ -329,7 +430,9 @@ function NeuralNetworkVisualization({ result, explanation }) {
         {/* Key Findings */}
         <Card>
           <CardHeader>
-            <CardTitle>Key Findings</CardTitle>
+            <CardTitle>
+              {key_findings_section_title || "주요 발견 사항"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
@@ -345,7 +448,9 @@ function NeuralNetworkVisualization({ result, explanation }) {
         {/* Recommendations */}
         <Card>
           <CardHeader>
-            <CardTitle>Recommendations</CardTitle>
+            <CardTitle>
+              {recommendations_section_title || "권장 사항"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {recommendations?.immediate_actions &&
@@ -368,9 +473,11 @@ function NeuralNetworkVisualization({ result, explanation }) {
                     Further Analysis
                   </h3>
                   <ul className="list-disc pl-5 space-y-2">
-                    {recommendations.further_analysis.map((action, index) => (
-                      <li key={index}>{action}</li>
-                    ))}
+                    {recommendations.further_analysis.map(
+                      (action, index) => (
+                        <li key={index}>{action}</li>
+                      )
+                    )}
                   </ul>
                 </>
               )}
@@ -400,9 +507,16 @@ NeuralNetworkVisualization.propTypes = {
     }).isRequired,
     graph3: PropTypes.shape({
       graph_type: PropTypes.string,
-      mse: PropTypes.number.isRequired,
-      mae: PropTypes.number.isRequired,
-      r2_score: PropTypes.number.isRequired,
+      metrics: PropTypes.arrayOf(
+        PropTypes.shape({
+          metric_name: PropTypes.string.isRequired,
+          metric_value: PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.string,
+          ]).isRequired,
+          interpretation: PropTypes.string.isRequired,
+        })
+      ).isRequired,
     }).isRequired,
     model: PropTypes.string,
     architecture: PropTypes.string,
@@ -466,16 +580,25 @@ NeuralNetworkVisualization.propTypes = {
       immediate_actions: PropTypes.arrayOf(PropTypes.string),
       further_analysis: PropTypes.arrayOf(PropTypes.string),
     }),
-    Neural_Network: PropTypes.shape({
-      report_title: PropTypes.string,
-      Predictions_vs_Actual: PropTypes.shape({
-        Predictions_vs_Actual_title: PropTypes.string,
-        "x-axis_title": PropTypes.string,
-        "x-axis_description": PropTypes.string,
-        "y-axis_title": PropTypes.string,
-        "y-axis_description": PropTypes.string,
+    model_specific_details: PropTypes.shape({
+      details: PropTypes.shape({
+        neural_network_case: PropTypes.shape({
+          report_title: PropTypes.string,
+          Predictions_vs_Actual: PropTypes.shape({
+            Predictions_vs_Actual_title: PropTypes.string,
+            "x-axis_title": PropTypes.string,
+            "x-axis_description": PropTypes.string,
+            "y-axis_title": PropTypes.string,
+            "y-axis_description": PropTypes.string,
+          }),
+        }),
       }),
-    }).isRequired,
+    }),
+    overview_section_title: PropTypes.string,
+    key_findings_section_title: PropTypes.string,
+    recommendations_section_title: PropTypes.string,
+    data_table_title: PropTypes.string,
+    data_table_description: PropTypes.string, // Added for data table description
   }).isRequired,
 };
 

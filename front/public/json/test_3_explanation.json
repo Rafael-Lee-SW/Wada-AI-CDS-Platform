@@ -96,24 +96,34 @@
         "성능 지표에 기반한 피드백 시스템 구축"
       ]
     },
-    "LogisticRegression_Case": {
-      "report_title": "인력 성과 평가 및 개선 방안 보고서",
-      "classes": {
-        "classTitle": ["고성과 인력", "저성과 인력"],
-        "classDescription": [
-          "고성과 인력은 높은 기여도를 가진 직원으로서 조직의 주요 성과에 기여하고 있습니다.",
-          "저성과 인력은 추가적인 개선이 필요한 직원으로 분류됩니다."
-        ]
-      },
-      "x-axis_title": "PC1 (주성분 1)",
-      "x-axis_description": "PC1은 데이터의 첫 번째 주성분으로, 인력 성과의 주요 요인을 대표합니다.",
-      "y-axis_title": "PC2 (주성분 2)",
-      "y-axis_description": "PC2는 데이터의 두 번째 주성분으로, 인력 성과와의 추가적인 변동성을 설명합니다.",
-      "boundary_lines": {
-        "boundary_line_title": ["고성과와 저성과 경계선"],
-        "boundary_line_description": [
-          "이 경계선은 모델이 고성과와 저성과 인력을 분리하는 기준을 보여줍니다."
-        ]
+    "model_specific_details": {
+      "model_type": "로지스틱 회귀 (Logistic Regression",
+      "details": {
+        "LogisticRegression_Case": {
+          "report_title": "인력 성과 평가 및 개선 방안 보고서",
+          "classes": {
+            "classTitle": [
+              "고성과 인력",
+              "저성과 인력"
+            ],
+            "classDescription": [
+              "고성과 인력은 높은 기여도를 가진 직원으로서 조직의 주요 성과에 기여하고 있습니다.",
+              "저성과 인력은 추가적인 개선이 필요한 직원으로 분류됩니다."
+            ]
+          },
+          "x-axis_title": "PC1 (주성분 1)",
+          "x-axis_description": "PC1은 데이터의 첫 번째 주성분으로, 인력 성과의 주요 요인을 대표합니다.",
+          "y-axis_title": "PC2 (주성분 2)",
+          "y-axis_description": "PC2는 데이터의 두 번째 주성분으로, 인력 성과와의 추가적인 변동성을 설명합니다.",
+          "boundary_lines": {
+            "boundary_line_title": [
+              "고성과와 저성과 경계선"
+            ],
+            "boundary_line_description": [
+              "이 경계선은 모델이 고성과와 저성과 인력을 분리하는 기준을 보여줍니다."
+            ]
+          }
+        }
       }
     }
   }

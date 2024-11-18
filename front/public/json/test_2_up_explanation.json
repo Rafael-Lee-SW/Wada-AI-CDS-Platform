@@ -1,0 +1,130 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "이 분석의 목적은 직원 중 30%를 선발하여 해고해야 하는 상황에서, 회사 운영에 미치는 영향을 최소화하고 유지할 인력을 효과적으로 선정하는 것입니다.",
+      "data_description": "분석된 데이터는 직원의 근무 만족도, 성과 평가, 급여, 재직 기간과 같은 다양한 변수를 포함하며, 이를 통해 직원의 생산성과 회사에 대한 기여도를 평가할 수 있습니다.",
+      "models_used": {
+        "model_name": "RandomForestClassifier",
+        "model_description": "RandomForestClassifier 모델은 여러 개의 의사결정 나무를 결합하여 예측 정확도를 높이는 앙상블 학습 모델입니다. 이 모델은 특히 중요 변수를 자동으로 선정하고, 분류 성능을 개선하는 데 적합합니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "정확도 (Accuracy)",
+          "metric_value": 0.968,
+          "interpretation": "이 모델의 전체 정확도는 약 96.8%로, 직원 해고 결정을 위한 데이터 기반 예측이 매우 정확하다는 것을 의미합니다."
+        },
+        {
+          "metric_name": "정밀도 (Precision)",
+          "metric_value": {
+            "0": 0.955,
+            "1": 1.0
+          },
+          "interpretation": "정밀도는 해고 및 유지될 직원들을 올바르게 예측하는 능력을 의미하며, 해고 예측에 있어 높은 신뢰도를 제공합니다."
+        },
+        {
+          "metric_name": "재현율 (Recall)",
+          "metric_value": {
+            "0": 1.0,
+            "1": 0.905
+          },
+          "interpretation": "재현율은 실제 해고할 직원 중 모델이 정확히 예측한 비율을 의미하며, 0번 클래스를 매우 정확하게 예측함을 보여줍니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "모델은 전체적으로 96.8%의 정확도를 보이며, 해고와 유지 예측에서 신뢰도가 매우 높습니다.",
+        "notable_patterns": [
+          "재직 기간(TenureDays)과 급여(Salary) 변수가 해고 여부에 가장 큰 영향을 미칩니다.",
+          "근무 만족도(EmpSatisfaction)가 낮고 결근이 많을수록 해고될 확률이 높습니다."
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "TenureDays",
+          "importance_score": 0.488,
+          "business_impact": "재직 기간이 길수록 해고 대상에서 제외될 가능성이 큽니다. 이는 숙련된 직원의 유지가 중요함을 의미합니다."
+        },
+        {
+          "feature_name": "ManagerID",
+          "importance_score": 0.109,
+          "business_impact": "직속 관리자에 따라 직원의 평가와 관리 방식이 다르므로, 해고 여부에도 영향을 미칠 수 있습니다."
+        },
+        {
+          "feature_name": "Salary",
+          "importance_score": 0.094,
+          "business_impact": "높은 급여를 받는 직원은 상대적으로 회사에 중요한 역할을 맡고 있을 가능성이 높으므로 해고 판단에 중요한 변수로 작용합니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "재직 기간이 길고 급여가 높은 직원은 일반적으로 해고 위험이 낮습니다.",
+          "business_insight": "장기 근속 직원과 핵심 인재의 유지가 회사 운영 안정성에 긍정적인 영향을 미칩니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "특성 중요도 차트",
+        "type": "bar",
+        "description": "각 특성이 해고 여부 예측에 얼마나 중요한지 보여주는 그래프입니다.",
+        "insights": "재직 기간과 급여, 관리자 정보가 해고 여부를 결정하는 중요한 요소임을 확인할 수 있습니다."
+      },
+      {
+        "title": "예측 확률 차트",
+        "type": "probability",
+        "description": "각 직원에 대한 해고 가능성을 보여줍니다.",
+        "insights": "확률이 90% 이상인 직원은 해고 가능성이 매우 낮습니다."
+      },
+      {
+        "title": "분류 리포트",
+        "type": "table",
+        "description": "예측 정확도와 정밀도, 재현율을 보여주는 표입니다.",
+        "insights": "모델의 성능이 매우 높아 예측이 신뢰할 만한 수준입니다."
+      },
+      {
+        "title": "혼동 행렬",
+        "type": "heatmap",
+        "description": "실제와 예측된 해고 여부를 비교한 혼동 행렬입니다.",
+        "insights": "오차가 거의 없어 모델의 예측 정확도가 높음을 확인할 수 있습니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "재직 기간과 급여가 해고 여부 결정에 중요한 영향을 미침",
+        "impact": "해고 결정 시 회사 내 핵심 인재 유지 가능성을 고려할 수 있음",
+        "recommendation": "재직 기간과 급여를 반영하여 우선 순위를 설정"
+      },
+      {
+        "finding": "근무 만족도가 낮고 결근이 많은 직원이 해고 위험이 큼",
+        "impact": "이 직원들을 우선 해고 대상으로 선정할 수 있음",
+        "recommendation": "근무 태도 및 출근율을 종합적으로 평가하여 해고 결정"
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "재직 기간이 짧고 근무 만족도가 낮은 직원을 우선 해고 대상으로 선정",
+        "급여 수준이 상대적으로 낮고 결근이 잦은 직원을 검토"
+      ],
+      "further_analysis": [
+        "부서별로 해고가 회사 성과에 미치는 영향을 분석",
+        "재직 기간과 직무 수행 능력 간의 관계를 추가 분석하여 해고 후 생산성 예측"
+      ]
+    },
+    "model_specific_details": {
+      "model_type": "랜덤 포레스트 분류 (RandomForestClassifier)",
+      "details": {
+        "RandomForest_case": {
+          "report_title": "RandomForest 모델을 이용한 직원 해고 예측 보고서",
+          "x-axis_title": "실제 해고 여부",
+          "x-axis_description": "실제 해고 여부를 나타냅니다 (0: 해고 아님, 1: 해고)",
+          "y-axis_title": "예측된 해고 여부",
+          "y-axis_description": "모델이 예측한 해고 여부를 나타냅니다 (0: 해고 아님, 1: 해고)"
+        }
+      }
+    }
+  }
+}
