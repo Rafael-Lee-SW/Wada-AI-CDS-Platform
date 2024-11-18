@@ -52,6 +52,29 @@ const styles = {
         width: '60px',
         padding: '10px'
     },
+    otherReplyContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingTop: '20px',
+        paddingBottom: '20px'
+    },
+    otherReply: {
+        wordWrap: 'break-word',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'keep-all',
+        overflowWrap: 'break-word',
+        maxWidth: '70%', // 최대 너비를 부모 요소에 맞추기
+        lineHeight: '1.6',
+        textAlign: 'center',
+        fontSize: '18px',
+        color: '#6c4e82'
+    },
+    replyImg: {
+        width: '40px',
+        padding: '10px'
+    },
     infoBox: {
         padding: '20px'
     },
@@ -110,6 +133,13 @@ const styles = {
     modelContent: {
         paddingTop: '10px'
     },
+    imgContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '10px',
+    },
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -119,7 +149,7 @@ const styles = {
         width: '100%',
     },
     button2Container: {
-        marginTop: '10px',
+        marginTop: '25px',
         width: '100%',
         display: 'flex',
         justifyContent: 'flex-end'
@@ -142,7 +172,7 @@ const styles = {
     },
     flipCard: {
         backgroundColor: 'transparent',
-        width: '250px',
+        width: '300px',
         minHeight: '254px',
         perspective: '1000px',
         fontFamily: 'sans-serif',
@@ -169,11 +199,11 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center', 
         width: '100%',
-        maxHeight: '280px',
+        maxHeight: '300px',
         backfaceVisibility: 'hidden',
         border: '1px solid #9370db',
         borderRadius: '1rem',
-        background: 'linear-gradient(120deg, #dec1de 20%, #d9c5d9 50%, #d9ccd9 80%)',
+        background: 'linear-gradient(120deg, rgba(210, 200, 220, 0.7) 20%, rgba(200, 190, 210, 0.7) 50%, rgba(190, 180, 200, 0.7) 80%)',
         color: '#6c4e82',
         overflowY: 'auto',
         scrollbarWidth: 'none',
@@ -205,16 +235,20 @@ const styles = {
     },
     reason: {
         padding: '5px',
-        wordBreak: 'keep-all',
+        textAlign: 'start',
+        color: '#481677'
     },
     title1: {
-        fontSize: '19px',
+        fontSize: '18px',
         fontWeight: 900,
         margin: 0,
         wordWrap: 'break-word',
         wordBreak: 'break-all',
         whiteSpace: 'normal', 
-        color: '#481677'
+        color: '#481677',
+        padding: '15px 15px',
+        paddingBottom: '20px',
+        borderBottom: '1px dotted #481677'
     },
     title: {
         fontSize: '18px',

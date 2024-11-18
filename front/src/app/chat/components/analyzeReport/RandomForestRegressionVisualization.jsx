@@ -350,19 +350,19 @@ export default function RandomForestRegressorVisualization({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Typography variant="h6">분석 목적</Typography>
+              <Typography variant="h6" style={{ padding: '0 0 10px'}}>◾ 분석 목적</Typography>
               <Typography variant="body1" gutterBottom>
                 {overview.analysis_purpose ||
                   "분석 목적이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6">데이터 설명</Typography>
+              <Typography variant="h6" style={{ padding: '10px 0 10px'}}>◾ 데이터 설명</Typography>
               <Typography variant="body1" gutterBottom>
                 {overview.data_description ||
                   "데이터 설명이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6">사용된 모델</Typography>
+              <Typography variant="h6" style={{ padding: '10px 0 10px'}}>◾ 사용된 모델</Typography>
               <Typography variant="body1" gutterBottom>
                 {overview.models_used?.model_description ||
                   "모델 설명이 제공되지 않았습니다."}
@@ -372,24 +372,38 @@ export default function RandomForestRegressorVisualization({
 
           {/* Tabs Section */}
           <Tabs defaultValue="feature_importance" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="feature_importance">
+            <TabsList className="grid w-full grid-cols-5 space-x-4">
+              <TabsTrigger
+                value="feature_importance"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizations[0]?.title || "특성 중요도"}
               </TabsTrigger>
-              <TabsTrigger value="regression_metrics">
+              <TabsTrigger
+                value="regression_metrics"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizations[1]?.title || "모델 성능표"}
               </TabsTrigger>
-              <TabsTrigger value="actual_vs_predicted">
+              <TabsTrigger
+                value="actual_vs_predicted"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizations[2]?.title || "실제 값 vs 예측 값"}
               </TabsTrigger>
-              <TabsTrigger value="residuals">
+              <TabsTrigger
+                value="residuals"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizations[3]?.title || "잔차값(Residuals)"}
               </TabsTrigger>
-              <TabsTrigger value="predictions_overview">
+              <TabsTrigger
+                value="predictions_overview"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
                 {visualizations[4]?.title || "전체 예측 데이터"}
               </TabsTrigger>
             </TabsList>
-
             {/* Feature Importances Tab Content */}
             <TabsContent value="feature_importance">
               <Card>
@@ -397,12 +411,12 @@ export default function RandomForestRegressorVisualization({
                   <CardTitle>
                     {visualizations[0]?.title || "특성 중요도"}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription style={{ paddingTop: '10px'}}>
                     {visualizations[0]?.description ||
                       "분석에 있어서 각 특성이 얼마나 영향을 발휘하는 지를 나타냅니다."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>{renderFeatureImportances()}</CardContent>
+                <CardContent className={classes.plotContainer}>{renderFeatureImportances()}</CardContent>
               </Card>
             </TabsContent>
 

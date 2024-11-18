@@ -32,6 +32,7 @@ export default function Home({ sessionId }) {
     const [fileName, setFileName] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
     const [scrollToBottom, setScrollToBottom] = useState(false);
+    const [otherReply, setOtherReply] = useState('');
 
     const handleGoBack = () => {
         if (pageHistory.length > 0) {
@@ -239,11 +240,13 @@ export default function Home({ sessionId }) {
             const result = response.data;
             console.log("추가요청 결과: ", result);
             console.log("추가요청 requestId: ", result.requestId);
+            console.log("추가요청 reply: ", result.other_reply);
 
             setModels(result.model_recommendations);
             setPurpose(result.purpose_understanding);
             setOverview(result.data_overview);
             setRequestId(result.requestId);
+            setOtherReply(result.other_reply);
             handleChangePage('selectML');
 
             if (response.status != 200) {
@@ -345,7 +348,7 @@ export default function Home({ sessionId }) {
                     top: '18px',
                     display: (page === 'fileUploader' || page === 'newChat') ? 'none' : 'block'
                 }} />
-            {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit} onReSubmit={handleReSubmit} />}
+            {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} requestId={requestId} onModelSelect={handleModelSelect} onSubmit={handleSubmit} onReSubmit={handleReSubmit} otherReply={otherReply}/>}
             {page === 'chatContent' && <ChatContent fileName={fileName} result={result} sessionId={sessionId} chatContent={chatContent} onModelSelect={handleModelSelect} onSubmit={handleConversation} onOtherModels={handleOtherModels} onChangePage={handleChangePage} refreshKey={refreshKey} onMenuClick={handleMenuItemClick} setScrollToBottom={setScrollToBottom} scrollToBottom={scrollToBottom} />}
             {page === 'loading' && <Loading currentStep={currentStep} />}
             {page === 'fileUploader' && <FileUploader onChangePage={handleChangePage} onSubmitFiles={handleSubmitFiles} />}

@@ -118,7 +118,7 @@ const styles = {
     serverContainer: {
         display: 'flex',
         justifyContent: 'flex-start',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         marginBottom: '10px'
     },
     icon: {
@@ -145,7 +145,8 @@ const styles = {
         borderRadius: '10px',
         width: 'fit-content',
         cursor: 'pointer',
-        margin: 0
+        margin: 0,
+        whiteSpace: 'pre-wrap'
     },
     closeButton: {
         position: "absolute",
@@ -205,10 +206,10 @@ const styles = {
         border: '1px solid #9370db',
         borderRadius: '12px',
         cursor: 'pointer',
-        marginTop: '10px'
-    },
-    imgContainerHover: {
-        transform: 'scale(1.05)', 
+        marginTop: '10px',
+        '&:hover': {
+            transform: 'scale(1.05)'
+        }
     },
     img: {
         width: '30px',

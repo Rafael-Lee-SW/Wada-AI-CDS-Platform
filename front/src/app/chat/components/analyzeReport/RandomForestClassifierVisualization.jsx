@@ -398,19 +398,19 @@ export default function RandomForestClassifierVisualization({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Typography variant="h6">분석 목적</Typography>
+          <Typography variant="h6" style={{ padding: '0 0 10px' }}>◾ 분석 목적</Typography>
           <Typography variant="body1" gutterBottom>
             {overview.analysis_purpose ||
               "분석 목적이 제공되지 않았습니다."}
           </Typography>
 
-          <Typography variant="h6">데이터 설명</Typography>
+          <Typography variant="h6" style={{ padding: '10px 0' }}>◾ 데이터 설명</Typography>
           <Typography variant="body1" gutterBottom>
             {overview.data_description ||
               "데이터 설명이 제공되지 않았습니다."}
           </Typography>
 
-          <Typography variant="h6">사용된 모델</Typography>
+          <Typography variant="h6" style={{ padding: '10px 0' }}>◾ 사용된 모델</Typography>
           <Typography variant="body1" gutterBottom>
             {overview.models_used?.model_description ||
               "모델 설명이 제공되지 않았습니다."}
@@ -420,24 +420,40 @@ export default function RandomForestClassifierVisualization({
 
       {/* 탭 섹션 */}
       <Tabs defaultValue="feature_importance" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="feature_importance">
+        <TabsList className="grid w-full grid-cols-5 space-x-4">
+          <TabsTrigger
+            value="feature_importance"
+            className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
             {visualizations[0]?.title || "특성 중요도"}
           </TabsTrigger>
-          <TabsTrigger value="classification_metrics">
+          <TabsTrigger
+            value="classification_metrics"
+            className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
             {visualizations[1]?.title || "모델 성능표"}
           </TabsTrigger>
-          <TabsTrigger value="confusion_matrix">혼동 행렬</TabsTrigger>
-          <TabsTrigger value="classification_probabilities">
-            {"분류 확률"}
+          <TabsTrigger
+            value="confusion_matrix"
+            className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            혼동 행렬
           </TabsTrigger>
-          <TabsTrigger value="predictions_overview">
+          <TabsTrigger
+            value="classification_probabilities"
+            className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            분류 확률
+          </TabsTrigger>
+          <TabsTrigger
+            value="predictions_overview"
+            className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
             {visualizations[4]?.title || "전체 예측 데이터"}
           </TabsTrigger>
         </TabsList>
-
         {/* 특성 중요도 탭 내용 */}
-        <TabsContent value="feature_importance">
+        <TabsContent value="feature_importance" className={classes.plotContainer}>
           <Card>
             <CardHeader>
               <CardTitle>
@@ -526,7 +542,7 @@ export default function RandomForestClassifierVisualization({
             <ul className="list-disc pl-5 space-y-2">
               {key_findings.map((finding, index) => (
                 <li key={index} className={classes.listItem}>
-                  <strong>{finding.finding}</strong>: {finding.impact}
+                  <strong style={{ color: '#8770b4' }}>{finding.finding}</strong>: {finding.impact}
                 </li>
               ))}
             </ul>
@@ -561,7 +577,7 @@ export default function RandomForestClassifierVisualization({
             {recommendations.further_analysis &&
               recommendations.further_analysis.length > 0 && (
                 <>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="text-lg font-semibold mb-2" style={{ paddingTop: '10px'}}>
                     추가 분석
                   </h3>
                   <ul className="list-disc pl-5 space-y-2">
