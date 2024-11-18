@@ -1,13 +1,15 @@
 const styles = {
     chatContainer: {
         display: "flex",
-        width: "100vw",
+        flex: 1,
+        width: "100%",
         height: "100%",
+        justifyContent: 'center'
     },
     fullScreenChat: {
-        width: '100%',
-        transition: "transform 0.5s ease", // 부드러운 전환 효과
-        transformOrigin: "left",         // 왼쪽을 기준으로 확장 및 축소
+        width: '70%',
+        transition: "width 0.5s ease", 
+        transformOrigin: "left",        
         transform: "scaleX(1)",
         height: '100%',
         overflowY: "hidden",
@@ -16,7 +18,7 @@ const styles = {
         width: '50%',
         borderRight: "1px solid #ddd",
         overflowY: "hidden",
-        transition: "transform 0.3s ease"
+        transition: "width 0.5s ease",
     },
     rightSection: {
         overflow: 'hidden',
@@ -24,11 +26,6 @@ const styles = {
         width: "50%",            
         transition: "width 0.5s ease",
         position: "relative",
-    },
-    rightSectionExpanded: {
-        width: '100%',
-        overflowY: "hidden",           
-        transition: "width 0.5s ease",
     },
     chatWindow: {
         flex: 1,
@@ -39,15 +36,16 @@ const styles = {
         marginTop: '50px',
     },
     img: {
-        width: '30px',
-        margin: '0 10px'
+        width: '25px',
+        marginRight: '10px'
     },
     file: {
         display: 'flex',                
         alignItems: 'flex-end',       
         marginBottom: '10px',          
-        padding: '10px', 
-        border: '1px solid #d3d3d3',           
+        padding: '15px', 
+        paddingRight: '20px',
+        border: '1px solid #d7c6fa',           
         borderRadius: '10px',
         width: 'fit-content',
         marginLeft: 'auto',
@@ -60,36 +58,53 @@ const styles = {
         flexDirection: 'column',        
         alignItems: 'flex-end',       
         marginBottom: '10px',          
-        backgroundColor: '#e1f5fe',     
-        padding: '20px',            
+        backgroundColor: '#d7c6fa',     
+        padding: '15px',            
         borderRadius: '10px',
         width: 'fit-content',
         marginLeft: 'auto'
     },
+    serverContainer: {
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+    },
+    icon: {
+        width: '60px'
+    },
     server: {
         display: 'flex',
         flexDirection: 'column',        
-        justifyContent: 'flex-start',
         marginBottom: '10px',
         backgroundColor: '#f0f0f0',    
-        padding: '20px',
+        padding: '15px',
         borderRadius: '10px',
         width: 'fit-content',
         cursor: 'pointer',
+        fontWeight: 'bold',
+        margin: 0
     },
     expandButton: {
         position: "absolute",
         top: 10,
-        right: 50,
-        padding: "5px 10px",
-        cursor: "pointer",
+        right: 45,
+        padding: '5px 10px',
+        backgroundColor: '#d3d3d3',
+        color: 'black',
+        border: 'none',
+        borderRadius: '12px',
+        cursor: 'pointer'
     },
     closeButton: {
         position: "absolute",
         top: 10,
         right: 10,
-        padding: "5px 10px",
-        cursor: "pointer",
+        padding: '5px 10px',
+        color: 'black',
+        fontWeight: 'bold',
+        border: 'none',
+        borderRadius: '12px',
+        cursor: 'pointer'
     },
     resultContent: {
         padding: "20px",

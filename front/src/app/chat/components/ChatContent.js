@@ -33,10 +33,6 @@ export default function ChatContent({ file, message, result }) {
         setIsExpanded(false); 
     };
 
-    const toggleExpand = () => {
-        setIsExpanded(!isExpanded);
-    };
-
     return (
         <div style={styles.chatContainer}>
             {/* 왼쪽 채팅창 */}
@@ -49,7 +45,8 @@ export default function ChatContent({ file, message, result }) {
                     <div style={styles.user}>
                         <span>{message}</span>
                     </div>
-                    <div>
+                    <div style={styles.serverContainer}>
+                        <img src="/img/icon.png" alt="logo" style={styles.icon}/>
                         <span onClick={handleResultClick} style={styles.server}>
                             분석 결과를 보려면 여기를 클릭하세요.
                         </span>  
@@ -60,9 +57,6 @@ export default function ChatContent({ file, message, result }) {
             {/* 오른쪽 분석 결과 창 */}
             {showResult && (
                 <div style={isExpanded ? styles.rightSectionExpanded : styles.rightSection}>
-                    <button onClick={toggleExpand} style={styles.expandButton}>
-                        {isExpanded ? "축소" : "확장"}
-                    </button>
                     <button onClick={handleCloseDashBoard} style={styles.closeButton}>X</button>
                     <div style={styles.resultContent}>
                         {/* 중요도 그래프 */}

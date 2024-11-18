@@ -3,15 +3,17 @@ package com.ssafy.wada.presentation.response;
 import java.util.Map;
 
 public record ModelDispatchResponse(
-    Map<String, Object> resultSummary,
-    Map<String, Object> resultAll,
-    Map<String, Object> resultLlmDescription  // String -> Map<String, Object> 로 변경
+    int requestId,
+    Map<String, Object> SelectedModelFromUser,
+    Map<String, Object> ResultFromModel ,
+    Map<String, Object> ResultDescriptionFromLLM
 ) {
     public static ModelDispatchResponse of(
-        Map<String, Object> resultSummary,
-        Map<String, Object> resultAll,
-        Map<String, Object> resultLlmDescription
+        int requestId,
+        Map<String, Object> SelectedModelFromUser,
+        Map<String, Object> ResultFromModel,
+        Map<String, Object> ResultDescriptionFromLLM
     ) {
-        return new ModelDispatchResponse(resultSummary, resultAll, resultLlmDescription);
+        return new ModelDispatchResponse(requestId,SelectedModelFromUser, ResultFromModel,ResultDescriptionFromLLM);
     }
 }
