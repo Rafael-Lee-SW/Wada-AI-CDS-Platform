@@ -27,26 +27,17 @@ public class CustomActuator {
 		for (var model : models) {
 			String modelName = model.getModelName();
 
-			removeExistingGauge("custom_model_selection", "model", modelName);
-			removeExistingGauge("custom_model_recommendation", "model", modelName);
-
-			Gauge.builder("custom_model_selection", model, MachineLearningModel::getSelected)
+			Gauge.builder("custom_model_selection", model::getSelected)
 				.description("Number of selected items for each model")
 				.tag("model", modelName)
+				.strongReference(true)
 				.register(meterRegistry);
 
-			Gauge.builder("custom_model_recommendation", model, MachineLearningModel::getRecommended)
+			Gauge.builder("custom_model_recommendation", model::getRecommended)
 				.description("Number of recommended items for each model")
 				.tag("model", modelName)
+				.strongReference(true)
 				.register(meterRegistry);
 		}
-	}
-
-	private void removeExistingGauge(String metricName, String tagKey, String tagValue) {
-		// 기존 등록된 메트릭을 삭제
-		meterRegistry.get(metricName)
-			.tags(tagKey, tagValue)
-			.meters()
-			.forEach(meterRegistry::remove);
 	}
 }
