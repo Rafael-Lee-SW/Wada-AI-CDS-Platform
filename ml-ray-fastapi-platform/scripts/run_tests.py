@@ -8,7 +8,7 @@ import os
 import time
 import json
 
-test_config_now = 'test_config_z3.yaml'
+test_config_now = 'test_config_z6.yaml'
 
 def setup_logging(base_log_dir, trial_num):
     """
