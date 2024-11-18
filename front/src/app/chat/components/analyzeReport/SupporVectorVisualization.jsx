@@ -24,51 +24,74 @@ import {
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
-import useVisualizationStyles from "/styles/analyzingSvmStyle.js"
+
+// Custom Styles (Assuming you have a similar styles file)
+import useSVMStyles from "/styles/analyzingSvmStyle.js";
 
 function SVMVisualization({ result, explanation }) {
+  const classes = useSVMStyles();
 
-  const classes = useVisualizationStyles();
-  // Extract necessary data from the result prop
-  const modelType = result.model.toLowerCase();
-  const isClassification = modelType.includes("classifier");
-  const isRegression = modelType.includes("regressor");
+  // Destructure data from result and explanation
+  const { graph1, graph2, graph3, graph4, model } = result || {};
 
-  // Extract data for visualizations
-  const rocData = result.graph1 || {};
-  const decisionBoundaryData = result.graph2 || {};
-  const classificationReportData = result.graph3 || {};
-  const confusionMatrixData = result.graph4 || {};
+  // Destructure explanation with deeper nesting
+  const {
+    overview = {},
+    model_performance = {},
+    visualizations = [],
+    key_findings = [],
+    recommendations = {},
+    model_specific_details = {},
+    overview_section_title = "개요",
+    key_findings_section_title = "주요 발견 사항",
+    recommendations_section_title = "권장 사항",
+    data_table_title = "모든 데이터 포인트",
+    data_table_description = "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다.",
+  } = explanation || {};
 
-  // Extract performance metrics
-  const accuracy = result.accuracy;
-  const rocAucScore = result.roc_auc_score;
-  const mse = result.mse;
-  const r2Score = result.r2_score;
+  // Extract SupportVectorMachine_case from nested structure
+  const svmCase = model_specific_details?.details?.svm_case || {};
 
-  // Extract explanation data
-  const { overview = {} } = explanation;
-  const keyFindings = explanation.key_findings || [];
-  const recommendations = explanation.recommendations || {};
-  const visualizationsInfo = explanation.visualizations || [];
-  const classificationReportExplanation =
-    explanation.SupportVectorMachine_case?.Classification_Report || {};
+  const {
+    report_title: svmReportTitle = "Support Vector Machine Analysis Report",
+    Decision_Boundary_Graph = {},
+    Classification_Report = {},
+  } = svmCase;
+
+  // Extract axis titles and descriptions from nested Decision_Boundary_Graph
+  const xAxisTitle =
+    Decision_Boundary_Graph?.["x-axis_title"] || "주성분 1";
+  const xAxisDescription =
+    Decision_Boundary_Graph?.["x-axis_description"] ||
+    "PC1은 데이터의 첫 번째 주성분으로, 주요 요인을 대표합니다.";
+  const yAxisTitle =
+    Decision_Boundary_Graph?.["y-axis_title"] || "주성분 2";
+  const yAxisDescription =
+    Decision_Boundary_Graph?.["y-axis_description"] ||
+    "PC2는 데이터의 두 번째 주성분으로, 첫번째 주성분간의 추가적인 변동성을 설명합니다.";
 
   // --- Visualization Functions ---
 
   // Render ROC Curve
   const renderRocCurve = () => {
-    if (!rocData.fpr || !rocData.tpr) return null;
+    if (!graph1 || !graph1.fpr || !graph1.tpr) {
+      return (
+        <p className="text-red-500">
+          ROC Curve를 렌더링할 수 없습니다. 데이터가 누락되었습니다.
+        </p>
+      );
+    }
 
     return (
       <Plot
         data={[
           {
-            x: rocData.fpr,
-            y: rocData.tpr,
+            x: graph1.fpr,
+            y: graph1.tpr,
             type: "scatter",
             mode: "lines",
             name: "ROC Curve",
+            line: { color: "blue" },
           },
           {
             x: [0, 1],
@@ -80,7 +103,7 @@ function SVMVisualization({ result, explanation }) {
           },
         ]}
         layout={{
-          title: visualizationsInfo[0]?.title || "ROC Curve",
+          title: visualizations?.[0]?.title || "ROC Curve",
           xaxis: { title: "False Positive Rate" },
           yaxis: { title: "True Positive Rate" },
           height: 500,
@@ -101,13 +124,13 @@ function SVMVisualization({ result, explanation }) {
       !decisionBoundaryData.yy ||
       !decisionBoundaryData.Z
     )
-      return null;
+      return (
+        <p className="text-red-500">
+          결정 경계 시각화를 렌더링할 수 없습니다. 데이터가 누락되었습니다.
+        </p>
+      );
 
-    const X_vis = decisionBoundaryData.X_vis;
-    const y_vis = decisionBoundaryData.y_vis;
-    const xx = decisionBoundaryData.xx;
-    const yy = decisionBoundaryData.yy;
-    const Z = decisionBoundaryData.Z;
+    const { X_vis, y_vis, xx, yy, Z } = decisionBoundaryData;
 
     // Find decision boundary points (z ~ 0)
     const decisionBoundaryPoints = X_vis.filter((_, index) => {
@@ -183,23 +206,19 @@ function SVMVisualization({ result, explanation }) {
           layout={{
             title: "결정 경계 시각화",
             xaxis: {
-              title: explanation.SupportVectorMachine_case?.Decision_Boundary_Graph[
-                "x_axis_title"
-              ] || "주성분 1",
+              title: xAxisTitle,
             },
             yaxis: {
-              title: explanation.SupportVectorMachine_case?.Decision_Boundary_Graph[
-                "y_axis_title"
-              ] || "주성분 2",
+              title: yAxisTitle,
             },
             height: 600,
             margin: { t: 50, l: 50, r: 50, b: 100 },
           }}
           config={{ responsive: true }}
         />
-        <div>
-          <h3>해석:</h3>
-          <ul>
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">해석:</h3>
+          <ul className="list-disc pl-5 space-y-2">
             <li>
               <strong>결정 경계 (z=0):</strong> 클래스 1과 클래스 2의 분류 경계. 흰색 영역으로 나타남.
             </li>
@@ -224,35 +243,35 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-
   // Render Confusion Matrix
   const renderConfusionMatrix = () => {
-    if (
-      !confusionMatrixData.confusion_matrix ||
-      !confusionMatrixData.labels
-    )
-      return null;
+    if (!confusionMatrixData.confusion_matrix || !confusionMatrixData.labels) {
+      return (
+        <p className="text-red-500">
+          혼동 행렬을 렌더링할 수 없습니다. 데이터가 누락되었습니다.
+        </p>
+      );
+    }
 
-    const matrix = confusionMatrixData.confusion_matrix;
-    const labels = confusionMatrixData.labels;
+    const { confusion_matrix, labels } = confusionMatrixData;
 
     return (
       <Plot
         data={[
           {
-            z: matrix,
+            z: confusion_matrix,
             x: labels,
             y: labels,
             type: "heatmap",
             colorscale: "Blues",
             showscale: false,
-            text: matrix.map((row) => row.map((value) => value.toString())),
+            text: confusion_matrix.map((row) => row.map((value) => value.toString())),
             hoverinfo: "text",
             texttemplate: "%{text}",
           },
         ]}
         layout={{
-          title: visualizationsInfo[2]?.title || "Confusion Matrix",
+          title: visualizationsInfo[2]?.title || "혼동 행렬",
           xaxis: { title: "Predicted Label" },
           yaxis: { title: "True Label" },
           height: 500,
@@ -265,9 +284,9 @@ function SVMVisualization({ result, explanation }) {
 
   // Render Classification Report
   const renderClassificationReport = () => {
-    if (!classificationReportData.classification_report) return null;
+    if (!Classification_Report.classification_report) return null;
 
-    const report = classificationReportData.classification_report;
+    const report = Classification_Report.classification_report;
     const classes = Object.keys(report).filter(
       (key) => !["accuracy", "macro avg", "weighted avg"].includes(key)
     );
@@ -331,55 +350,37 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-  // Render Regression Plot
-  const renderRegressionPlot = () => {
-    if (!result.graph1) return null;
+  // Render Data Table for All Spots
+  const renderDataTable = () => {
+    if (!result.graph4 || !result.graph4.all_data) return null;
 
-    const X_vis = result.graph1.X_vis;
-    const y_vis = result.graph1.y_vis;
-    const y_pred = result.graph1.y_pred;
+    const dataTable = result.graph4.all_data.map((row, index) => ({
+      id: index,
+      Identifier: row.identifier,
+      Actual: row.actual,
+      Predicted: row.predicted,
+    }));
 
     return (
-      <Plot
-        data={[
-          {
-            x: X_vis,
-            y: y_vis,
-            mode: "markers",
-            type: "scatter",
-            name: "Actual",
-          },
-          {
-            x: X_vis,
-            y: y_pred,
-            mode: "markers",
-            type: "scatter",
-            name: "Predicted",
-          },
-        ]}
-        layout={{
-          title: "Actual vs Predicted",
-          xaxis: { title: "Feature 1" },
-          yaxis: { title: "Target" },
-          height: 500,
-          margin: { t: 50, l: 50, r: 50, b: 100 },
-          legend: { orientation: "h", x: 0, y: -0.2 },
-        }}
-        config={{ responsive: true }}
-      />
-    );
-  };
-
-  // Render Regression Metrics
-  const renderRegressionMetrics = () => {
-    return (
-      <div className="space-y-2">
-        <p>
-          Mean Squared Error (MSE): {mse ? mse.toFixed(2) : "N/A"}
-        </p>
-        <p>
-          R² Score: {r2Score ? r2Score.toFixed(2) : "N/A"}
-        </p>
+      <div className="overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Identifier</TableHead>
+              <TableHead>Actual Value</TableHead>
+              <TableHead>Predicted Value</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataTable.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.Identifier}</TableCell>
+                <TableCell>{row.Actual}</TableCell>
+                <TableCell>{row.Predicted}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     );
   };
@@ -389,17 +390,40 @@ function SVMVisualization({ result, explanation }) {
     <div className="container mx-auto p-4 space-y-8">
       {/* Report Title */}
       <h1 className="text-4xl font-bold text-center mb-8">
-        {explanation.SupportVectorMachine_case?.report_title ||
-          "Analysis Report"}
+        {svmReportTitle || "Support Vector Machine Analysis Report"}
       </h1>
 
       {/* Overview */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">분석 요약</h2>
-        <p>{overview?.analysis_purpose}</p>
-        <p>{overview?.data_description}</p>
-        <p>{overview?.models_used?.model_description}</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{overview_section_title || "개요"}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Typography variant="h6" style={{ paddingBottom: "10px" }}>
+            ◾ 분석 목적
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {overview?.analysis_purpose ||
+              "분석 목적이 제공되지 않았습니다."}
+          </Typography>
+
+          <Typography variant="h6" style={{ paddingBottom: "10px" }}>
+            ◾ 데이터 설명
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {overview?.data_description ||
+              "데이터 설명이 제공되지 않았습니다."}
+          </Typography>
+
+          <Typography variant="h6" style={{ paddingBottom: "10px" }}>
+            ◾ 사용된 모델
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {overview?.models_used?.model_description ||
+              "모델 설명이 제공되지 않았습니다."}
+          </Typography>
+        </CardContent>
+      </Card>
 
       {/* Tabs */}
       <Tabs defaultValue="roc_curve" className="w-full">
@@ -410,19 +434,19 @@ function SVMVisualization({ result, explanation }) {
                 value="roc_curve"
                 className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                {visualizationsInfo[0]?.title || "ROC Curve"}
+                {visualizations?.[0]?.title || "ROC Curve"}
               </TabsTrigger>
               <TabsTrigger
                 value="decision_boundary"
                 className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                {visualizationsInfo[1]?.title || "Decision Boundary"}
+                {visualizations?.[1]?.title || "Decision Boundary"}
               </TabsTrigger>
               <TabsTrigger
                 value="confusion_matrix"
                 className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                {visualizationsInfo[2]?.title || "Confusion Matrix"}
+                {visualizations?.[2]?.title || "Confusion Matrix"}
               </TabsTrigger>
             </>
           )}
@@ -443,6 +467,7 @@ function SVMVisualization({ result, explanation }) {
             </>
           )}
         </TabsList>
+
         {/* Classification Tabs */}
         {isClassification && (
           <>
@@ -451,14 +476,16 @@ function SVMVisualization({ result, explanation }) {
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizationsInfo[0]?.title || "ROC Curve"}
+                    {visualizations?.[0]?.title || "ROC Curve"}
                   </CardTitle>
                   <CardDescription>
-                    {visualizationsInfo[0]?.description ||
+                    {visualizations?.[0]?.description ||
                       "Receiver Operating Characteristic Curve"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className={classes.plotContainer}>{renderRocCurve()}</CardContent>
+                <CardContent className={classes.plotContainer}>
+                  {renderRocCurve()}
+                </CardContent>
               </Card>
             </TabsContent>
 
@@ -467,14 +494,16 @@ function SVMVisualization({ result, explanation }) {
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizationsInfo[1]?.title || "Decision Boundary"}
+                    {visualizations?.[1]?.title || "Decision Boundary"}
                   </CardTitle>
                   <CardDescription>
-                    {visualizationsInfo[1]?.description ||
+                    {visualizations?.[1]?.description ||
                       "Visualization of decision boundaries"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className={classes.plotContainer}>{renderDecisionBoundary()}</CardContent>
+                <CardContent className={classes.plotContainer}>
+                  {renderDecisionBoundary()}
+                </CardContent>
               </Card>
             </TabsContent>
 
@@ -483,14 +512,16 @@ function SVMVisualization({ result, explanation }) {
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizationsInfo[2]?.title || "Confusion Matrix"}
+                    {visualizations?.[2]?.title || "Confusion Matrix"}
                   </CardTitle>
                   <CardDescription>
-                    {visualizationsInfo[2]?.description ||
+                    {visualizations?.[2]?.description ||
                       "Confusion matrix of classification results"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className={classes.plotContainer}>{renderConfusionMatrix()}</CardContent>
+                <CardContent className={classes.plotContainer}>
+                  {renderConfusionMatrix()}
+                </CardContent>
               </Card>
             </TabsContent>
           </>
@@ -537,11 +568,11 @@ function SVMVisualization({ result, explanation }) {
         {/* Key Findings */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ color: '#8770b4'}}>주목할만한 부분</CardTitle>
+            <CardTitle style={{ color: "#8770b4" }}>주목할만한 부분</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
-              {keyFindings.map((finding, index) => (
+              {key_findings.map((finding, index) => (
                 <li key={index}>
                   <strong>{finding.finding}</strong>: {finding.impact}
                 </li>
@@ -576,9 +607,11 @@ function SVMVisualization({ result, explanation }) {
                     추가 분석
                   </h3>
                   <ul className="list-disc pl-5 space-y-2">
-                    {recommendations.further_analysis.map((action, index) => (
-                      <li key={index}>{action}</li>
-                    ))}
+                    {recommendations.further_analysis.map(
+                      (action, index) => (
+                        <li key={index}>{action}</li>
+                      )
+                    )}
                   </ul>
                 </>
               )}
@@ -589,7 +622,7 @@ function SVMVisualization({ result, explanation }) {
   );
 }
 
-// Define prop types for validation
+// Define PropTypes for type checking
 SVMVisualization.propTypes = {
   result: PropTypes.shape({
     model: PropTypes.string.isRequired,
@@ -597,29 +630,74 @@ SVMVisualization.propTypes = {
     roc_auc_score: PropTypes.number,
     mse: PropTypes.number,
     r2_score: PropTypes.number,
-    graph1: PropTypes.object,
-    graph2: PropTypes.object,
-    graph3: PropTypes.object,
-    graph4: PropTypes.object,
+    graph1: PropTypes.shape({
+      fpr: PropTypes.arrayOf(PropTypes.number).isRequired,
+      tpr: PropTypes.arrayOf(PropTypes.number).isRequired,
+    }),
+    graph2: PropTypes.shape({
+      X_vis: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+      y_vis: PropTypes.arrayOf(PropTypes.number).isRequired,
+      xx: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+      yy: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+      Z: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+    }),
+    graph3: PropTypes.shape({
+      classification_report: PropTypes.object.isRequired,
+    }),
+    graph4: PropTypes.shape({
+      confusion_matrix: PropTypes.arrayOf(
+        PropTypes.arrayOf(PropTypes.number)
+      ).isRequired,
+      labels: PropTypes.arrayOf(PropTypes.string).isRequired,
+      all_data: PropTypes.arrayOf(
+        PropTypes.shape({
+          identifier: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
+          actual: PropTypes.number.isRequired,
+          predicted: PropTypes.number.isRequired,
+        })
+      ),
+    }),
   }).isRequired,
   explanation: PropTypes.shape({
     overview: PropTypes.shape({
-      analysis_purpose: PropTypes.string,
-      data_description: PropTypes.string,
+      analysis_purpose: PropTypes.string.isRequired,
+      data_description: PropTypes.string.isRequired,
       models_used: PropTypes.shape({
-        model_description: PropTypes.string,
+        model_name: PropTypes.string,
+        model_description: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+    model_performance: PropTypes.shape({
+      metrics: PropTypes.arrayOf(
+        PropTypes.shape({
+          metric_name: PropTypes.string.isRequired,
+          metric_value: PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.string,
+          ]).isRequired,
+          interpretation: PropTypes.string.isRequired,
+        })
+      ).isRequired,
+      prediction_analysis: PropTypes.shape({
+        overall_accuracy: PropTypes.string,
+        notable_patterns: PropTypes.arrayOf(PropTypes.string),
       }),
-    }),
-    key_findings: PropTypes.arrayOf(
-      PropTypes.shape({
-        finding: PropTypes.string,
-        impact: PropTypes.string,
-        recommendation: PropTypes.string,
-      })
-    ),
-    recommendations: PropTypes.shape({
-      immediate_actions: PropTypes.arrayOf(PropTypes.string),
-      further_analysis: PropTypes.arrayOf(PropTypes.string),
+    }).isRequired,
+    feature_importance: PropTypes.shape({
+      key_features: PropTypes.arrayOf(
+        PropTypes.shape({
+          feature_name: PropTypes.string.isRequired,
+          importance_score: PropTypes.number, // can be null
+          business_impact: PropTypes.string.isRequired,
+        })
+      ),
+      relationships: PropTypes.arrayOf(
+        PropTypes.shape({
+          description: PropTypes.string.isRequired,
+          business_insight: PropTypes.string.isRequired,
+        })
+      ),
     }),
     visualizations: PropTypes.arrayOf(
       PropTypes.shape({
@@ -627,17 +705,37 @@ SVMVisualization.propTypes = {
         description: PropTypes.string,
         insights: PropTypes.string,
       })
+    ).isRequired,
+    key_findings: PropTypes.arrayOf(
+      PropTypes.shape({
+        finding: PropTypes.string.isRequired,
+        impact: PropTypes.string.isRequired,
+        recommendation: PropTypes.string.isRequired,
+      })
     ),
-    SupportVectorMachine_case: PropTypes.shape({
-      report_title: PropTypes.string,
-      Decision_Boundary_Graph: PropTypes.shape({
-        "x-axis_title": PropTypes.string,
-        "x-axis_description": PropTypes.string,
-        "y-axis_title": PropTypes.string,
-        "y-axis_description": PropTypes.string,
-      }),
-      Classification_Report: PropTypes.object,
+    recommendations: PropTypes.shape({
+      immediate_actions: PropTypes.arrayOf(PropTypes.string),
+      further_analysis: PropTypes.arrayOf(PropTypes.string),
     }),
+    model_specific_details: PropTypes.shape({
+      details: PropTypes.shape({
+        svm_case: PropTypes.shape({
+          report_title: PropTypes.string,
+          Decision_Boundary_Graph: PropTypes.shape({
+            "x-axis_title": PropTypes.string,
+            "x-axis_description": PropTypes.string,
+            "y-axis_title": PropTypes.string,
+            "y-axis_description": PropTypes.string,
+          }),
+          Classification_Report: PropTypes.object.isRequired,
+        }),
+      }),
+    }),
+    overview_section_title: PropTypes.string,
+    key_findings_section_title: PropTypes.string,
+    recommendations_section_title: PropTypes.string,
+    data_table_title: PropTypes.string,
+    data_table_description: PropTypes.string, // Added for data table description
   }).isRequired,
 };
 

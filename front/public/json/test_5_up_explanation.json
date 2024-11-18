@@ -1,0 +1,93 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "이 분석의 목적은 직원의 참여도와 만족도, 인종, 부서 정보를 기반으로 직원들을 다양한 그룹으로 분류하여, 각 그룹의 특징을 이해하고 이를 통해 개선 가능한 인사이트를 도출하는 것입니다.",
+      "data_description": "데이터는 'EngagementSurvey' (직원 참여도), 'EmpSatisfaction' (직원 만족도), 'RaceDesc' (인종 - Asian, Black or African American, Hispanic, Two or more races, White), 'Department' (부서 - Executive Office, IT/IS, Production, Sales, Software Engineering) 등의 정보를 포함하고 있습니다.",
+      "models_used": {
+        "model_name": "KmeansClusteringSegmentation",
+        "model_description": "K-means 클러스터링 모델은 데이터를 몇 개의 그룹으로 나누는 방법을 제공합니다. 각 그룹은 서로 유사한 성향을 가진 데이터들로 구성됩니다. 마치 여러 가지 색의 구슬을 같은 색끼리 그룹으로 나누는 것과 비슷합니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "클러스터 수",
+          "metric_value": 3,
+          "interpretation": "3개의 서로 다른 그룹으로 분류되었음을 의미합니다. 각 그룹은 비슷한 특성을 가진 데이터를 묶어줍니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "이 분석은 명시적 정확도를 측정하는 것이 아닌, 데이터를 어떻게 효과적으로 그룹화하는지에 집중합니다.",
+        "notable_patterns": [
+          "한 그룹은 IT/IS나 Software Engineering 부서의 비율이 높고, 만족도가 대체로 높았습니다.",
+          "또 다른 그룹은 African American 인종의 비율이 높았고, 다른 그룹에 비해 낮은 만족도를 보였습니다."
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "EmpSatisfaction",
+          "importance_score": null,
+          "business_impact": "직원의 만족도는 업무 성과와 직결될 수 있어 조직의 생산성을 높이기 위한 주요 개선 지표로 사용될 수 있습니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "부서와 만족도 간에 강한 연관성이 보였습니다.",
+          "business_insight": "특정 부서에 대한 목표적인 개선 시도를 통해 전반적인 만족도를 높일 수 있습니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "클러스터 분포",
+        "type": "막대 차트",
+        "description": "각 클러스터에 속하는 직원 수를 보여줍니다.",
+        "insights": "가장 큰 클러스터는 첫 번째 그룹으로, 대부분의 직원이 비슷한 특성을 공유하고 있음을 시사합니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "세 가지 주요 그룹으로 직원이 구분되어 있으며, 각각의 그룹은 다른 업무 환경과 만족도를 보여주었습니다.",
+        "impact": "이런 식별은 특정 그룹의 문제 해결 또는 장점을 강화하는 기회를 제공합니다.",
+        "recommendation": "각 그룹의 세부적인 필요에 맞춘 정책 개발이 필요합니다."
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "IT/IS와 Software Engineering 부서의 높은 만족도를 유지할 수 있는 방안을 구체화합니다."
+      ],
+      "further_analysis": [
+        "RaceDesc 내 다양한 인종 별로 더 구체적인 분석이 필요합니다."
+      ]
+    },
+    "model_specific_details": {
+      "model_type": "K-Means 클러스터링",
+      "details": {
+        "kmeans_clustering_case": {
+          "report_title": "직원 세분화 보고서",
+          "x_axis_title": "PC1 축",
+          "x_axis_description": "데이터의 첫 번째 주 성분에 기반한 축",
+          "y_axis_title": "PC2 축",
+          "y_axis_description": "데이터의 두 번째 주 성분에 기반한 축",
+          "cluster_title": "직원 클러스터",
+          "cluster_description": "각 클러스터는 유사한 특성을 가지는 직원들로 구성되어 있으며 이는 개별 특징적 성향을 나타냅니다.",
+          "cluster": {
+            "cluster_title": [
+              "클러스터 1",
+              "클러스터 2",
+              "클러스터 3"
+            ],
+            "cluster_description": [
+              "클러스터 1: 주로 생산 부서 직원들이며, 평균 참여도와 만족도를 가지고 있습니다.",
+              "클러스터 2: IT/IS와 Software Engineering 부서 직원들이 많으며, 높은 만족도를 보입니다.",
+              "클러스터 3: 주로 Executive Office 부서와 African American 비율이 높고, 낮은 만족도를 보입니다."
+            ]
+          }
+        }
+      }
+    }
+  }
+}

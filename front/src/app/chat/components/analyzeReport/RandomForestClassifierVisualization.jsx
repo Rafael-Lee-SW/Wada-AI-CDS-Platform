@@ -50,12 +50,28 @@ export default function RandomForestClassifierVisualization({
     key_findings = [],
     recommendations = {},
     visualizations = [],
+    model_specific_details = {},
     report_title = "랜덤 포레스트 분류 모델 분석 보고서",
-    "x-axis_title": xAxisTitle = "",
-    "x-axis_description": xAxisDescription = "",
-    "y-axis_title": yAxisTitle = "",
-    "y-axis_description": yAxisDescription = "",
+    "x-axis_title": defaultXAxisTitle = "",
+    "x-axis_description": defaultXAxisDescription = "",
+    "y-axis_title": defaultYAxisTitle = "",
+    "y-axis_description": defaultYAxisDescription = "",
+    overview_section_title = "개요",
+    key_findings_section_title = "주요 발견 사항",
+    recommendations_section_title = "권장 사항",
   } = explanation;
+
+  // Extract RandomForest_case details
+  const rfCase =
+    model_specific_details?.details?.random_forest_case || {};
+
+  const {
+    report_title: rfReportTitle = report_title,
+    x_axis_title: rfXAxisTitle = defaultXAxisTitle,
+    x_axis_description: rfXAxisDescription = defaultXAxisDescription,
+    y_axis_title: rfYAxisTitle = defaultYAxisTitle,
+    y_axis_description: rfYAxisDescription = defaultYAxisDescription,
+  } = rfCase;
 
   // 특성 중요도 막대 차트를 렌더링하는 함수
   const renderFeatureImportances = () => {
@@ -99,11 +115,11 @@ export default function RandomForestClassifierVisualization({
         layout={{
           title: visualizations[0]?.title || "특성 중요도",
           xaxis: {
-            title: "특성",
+            title: rfXAxisTitle || "특성",
             automargin: true,
           },
           yaxis: {
-            title: "중요도",
+            title: rfYAxisTitle || "중요도",
             tickformat: ".0%",
             automargin: true,
           },
@@ -206,11 +222,11 @@ export default function RandomForestClassifierVisualization({
         layout={{
           title: "혼동 행렬",
           xaxis: {
-            title: "예측 값",
+            title: rfXAxisTitle || "예측 값",
             automargin: true,
           },
           yaxis: {
-            title: "실제 값",
+            title: rfYAxisTitle || "실제 값",
             automargin: true,
           },
           height: 600,
@@ -292,11 +308,11 @@ export default function RandomForestClassifierVisualization({
           layout={{
             title: visualizations[1]?.title || "분류 확률",
             xaxis: {
-              title: "멤버 식별자",
+              title: rfXAxisTitle || "멤버 식별자",
               automargin: true,
             },
             yaxis: {
-              title: "클래스 1 확률",
+              title: rfYAxisTitle || "클래스 1 확률",
               automargin: true,
               range: [0, 1],
             },
@@ -387,30 +403,36 @@ export default function RandomForestClassifierVisualization({
     <div className="container mx-auto p-4 space-y-8">
       {/* 보고서 제목 */}
       <h1 className="text-4xl font-bold text-center mb-8">
-        {report_title || "분류 모델 분석 보고서"}
+        {rfReportTitle}
       </h1>
 
       {/* 개요 섹션 */}
       <Card>
         <CardHeader>
           <CardTitle>
-            {explanation.overview_section_title || "개요"}
+            {overview_section_title || "개요"}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Typography variant="h6" style={{ padding: '0 0 10px' }}>◾ 분석 목적</Typography>
+          <Typography variant="h6" style={{ padding: '0 0 10px' }}>
+            ◾ 분석 목적
+          </Typography>
           <Typography variant="body1" gutterBottom>
             {overview.analysis_purpose ||
               "분석 목적이 제공되지 않았습니다."}
           </Typography>
 
-          <Typography variant="h6" style={{ padding: '10px 0' }}>◾ 데이터 설명</Typography>
+          <Typography variant="h6" style={{ padding: '10px 0' }}>
+            ◾ 데이터 설명
+          </Typography>
           <Typography variant="body1" gutterBottom>
             {overview.data_description ||
               "데이터 설명이 제공되지 않았습니다."}
           </Typography>
 
-          <Typography variant="h6" style={{ padding: '10px 0' }}>◾ 사용된 모델</Typography>
+          <Typography variant="h6" style={{ padding: '10px 0' }}>
+            ◾ 사용된 모델
+          </Typography>
           <Typography variant="body1" gutterBottom>
             {overview.models_used?.model_description ||
               "모델 설명이 제공되지 않았습니다."}
@@ -534,8 +556,8 @@ export default function RandomForestClassifierVisualization({
         {/* 주요 발견 사항 */}
         <Card>
           <CardHeader>
-            <CardTitle>
-              {explanation.key_findings_section_title || "주요 발견 사항"}
+            <CardTitle style={{ color: '#8770b4' }}>
+              {key_findings_section_title || "주요 발견 사항"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -553,7 +575,7 @@ export default function RandomForestClassifierVisualization({
         <Card>
           <CardHeader>
             <CardTitle>
-              {explanation.recommendations_section_title || "권장 사항"}
+              {recommendations_section_title || "권장 사항"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -577,7 +599,7 @@ export default function RandomForestClassifierVisualization({
             {recommendations.further_analysis &&
               recommendations.further_analysis.length > 0 && (
                 <>
-                  <h3 className="text-lg font-semibold mb-2" style={{ paddingTop: '10px'}}>
+                  <h3 className="text-lg font-semibold mb-2" style={{ paddingTop: '10px' }}>
                     추가 분석
                   </h3>
                   <ul className="list-disc pl-5 space-y-2">
@@ -594,6 +616,66 @@ export default function RandomForestClassifierVisualization({
           </CardContent>
         </Card>
       </div>
+
+      {/* 모델 성능 섹션 */}
+      {result && explanation && explanation.model_performance && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {explanation.model_performance_section_title ||
+                "모델 성능"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* 중요 지표 렌더링 */}
+            <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}>
+              ◾ 중요 지표
+            </Typography>
+            {explanation.model_performance.metrics.map((metric, index) => (
+              <div key={index} className="mb-2">
+                <Typography variant="body1">
+                  <strong>{metric.metric_name}:</strong> {metric.metric_value}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {metric.interpretation}
+                </Typography>
+              </div>
+            ))}
+
+            {/* 예측 모델 분석 렌더링 */}
+            {explanation.model_performance.prediction_analysis && (
+              <>
+                <Typography
+                  variant="h6"
+                  className="mt-4"
+                  style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}
+                >
+                  ◾ 예측 모델 분석
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>정확도:</strong>{" "}
+                  {
+                    explanation.model_performance.prediction_analysis
+                      .overall_accuracy
+                  }
+                </Typography>
+                <Typography variant="body1">
+                  <strong>주목할만한 부분:</strong>
+                </Typography>
+                <ul className="list-disc pl-5">
+                  {explanation.model_performance.prediction_analysis.notable_patterns.map(
+                    (pattern, idx) => (
+                      <li key={idx}>
+                        <Typography variant="body2">{pattern}</Typography>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -657,10 +739,25 @@ RandomForestClassifierVisualization.propTypes = {
         insights: PropTypes.string,
       })
     ).isRequired,
+    model_specific_details: PropTypes.shape({
+      details: PropTypes.shape({
+        random_forest_case: PropTypes.shape({
+          report_title: PropTypes.string,
+          x_axis_title: PropTypes.string,
+          x_axis_description: PropTypes.string,
+          y_axis_title: PropTypes.string,
+          y_axis_description: PropTypes.string,
+        }),
+      }),
+    }),
     report_title: PropTypes.string,
     "x-axis_title": PropTypes.string,
     "x-axis_description": PropTypes.string,
     "y-axis_title": PropTypes.string,
     "y-axis_description": PropTypes.string,
+    overview_section_title: PropTypes.string,
+    model_performance_section_title: PropTypes.string,
+    key_findings_section_title: PropTypes.string,
+    recommendations_section_title: PropTypes.string,
   }).isRequired,
 };

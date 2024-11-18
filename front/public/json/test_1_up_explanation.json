@@ -1,0 +1,97 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "이번 분석의 목적은 직원들의 월급(Salary)에 영향을 미칠 수 있는 요소들을 이해하고, 이를 기반으로 월급을 예측하는 것입니다.",
+      "data_description": "분석에 사용된 데이터는 직원들의 성과 평가 점수(PerformanceScore), 만족도 조사 점수(EngagementSurvey), 부서 ID(DeptID), 직원 만족도(EmpSatisfaction)를 포함하고 있습니다. 이 외에도 각각의 직원들을 구별하는 ID가 포함되어 있습니다.",
+      "models_used": {
+        "model_name": "RandomForestRegression",
+        "model_description": "RandomForestRegression은 여러 개의 결정 트리(decision tree)를 결합하여 예측 성능을 향상시키는 모델입니다. 각 트리에서 예측한 결과를 종합하여 최종 예측값을 도출합니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "R²",
+          "metric_value": "0.1449",
+          "interpretation": "R² 값은 예측 모델이 실제 데이터의 변동성을 얼마나 설명하는지를 나타냅니다. 0.1449라는 값은 모델이 전체 월급 변동성의 약 14.49%만 설명할 수 있음을 의미합니다."
+        },
+        {
+          "metric_name": "MSE",
+          "metric_value": "692100512.1",
+          "interpretation": "MSE(Mean Squared Error)는 예측 값이 실제 값과 어느 정도 차이가 나는지를 나타냅니다. 값이 클수록 예측 오차가 크다는 뜻입니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "모델의 전반적인 예측 정확도는 상대적으로 낮습니다. 이는 모델이 아직 데이터를 충분히 잘 설명하지 못한다는 것을 시사합니다.",
+        "notable_patterns": [
+          "일부 고소득 직원의 경우 모델이 예측을 과대 또는 과소평가하는 경향이 있습니다.",
+          "부서와 관련된 변수가 월급 예측에 상당한 영향을 미치는 것으로 보입니다."
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "EngagementSurvey",
+          "importance_score": "0.3733",
+          "business_impact": "직원 참여도 점수는 월급에 큰 영향을 미칠 수 있으며, 이는 직원 만족도를 높이는 것이 보상을 증가시킬 수 있음을 시사합니다."
+        },
+        {
+          "feature_name": "DeptID",
+          "importance_score": "0.4494",
+          "business_impact": "부서 간의 차이는 월급에 상당한 영향을 미칩니다. 따라서 부서별로 보상 정책을 달리하는 것이 필요할 수 있습니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "직원 만족도나 참여도와 같은 요소들은 성과 점수와 더불어 부서에 따라 다르게 월급에 영향을 미칩니다.",
+          "business_insight": "이를 통해 부서별로 다른 동기 부여 전략이 필요할 수 있으며, 전체적인 직원 만족도를 향상시켜 성과를 높이는 방안을 고민할 수 있습니다."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "특성 중요도",
+        "type": "바 차트",
+        "description": "각 특성이 월급 예측에 얼마나 중요한지를 보여줍니다.",
+        "insights": "부서 ID와 참여도 점수가 월급 예측에서 가장 중요한 요소임을 알 수 있습니다."
+      },
+      {
+        "title": "실제 vs 예측 월급",
+        "type": "산점도",
+        "description": "실제 월급과 모델이 예측한 월급을 비교하여 보여줍니다.",
+        "insights": "어떤 직원들의 경우 예측이 실제와 크게 다를 수 있음을 알 수 있습니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "부서 ID와 직원 참여도가 월급 예측에 중요한 영향을 미친다.",
+        "impact": "각 부서별로 체계적인 참여도 제고 방안이 마련될 필요가 있습니다.",
+        "recommendation": "부서별로 공정한 평가 기준을 마련하고 직원 참여도 향상 프로그램을 실시하세요."
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "부서별 참여도 향상 프로그램 도입",
+        "직원 만족도 조사 강화"
+      ],
+      "further_analysis": [
+        "성과 점수와 월급 간의 관계를 더 깊이 탐구",
+        "모델 성능을 높이기 위한 추가 특성 발굴"
+      ]
+    },
+    "model_specific_details": {
+      "model_type": "랜덤 포레스트 회귀 (RandomForestRegression)",
+      "details": {
+        "random_forest_case": {
+          "report_title": "랜덤 포레스트 회귀 분석 결과",
+          "x_axis_title": "실제 월급",
+          "x_axis_description": "실제 측정된 월급 값",
+          "y_axis_title": "예측 월급",
+          "y_axis_description": "모델이 예측한 월급 값"
+        }
+      }
+    }
+  }
+}

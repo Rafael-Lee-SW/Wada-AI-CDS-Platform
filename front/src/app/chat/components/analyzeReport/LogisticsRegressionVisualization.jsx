@@ -58,20 +58,33 @@ export default function LogisticRegressionVisualization({
     visualizations,
     key_findings,
     recommendations,
-    LogisticRegression_Case,
+    model_specific_details = {},
+    overview_section_title = "개요",
+    key_findings_section_title = "주요 발견 사항",
+    recommendations_section_title = "권장 사항",
+    data_table_title = "모든 데이터 포인트",
+    data_table_description = "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다.",
   } = explanation || {};
 
-  // Extract report titles and descriptions
-  const reportTitle =
-    LogisticRegression_Case?.report_title || "AI 모델 분석 보고서";
-  const classesInfo = LogisticRegression_Case?.classes || {};
-  const boundaryLines = LogisticRegression_Case?.boundary_lines || {};
-  const xAxisTitle = explanation["x-axis_title"] || "PC1";
+  // Extract LogisticRegression_case details from nested structure
+  const logisticCase =
+    model_specific_details?.details?.logistic_regression_case || {};
+
+  const {
+    report_title: logisticReportTitle = "AI 모델 분석 보고서",
+    classes: logisticClasses = {},
+    boundary_lines: logisticBoundaryLines = {},
+  } = logisticCase;
+
+  // Extract axis titles and descriptions from nested LogisticRegression_case
+  const xAxisTitle = logisticCase?.x_axis_title || explanation["x-axis_title"] || "PC1";
   const xAxisDescription =
+    logisticCase?.x_axis_description ||
     explanation["x-axis_description"] ||
     "PC1은 데이터의 첫 번째 주성분으로, 주요 요인을 대표합니다.";
-  const yAxisTitle = explanation["y-axis_title"] || "PC2";
+  const yAxisTitle = logisticCase?.y_axis_title || explanation["y-axis_title"] || "PC2";
   const yAxisDescription =
+    logisticCase?.y_axis_description ||
     explanation["y-axis_description"] ||
     "PC2는 데이터의 두 번째 주성분으로, 첫번째 주성분간의 추가적인 변동성을 설명합니다.";
 
@@ -113,7 +126,7 @@ export default function LogisticRegressionVisualization({
             coefficients,
             intercept,
             classes,
-            boundaryLines
+            logisticBoundaryLines
           );
           setDecisionBoundaryData(figure);
 
@@ -155,10 +168,10 @@ export default function LogisticRegressionVisualization({
 
       // --- Boundary Lines Titles ---
       if (
-        boundaryLines.boundary_line_title &&
-        boundaryLines.boundary_line_title.length > 0
+        logisticBoundaryLines.boundary_line_title &&
+        logisticBoundaryLines.boundary_line_title.length > 0
       ) {
-        setBoundaryLinesTitles(boundaryLines.boundary_line_title);
+        setBoundaryLinesTitles(logisticBoundaryLines.boundary_line_title);
       }
 
       // Clear any previous errors if data is processed successfully
@@ -183,16 +196,16 @@ export default function LogisticRegressionVisualization({
     // Map y indices to class titles
     const mappedY = y.map((cls) => {
       const isBinary =
-        overview.models_used.model_name === "LogisticRegressionBinary";
+        result.model === "LogisticRegressionBinary";
       const isMultinomial =
-        overview.models_used.model_name === "LogisticRegressionMultinomial";
+        result.model === "LogisticRegressionMultinomial";
 
       if (isBinary) {
-        return classesInfo.classTitle?.[cls] || `Class ${cls}`;
+        return logisticClasses.classTitle?.[cls] || `Class ${cls}`;
       } else if (isMultinomial) {
-        return classesInfo.classTitle?.[cls - 1] || `Class ${cls}`;
+        return logisticClasses.classTitle?.[cls - 1] || `Class ${cls}`;
       } else {
-        return classesInfo.classTitle?.[cls] || `Class ${cls}`;
+        return logisticClasses.classTitle?.[cls] || `Class ${cls}`;
       }
     });
 
@@ -228,7 +241,7 @@ export default function LogisticRegressionVisualization({
           titlefont: { size: 16, family: "Arial, sans-serif" },
         },
         legend: {
-          title: { text: "계층" },
+          title: { text: "클래스" },
           orientation: "h",
           x: 0,
           y: -0.2,
@@ -336,7 +349,7 @@ export default function LogisticRegressionVisualization({
 
             // Retrieve the corresponding boundary line title
             const boundaryTitle =
-              boundaryLines.boundary_line_title?.[boundaryIndex] ||
+              boundaryLinesTitles[boundaryIndex] ||
               `경계선 ${getClassName(classes[i])} vs ${getClassName(
                 classes[j]
               )}`;
@@ -367,7 +380,7 @@ export default function LogisticRegressionVisualization({
   const getClassName = (cls) => {
     // Use class index to get the title
     return (
-      LogisticRegression_Case?.classes?.classTitle?.[cls] || `Class ${cls}`
+      logisticClasses.classTitle?.[cls] || `Class ${cls}`
     );
   };
 
@@ -457,6 +470,9 @@ export default function LogisticRegressionVisualization({
             ))}
           </TableBody>
         </Table>
+        <p className="mt-4">
+          <strong>전체 정확도 (Accuracy):</strong> {accuracy !== null ? accuracy.toFixed(3) : "N/A"}
+        </p>
       </div>
     );
   };
@@ -534,30 +550,36 @@ export default function LogisticRegressionVisualization({
         <>
           {/* Report Title */}
           <h1 className="text-4xl font-bold text-center mb-8">
-            {reportTitle || "AI 모델 분석 보고서"}
+            {logisticReportTitle || "AI 모델 분석 보고서"}
           </h1>
 
           {/* Overview Section */}
           <Card>
             <CardHeader>
               <CardTitle>
-                {explanation.overview_section_title || "개요"}
+                {overview_section_title || "개요"}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Typography variant="h6" style={{ paddingBottom: '10px' }}>◾ 분석 목적</Typography>
+              <Typography variant="h6" style={{ paddingBottom: '10px' }}>
+                ◾ 분석 목적
+              </Typography>
               <Typography variant="body1" gutterBottom>
                 {overview?.analysis_purpose ||
                   "분석 목적이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6" style={{ paddingBottom: '10px' }}>◾ 데이터 설명</Typography>
+              <Typography variant="h6" style={{ paddingBottom: '10px' }}>
+                ◾ 데이터 설명
+              </Typography>
               <Typography variant="body1" gutterBottom>
                 {overview?.data_description ||
                   "데이터 설명이 제공되지 않았습니다."}
               </Typography>
 
-              <Typography variant="h6" style={{ paddingBottom: '10px' }}>◾ 사용된 모델</Typography>
+              <Typography variant="h6" style={{ paddingBottom: '10px' }}>
+                ◾ 사용된 모델
+              </Typography>
               <Typography variant="body1" gutterBottom>
                 {overview?.models_used?.model_description ||
                   "모델 설명이 제공되지 않았습니다."}
@@ -571,7 +593,7 @@ export default function LogisticRegressionVisualization({
             onValueChange={(value) => setActiveTab(value)}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-3 w-full space-x-4">
+            <TabsList className="grid grid-cols-5 w-full space-x-4">
               <TabsTrigger
                 value="decision_boundary"
                 className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -585,10 +607,22 @@ export default function LogisticRegressionVisualization({
                 분류 보고서
               </TabsTrigger>
               <TabsTrigger
-                value="data_table"
+                value="confusion_matrix"
                 className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                데이터 테이블
+                혼동 행렬
+              </TabsTrigger>
+              <TabsTrigger
+                value="classification_probabilities"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                분류 확률
+              </TabsTrigger>
+              <TabsTrigger
+                value="predictions_overview"
+                className="border border-gray-300 rounded-t-lg py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                {visualizations[4]?.title || "전체 예측 데이터"}
               </TabsTrigger>
             </TabsList>
             {/* Decision Boundary Tab Content */}
@@ -605,43 +639,43 @@ export default function LogisticRegressionVisualization({
                 </CardHeader>
                 <CardContent>
                   <div className={classes.plotContainer}>
-                  {decisionBoundaryData && (
-                    <Plot
-                      data={decisionBoundaryData.data}
-                      layout={decisionBoundaryData.layout}
-                      config={{ responsive: true }}
-                    />
-                  )}
-                  {/* Axis Descriptions */}
-                  {xAxisDescription && (
-                    <Typography
-                      variant="body2"
-                      gutterBottom
-                      className={classes.typographyBody2}
-                    >
-                      <strong>{`${xAxisTitle} (x)`}</strong>: {xAxisDescription}
-                    </Typography>
-                  )}
-                  {yAxisDescription && (
-                    <Typography
-                      variant="body2"
-                      gutterBottom
-                      className={classes.typographyBody2}
-                    >
-                      <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
-                    </Typography>
-                  )}
+                    {decisionBoundaryData && (
+                      <Plot
+                        data={decisionBoundaryData.data}
+                        layout={decisionBoundaryData.layout}
+                        config={{ responsive: true }}
+                      />
+                    )}
+                    {/* Axis Descriptions */}
+                    {xAxisDescription && (
+                      <Typography
+                        variant="body2"
+                        gutterBottom
+                        className={classes.typographyBody2}
+                      >
+                        <strong>{`${xAxisTitle} (x)`}</strong>: {xAxisDescription}
+                      </Typography>
+                    )}
+                    {yAxisDescription && (
+                      <Typography
+                        variant="body2"
+                        gutterBottom
+                        className={classes.typographyBody2}
+                      >
+                        <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
+                      </Typography>
+                    )}
                   </div>
                   {/* Class Descriptions and Boundary Lines Descriptions */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {/* Class Descriptions */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <h3 className="text-lg font-semibold mb-2">
                         클래스 설명
                       </h3>
-                      {classesInfo.classTitle &&
-                        classesInfo.classDescription &&
-                        classesInfo.classTitle.map((title, index) => (
+                      {logisticClasses.classTitle &&
+                        logisticClasses.classDescription &&
+                        logisticClasses.classTitle.map((title, index) => (
                           <Card key={index} className="flex items-center p-2" style={{ padding:'10px'}}>
                             <span
                               className="inline-block w-4 h-4 mr-2 rounded-full"
@@ -651,9 +685,9 @@ export default function LogisticRegressionVisualization({
                             ></span>
                             <div>
                               <CardTitle className="text-sm" style={{ textAlign: 'start', padding: '10px 0' }}>{title}</CardTitle>
-                              <CardContent className="p-0" style={{ textAlign: 'start', padding: 0}}>
+                              <CardContent className="p-0" style={{ textAlign: 'start', padding: 0 }}>
                                 <Typography variant="body2">
-                                  {classesInfo.classDescription[index] ||
+                                  {logisticClasses.classDescription[index] ||
                                     "설명이 제공되지 않았습니다."}
                                 </Typography>
                               </CardContent>
@@ -663,25 +697,25 @@ export default function LogisticRegressionVisualization({
                     </div>
                     {/* Boundary Lines Descriptions */}
                     <div>
-                      <h3 className="text-lg font-semibold mb-2" style={{ paddingBottom: '10px'}}>
+                      <h3 className="text-lg font-semibold mb-2" style={{ paddingBottom: '10px' }}>
                         결정 경계 설명
                       </h3>
-                      {boundaryLines.boundary_line_description &&
-                        boundaryLines.boundary_line_description.map(
-                          (desc, index) => (
-                            <Card key={index} className="p-2">
-                              <CardHeader>
-                                <CardTitle style={{ color: '#8770b4'}}>
-                                  {boundaryLines.boundary_line_title[index] ||
-                                    `경계선 ${index + 1}`}
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <Typography variant="body2">{desc}</Typography>
-                              </CardContent>
-                            </Card>
-                          )
-                        )}
+                      {boundaryLinesTitles &&
+                        boundaryLinesTitles.map((title, index) => (
+                          <Card key={index} className="p-2 mb-2">
+                            <CardHeader>
+                              <CardTitle style={{ color: '#8770b4' }}>
+                                {title || `경계선 ${index + 1}`}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <Typography variant="body2">
+                                {logisticBoundaryLines.boundary_line_description[index] ||
+                                  "설명이 제공되지 않았습니다."}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        ))}
                     </div>
                   </div>
                 </CardContent>
@@ -693,15 +727,19 @@ export default function LogisticRegressionVisualization({
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {visualizations[0]?.description || "분류 보고서"}
+                    {visualizations[1]?.title || "분류 보고서"}
                   </CardTitle>
+                  <CardDescription>
+                    {visualizations[1]?.description ||
+                      "모델의 분류 성능을 보여줍니다."}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                   {/* Display Overall Accuracy */}
                   {accuracy !== null && (
                     <div className="mb-4">
                       <Typography variant="h6">
-                        전체 정확도: {accuracy.toFixed(4)}
+                        전체 정확도 (Accuracy): {accuracy.toFixed(3)}
                       </Typography>
                     </div>
                   )}
@@ -711,19 +749,91 @@ export default function LogisticRegressionVisualization({
               </Card>
             </TabsContent>
 
-            {/* Data Table Tab Content */}
-            <TabsContent value="data_table">
+            {/* Confusion Matrix Tab Content */}
+            <TabsContent value="confusion_matrix">
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {explanation.data_table_title || "모든 데이터 포인트"}
+                    {visualizations[2]?.title || "혼동 행렬"}
                   </CardTitle>
                   <CardDescription>
-                    {explanation.data_table_description ||
-                      "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다."}
+                    {visualizations[2]?.description ||
+                      "실제 값과 예측 값 간의 혼동 행렬을 나타냅니다."}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">{renderDataTable()}</CardContent>
+                <CardContent className={classes.plotContainer}>
+                  {result.graph4 && (
+                    <Plot
+                      data={[
+                        {
+                          z: result.graph4.confusion_matrix,
+                          x: result.graph4.labels,
+                          y: result.graph4.labels,
+                          type: "heatmap",
+                          colorscale: "Blues",
+                          hoverongaps: false,
+                          text: result.graph4.confusion_matrix.map((row) =>
+                            row.join(", ")
+                          ),
+                          texttemplate: "%{text}",
+                          textfont: {
+                            color: "white",
+                          },
+                        },
+                      ]}
+                      layout={{
+                        title: visualizations[2]?.title || "혼동 행렬",
+                        xaxis: {
+                          title: xAxisTitle || "예측 값",
+                          automargin: true,
+                        },
+                        yaxis: {
+                          title: yAxisTitle || "실제 값",
+                          automargin: true,
+                        },
+                        height: 600,
+                        template: "plotly_white",
+                      }}
+                      config={{ responsive: true }}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Classification Probabilities Tab Content */}
+            <TabsContent value="classification_probabilities">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {visualizations[3]?.title || "분류 확률"}
+                  </CardTitle>
+                  <CardDescription>
+                    {visualizations[3]?.description ||
+                      "각 멤버의 클래스에 대한 예측 확률을 나타냅니다."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className={classes.plotContainer}>
+                  {renderClassificationProbabilities()}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Predictions Overview Tab Content */}
+            <TabsContent value="predictions_overview">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {visualizations[4]?.title || "전체 예측 데이터"}
+                  </CardTitle>
+                  <CardDescription>
+                    {visualizations[4]?.description ||
+                      "모든 점들에 대한 실제 값, 예측 값, 잔차를 나타냅니다."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className={classes.plotContainer}>
+                  {renderDataTable()}
+                </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
@@ -784,15 +894,17 @@ export default function LogisticRegressionVisualization({
           <Card>
             <CardHeader>
               <CardTitle>
-                {explanation.key_findings_section_title || "주요 발견사항"}
+                {key_findings_section_title || "주요 발견사항"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
                 {key_findings.map((finding, index) => (
                   <li key={index} className={classes.listItem}>
-                    <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px'}}>{finding.finding}</Typography>
-                    <Typography variant="body1" style={{ paddingBottom: '10px'}}>
+                    <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}>
+                      {finding.finding}
+                    </Typography>
+                    <Typography variant="body1" style={{ paddingBottom: '10px' }}>
                       <strong>{finding.impact_label || "영향"}:</strong>{" "}
                       {finding.impact}
                     </Typography>
@@ -800,7 +912,7 @@ export default function LogisticRegressionVisualization({
                       <strong>
                         {finding.recommendation_label || "권장 사항"}:
                       </strong>{" "}
-                      ◾{finding.recommendation}
+                      ◾ {finding.recommendation}
                     </Typography>
                   </li>
                 ))}
@@ -812,14 +924,14 @@ export default function LogisticRegressionVisualization({
           <Card>
             <CardHeader>
               <CardTitle>
-                {explanation.recommendations_section_title || "권장 사항"}
+                {recommendations_section_title || "권장 사항"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {recommendations.immediate_actions &&
                 recommendations.immediate_actions.length > 0 && (
                   <>
-                    <Typography variant="h6" className="mb-2" style={{ paddingBottom: '10px'}}>
+                    <Typography variant="h6" className="mb-2" style={{ paddingBottom: '10px' }}>
                       {recommendations.immediate_actions_title ||
                         "즉각적인 조치"}
                     </Typography>
@@ -881,7 +993,7 @@ export default function LogisticRegressionVisualization({
                         <strong>전체 정확도:</strong>{" "}
                         {model_performance.prediction_analysis.overall_accuracy}
                       </Typography>
-                      <Typography variant="body1" style={{ paddingBottom: '10px'}}>
+                      <Typography variant="body1" style={{ paddingBottom: '10px' }}>
                         <strong>주목할 만한 패턴:</strong>
                       </Typography>
                       <ul className="list-disc pl-5">
@@ -912,10 +1024,10 @@ LogisticRegressionVisualization.propTypes = {
       X_pca: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
       y: PropTypes.arrayOf(
         PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      ), // Changed to handle both strings and numbers
+      ), // Handle both strings and numbers
       coefficients: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
       intercept: PropTypes.arrayOf(PropTypes.number),
-      classes: PropTypes.arrayOf(PropTypes.string), // Changed to string for class titles
+      classes: PropTypes.arrayOf(PropTypes.string), // Assuming class titles are strings
       original_data: PropTypes.arrayOf(PropTypes.object), // Added for data table
     }),
     graph3: PropTypes.shape({
@@ -924,7 +1036,9 @@ LogisticRegressionVisualization.propTypes = {
     }),
     graph4: PropTypes.shape({
       graph_type: PropTypes.string,
-      confusion_matrix: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+      confusion_matrix: PropTypes.arrayOf(
+        PropTypes.arrayOf(PropTypes.number)
+      ),
       labels: PropTypes.arrayOf(PropTypes.string),
     }),
     model: PropTypes.string,
@@ -994,15 +1108,23 @@ LogisticRegressionVisualization.propTypes = {
       further_analysis: PropTypes.arrayOf(PropTypes.string),
       further_analysis_title: PropTypes.string,
     }),
-    LogisticRegression_Case: PropTypes.shape({
-      report_title: PropTypes.string,
-      classes: PropTypes.shape({
-        classTitle: PropTypes.arrayOf(PropTypes.string),
-        classDescription: PropTypes.arrayOf(PropTypes.string),
-      }),
-      boundary_lines: PropTypes.shape({
-        boundary_line_title: PropTypes.arrayOf(PropTypes.string),
-        boundary_line_description: PropTypes.arrayOf(PropTypes.string),
+    model_specific_details: PropTypes.shape({
+      details: PropTypes.shape({
+        logistic_regression_case: PropTypes.shape({
+          report_title: PropTypes.string,
+          classes: PropTypes.shape({
+            classTitle: PropTypes.arrayOf(PropTypes.string),
+            classDescription: PropTypes.arrayOf(PropTypes.string),
+          }),
+          boundary_lines: PropTypes.shape({
+            boundary_line_title: PropTypes.arrayOf(PropTypes.string),
+            boundary_line_description: PropTypes.arrayOf(PropTypes.string),
+          }),
+          x_axis_title: PropTypes.string,
+          x_axis_description: PropTypes.string,
+          y_axis_title: PropTypes.string,
+          y_axis_description: PropTypes.string,
+        }),
       }),
     }),
     "x-axis_title": PropTypes.string,
