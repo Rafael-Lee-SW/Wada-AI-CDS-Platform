@@ -1,12 +1,9 @@
 package com.ssafy.wada.common.logger;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.ssafy.wada.application.domain.MachineLearningModel;
 import com.ssafy.wada.application.repository.ModelRepository;
 
 import io.micrometer.core.instrument.Gauge;
