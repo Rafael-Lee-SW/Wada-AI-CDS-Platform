@@ -18,14 +18,6 @@ import {
 } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
 import { Eye, EyeOff } from "lucide-react";
 
 // Material-UI Components
@@ -54,7 +46,7 @@ export default function KMeansVisualization({ result, explanation }) {
   const [clusterCentersPca, setClusterCentersPca] = useState([]);
   const [anomalies, setAnomalies] = useState([]);
   const [numAnomalies, setNumAnomalies] = useState(2);
-  const [isAnomalyDetection, setIsAnomalyDetection] = useState(false);
+  const [isAnomalyDetection, setIsAnomalyDetection] = useState(false); // Default to false
   const [error, setError] = useState(null);
   const [showInset, setShowInset] = useState(true);
 
@@ -66,6 +58,7 @@ export default function KMeansVisualization({ result, explanation }) {
   const visualizationsInfo = explanation.visualizations || [];
   const clusterDescriptions = explanation.cluster?.cluster_description || [];
   const clusterTitles = explanation.cluster?.cluster_title || [];
+  const modelPerformance = explanation.model_performance || {}; // Assuming model_performance exists
 
   // Graph axis titles and descriptions
   const {
@@ -123,32 +116,39 @@ export default function KMeansVisualization({ result, explanation }) {
         dfSample.push(row);
       }
 
+      // 로그: dfSample 확인
+      console.log("dfSample:", dfSample);
+
       if (!dfSample.length) {
-        setError("No data available for visualization.");
+        setError("시각화를 위한 데이터가 없습니다.");
         return;
       }
 
       // Prepare data for PCA
-      const X = dfSample.map((row) =>
-        featureColumns.map((col) => row[col])
-      );
+      const X = dfSample.map((row) => featureColumns.map((col) => row[col]));
 
       if (X.length === 0 || X[0].length === 0) {
-        setError("Data is empty or improperly formatted.");
+        setError("데이터가 비어 있거나 형식이 잘못되었습니다.");
         return;
       }
+
+      // 로그: PCA를 위한 X 데이터 확인
+      console.log("X (for PCA):", X);
 
       // Scale the data
       const X_scaled = X.map((row) =>
         row.map((value, i) => (value - scalerMean[i]) / scalerScale[i])
       );
 
+      // 로그: 스케일링된 데이터 확인
+      console.log("X_scaled:", X_scaled);
+
       // Check for invalid values
       const hasInvalidValues = X_scaled.some((row) =>
         row.some((value) => isNaN(value) || value === undefined)
       );
       if (hasInvalidValues) {
-        setError("Data contains invalid values after scaling.");
+        setError("스케일링 후 데이터에 유효하지 않은 값이 포함되어 있습니다.");
         return;
       }
 
@@ -204,13 +204,15 @@ export default function KMeansVisualization({ result, explanation }) {
           numAnomalies
         );
         setAnomalies(anomaliesData);
+      } else {
+        setAnomalies([]); // Clear anomalies if not anomaly detection
       }
 
       // Clear previous errors
       setError(null);
     } catch (e) {
       console.error("Error processing data:", e);
-      setError("Failed to process data for visualization.");
+      setError("데이터 시각화 처리가 실패했습니다.");
     }
   };
 
@@ -255,7 +257,7 @@ export default function KMeansVisualization({ result, explanation }) {
   const renderClusterDistribution = () => {
     const clusterLabels = clusters.map((cluster) => {
       const index = parseInt(cluster, 10);
-      return clusterTitles[index] || `Cluster ${cluster}`;
+      return clusterTitles[index] || `클러스터 ${cluster}`;
     });
     const clusterCounts = clusters.map((cluster) => clusterSizes[cluster]);
 
@@ -272,21 +274,22 @@ export default function KMeansVisualization({ result, explanation }) {
             },
           ]}
           layout={{
-            title: visualizationsInfo[0]?.title || "클러스터별 직원 수",
+            title: visualizationsInfo[0]?.title || "클러스터별 수",
             xaxis: {
               title: xAxisTitle || "클러스터",
               tickfont: { size: 14 },
               titlefont: { size: 16, family: "Arial, sans-serif" },
             },
             yaxis: {
-              title: visualizationsInfo[0]?.yaxis_title || "직원 수",
+              title: visualizationsInfo[0]?.yaxis_title || "구성 수",
               tickfont: { size: 14 },
               titlefont: { size: 16, family: "Arial, sans-serif" },
             },
             plot_bgcolor: "#f9f9f9",
             paper_bgcolor: "#f9f9f9",
+            autosize: true, // 자동 크기 조정
             height: 400,
-            margin: { t: 50, l: 50, r: 50, b: 50 },
+            margin: { t: 50, l: 50, r: 50, b: 80 }, // 하단 마진 증가
             font: {
               family:
                 '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -295,40 +298,88 @@ export default function KMeansVisualization({ result, explanation }) {
           }}
           config={{ responsive: true }}
         />
-        {/* Axis Description */}
-        {xAxisDescription && (
-          <Typography
-            variant="body2"
-            gutterBottom
-            className={classes.typographyBody2}
-          >
-            {xAxisDescription}
-          </Typography>
-        )}
-        {yAxisDescription && (
-          <Typography
-            variant="body2"
-            gutterBottom
-            className={classes.typographyBody2}
-          >
-            {yAxisDescription}
-          </Typography>
-        )}
+        {/* 축 설명을 그래프 하단에 배치 */}
+        <div className={classes.axisDescriptions}>
+          {xAxisTitle && xAxisDescription && (
+            <Typography
+              variant="body2"
+              gutterBottom
+              className={classes.axisDescription}
+            >
+              <strong>{`${xAxisTitle} (x)`}</strong>: 같은 성격을 지닌
+              그룹입니다.
+            </Typography>
+          )}
+          {yAxisTitle && yAxisDescription && (
+            <Typography
+              variant="body2"
+              gutterBottom
+              className={classes.axisDescription}
+            >
+              <strong>{`${yAxisTitle} (y)`}</strong>: 각 그룹이 몇 개의 인자로
+              구성되어 있는지 나타냅니다.
+            </Typography>
+          )}
+        </div>
       </div>
     );
   };
 
-  // Render cluster scatter plot with inset
+  // 클러스터 정보 렌더링 함수 추가
+  const renderClusterInformation = () => {
+    if (!clusters.length) return null;
+
+    return (
+      <Card className={classes.clusterInfoCard}>
+        <CardHeader>
+          <CardTitle>클러스터 정보</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {clusters.map((cluster, index) => (
+              <div key={cluster} className={classes.clusterInfo}>
+                {/* 클러스터 색상 표시기 추가 */}
+                <div
+                  className="inline-block w-4 h-4 mr-2 rounded-full"
+                  style={{ backgroundColor: clusterColorMap[cluster] }}
+                ></div>
+                <Typography
+                  variant="h6"
+                  className={classes.clusterTitle}
+                  style={{ color: clusterColorMap[cluster] }}
+                >
+                  {clusterTitles[index] || `클러스터 ${cluster}`}:&nbsp;
+                </Typography>
+                <Typography
+                  variant="body2"
+                  className={classes.clusterDescription}
+                >
+                  {clusterDescriptions[index] || "설명 없음."}
+                </Typography>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Render cluster scatter plot with conditional cluster centers
   const renderClusterScatterPlot = () => {
     if (!clusterData.length) return null;
 
     const clusterLabel = result.cluster_label || "Cluster_Anomaly";
-    const uniqueClusters = [...new Set(clusterData.map((d) => d[clusterLabel]))];
+    const uniqueClusters = [
+      ...new Set(clusterData.map((d) => d[clusterLabel])),
+    ];
 
     const colors = d3.schemeSet2; // Colorblind-friendly palette
 
     // Generate cluster color mapping
-    const currentClusterColorMap = generateClusterColorMap(uniqueClusters, colors);
+    const currentClusterColorMap = generateClusterColorMap(
+      uniqueClusters,
+      colors
+    );
 
     const data = [];
 
@@ -341,9 +392,7 @@ export default function KMeansVisualization({ result, explanation }) {
 
       if (points.length >= 3) {
         const hullIndices = convexHull(points);
-        const hullPoints = hullIndices.map(
-          (indexPair) => points[indexPair[0]]
-        );
+        const hullPoints = hullIndices.map((indexPair) => points[indexPair[0]]);
 
         // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
@@ -366,9 +415,9 @@ export default function KMeansVisualization({ result, explanation }) {
           fillcolor: currentClusterColorMap[cluster],
           opacity: 0.2,
           line: { color: currentClusterColorMap[cluster] },
-          name: `${clusterTitles[i] || `Cluster ${cluster}`} Area`,
+          name: `${clusterTitles[i] || `클러스터 ${cluster}`} 영역`,
           hoverinfo: "text",
-          text: clusterTitles[i] || `Cluster ${cluster}`,
+          text: clusterTitles[i] || `클러스터 ${cluster}`,
           hoveron: "fills",
         });
       }
@@ -384,7 +433,7 @@ export default function KMeansVisualization({ result, explanation }) {
         y: clusterPoints.map((d) => d.PC2),
         mode: "markers",
         type: "scatter",
-        name: clusterTitles[i] || `Cluster ${cluster}`,
+        name: clusterTitles[i] || `클러스터 ${cluster}`,
         marker: {
           color: currentClusterColorMap[cluster],
           size: 6,
@@ -406,32 +455,78 @@ export default function KMeansVisualization({ result, explanation }) {
       });
     });
 
-    // 3. Add cluster centers
-    data.push({
-      x: clusterCentersPca.map((c) => c[0]),
-      y: clusterCentersPca.map((c) => c[1]),
-      mode: "markers",
-      type: "scatter",
-      name: "Cluster Centers",
-      marker: { color: "black", symbol: "diamond", size: 12 },
-      hoverinfo: "none",
-    });
+    // 3. Add anomalies if it's an anomaly-detection model
+    if (isAnomalyDetection && anomalies.length > 0) {
+      data.push({
+        x: anomalies.map((a) => a.PC1),
+        y: anomalies.map((a) => a.PC2),
+        mode: "markers",
+        type: "scatter",
+        name: "이상치",
+        marker: { color: "red", symbol: "x", size: 12 },
+        hoverinfo: "text",
+        text: anomalies.map((a) => {
+          const featureInfo = featureColumns
+            .map((col) => `${col}: ${a[col]}`)
+            .join("<br>");
+          const clusterName = clusterTitles[a[clusterLabel]] || a[clusterLabel];
+          return `${featureInfo}<br>PC1: ${a.PC1.toFixed(
+            2
+          )}<br>PC2: ${a.PC2.toFixed(2)}<br>클러스터: ${clusterName}`;
+        }),
+      });
 
-    // 4. Add Inset Cluster Distribution Bar Chart (Conditionally)
+      // 4. Draw lines from anomalies to cluster centers
+      anomalies.forEach((anomaly) => {
+        const cluster = anomaly[clusterLabel];
+        const clusterIndex = parseInt(cluster, 10);
+        const center = clusterCentersPca[clusterIndex];
+        if (center) {
+          data.push({
+            x: [anomaly.PC1, center[0]],
+            y: [anomaly.PC2, center[1]],
+            mode: "lines",
+            line: { color: "gray", dash: "dash" },
+            showlegend: false,
+          });
+        }
+      });
+    }
+
+    // 5. Add cluster centers only if it's not an anomaly-detection model
+    if (!isAnomalyDetection) {
+      data.push({
+        x: clusterCentersPca.map((c) => c[0]),
+        y: clusterCentersPca.map((c) => c[1]),
+        mode: "markers",
+        type: "scatter",
+        name: "클러스터 중심",
+        marker: { color: "black", symbol: "diamond", size: 12 },
+        hoverinfo: "none",
+      });
+    }
+
+    // 6. Add Inset Cluster Distribution Bar Chart (Conditionally)
     if (showInset) {
       const clusterLabels = uniqueClusters.map((cluster) => {
         const index = parseInt(cluster, 10);
-        return clusterTitles[index] || `Cluster ${cluster}`;
+        return clusterTitles[index] || `클러스터 ${cluster}`;
       });
-      const clusterCounts = uniqueClusters.map((cluster) => clusterSizes[cluster]);
+      const clusterCounts = uniqueClusters.map(
+        (cluster) => clusterSizes[cluster]
+      );
 
       data.push({
         x: clusterLabels,
         y: clusterCounts,
         type: "bar",
-        marker: { color: uniqueClusters.map((cluster) => currentClusterColorMap[cluster]) },
+        marker: {
+          color: uniqueClusters.map(
+            (cluster) => currentClusterColorMap[cluster]
+          ),
+        },
         hoverinfo: "y",
-        name: "Cluster Distribution",
+        name: "클러스터 분포",
         xaxis: "x2",
         yaxis: "y2",
         showlegend: false,
@@ -439,10 +534,7 @@ export default function KMeansVisualization({ result, explanation }) {
     }
 
     return (
-      <div
-        className={classes.plotContainer}
-        style={{ position: "relative" }}
-      >
+      <div className={classes.plotContainer} style={{ position: "relative" }}>
         {/* Toggle Button for Inset Plot */}
         <Button
           variant="outline"
@@ -450,7 +542,11 @@ export default function KMeansVisualization({ result, explanation }) {
           className="absolute top-2 right-2 z-10"
           onClick={() => setShowInset(!showInset)}
         >
-          {showInset ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {showInset ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
         </Button>
         <Plot
           data={data}
@@ -489,6 +585,7 @@ export default function KMeansVisualization({ result, explanation }) {
               zeroline: false,
               showticklabels: false,
             },
+            showlegend: false,
             legend: {
               title: { text: clusterGroupTitle || "설명" },
               orientation: "h",
@@ -506,26 +603,27 @@ export default function KMeansVisualization({ result, explanation }) {
               color: "#1D1D1F",
             },
             hovermode: "closest",
+            autosize: true,
           }}
           config={{ responsive: true }}
         />
         {/* Axis Descriptions */}
-        {xAxisDescription && (
+        {xAxisTitle && xAxisDescription && (
           <Typography
             variant="body2"
             gutterBottom
             className={classes.typographyBody2}
           >
-            {xAxisDescription}
+            <strong>{`${xAxisTitle} (x)`}</strong>: {xAxisDescription}
           </Typography>
         )}
-        {yAxisDescription && (
+        {yAxisTitle && yAxisDescription && (
           <Typography
             variant="body2"
             gutterBottom
             className={classes.typographyBody2}
           >
-            {yAxisDescription}
+            <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
           </Typography>
         )}
         {/* Cluster Group Description */}
@@ -547,12 +645,17 @@ export default function KMeansVisualization({ result, explanation }) {
     if (!clusterData.length || !isAnomalyDetection) return null;
 
     const clusterLabel = result.cluster_label || "Cluster_Anomaly";
-    const uniqueClusters = [...new Set(clusterData.map((d) => d[clusterLabel]))];
+    const uniqueClusters = [
+      ...new Set(clusterData.map((d) => d[clusterLabel])),
+    ];
 
     const colors = d3.schemeSet2; // Colorblind-friendly palette
 
     // Generate cluster color mapping
-    const currentClusterColorMap = generateClusterColorMap(uniqueClusters, colors);
+    const currentClusterColorMap = generateClusterColorMap(
+      uniqueClusters,
+      colors
+    );
 
     const data = [];
 
@@ -565,9 +668,7 @@ export default function KMeansVisualization({ result, explanation }) {
 
       if (points.length >= 3) {
         const hullIndices = convexHull(points);
-        const hullPoints = hullIndices.map(
-          (indexPair) => points[indexPair[0]]
-        );
+        const hullPoints = hullIndices.map((indexPair) => points[indexPair[0]]);
 
         // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
@@ -590,9 +691,9 @@ export default function KMeansVisualization({ result, explanation }) {
           fillcolor: currentClusterColorMap[cluster],
           opacity: 0.2,
           line: { color: currentClusterColorMap[cluster] },
-          name: `${clusterTitles[i] || `Cluster ${cluster}`} Area`,
+          name: `${clusterTitles[i] || `클러스터 ${cluster}`} 영역`,
           hoverinfo: "text",
-          text: clusterTitles[i] || `Cluster ${cluster}`,
+          text: clusterTitles[i] || `클러스터 ${cluster}`,
           hoveron: "fills",
         });
       }
@@ -608,7 +709,7 @@ export default function KMeansVisualization({ result, explanation }) {
         y: clusterPoints.map((d) => d.PC2),
         mode: "markers",
         type: "scatter",
-        name: clusterTitles[i] || `Cluster ${cluster}`,
+        name: clusterTitles[i] || `클러스터 ${cluster}`,
         marker: {
           color: currentClusterColorMap[cluster],
           size: 6,
@@ -636,7 +737,7 @@ export default function KMeansVisualization({ result, explanation }) {
       y: anomalies.map((a) => a.PC2),
       mode: "markers",
       type: "scatter",
-      name: "Anomalies",
+      name: "이상치",
       marker: { color: "red", symbol: "x", size: 12 },
       hoverinfo: "text",
       text: anomalies.map((a) => {
@@ -646,7 +747,7 @@ export default function KMeansVisualization({ result, explanation }) {
         const clusterName = clusterTitles[a[clusterLabel]] || a[clusterLabel];
         return `${featureInfo}<br>PC1: ${a.PC1.toFixed(
           2
-        )}<br>PC2: ${a.PC2.toFixed(2)}<br>Cluster: ${clusterName}`;
+        )}<br>PC2: ${a.PC2.toFixed(2)}<br>클러스터: ${clusterName}`;
       }),
     });
 
@@ -666,32 +767,40 @@ export default function KMeansVisualization({ result, explanation }) {
       }
     });
 
-    // 5. Add cluster centers
-    data.push({
-      x: clusterCentersPca.map((c) => c[0]),
-      y: clusterCentersPca.map((c) => c[1]),
-      mode: "markers",
-      type: "scatter",
-      name: "Cluster Centers",
-      marker: { color: "black", symbol: "diamond", size: 12 },
-      hoverinfo: "none",
-    });
+    // 5. Add cluster centers only if it's not an anomaly-detection model
+    if (!isAnomalyDetection) {
+      data.push({
+        x: clusterCentersPca.map((c) => c[0]),
+        y: clusterCentersPca.map((c) => c[1]),
+        mode: "markers",
+        type: "scatter",
+        name: "클러스터 중심",
+        marker: { color: "black", symbol: "diamond", size: 12 },
+        hoverinfo: "none",
+      });
+    }
 
     // 6. Add Inset Cluster Distribution Bar Chart (Conditionally)
     if (showInset) {
       const clusterLabels = uniqueClusters.map((cluster) => {
         const index = parseInt(cluster, 10);
-        return clusterTitles[index] || `Cluster ${cluster}`;
+        return clusterTitles[index] || `클러스터 ${cluster}`;
       });
-      const clusterCounts = uniqueClusters.map((cluster) => clusterSizes[cluster]);
+      const clusterCounts = uniqueClusters.map(
+        (cluster) => clusterSizes[cluster]
+      );
 
       data.push({
         x: clusterLabels,
         y: clusterCounts,
         type: "bar",
-        marker: { color: uniqueClusters.map((cluster) => currentClusterColorMap[cluster]) },
+        marker: {
+          color: uniqueClusters.map(
+            (cluster) => currentClusterColorMap[cluster]
+          ),
+        },
         hoverinfo: "y",
-        name: "Cluster Distribution",
+        name: "클러스터 분포",
         xaxis: "x2",
         yaxis: "y2",
         showlegend: false,
@@ -699,10 +808,7 @@ export default function KMeansVisualization({ result, explanation }) {
     }
 
     return (
-      <div
-        className={classes.plotContainer}
-        style={{ position: "relative" }}
-      >
+      <div className={classes.plotContainer} style={{ position: "relative" }}>
         {/* Toggle Button for Inset Plot */}
         <Button
           variant="outline"
@@ -710,7 +816,11 @@ export default function KMeansVisualization({ result, explanation }) {
           className="absolute top-2 right-2 z-10"
           onClick={() => setShowInset(!showInset)}
         >
-          {showInset ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {showInset ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
         </Button>
         <Plot
           data={data}
@@ -749,6 +859,7 @@ export default function KMeansVisualization({ result, explanation }) {
               zeroline: false,
               showticklabels: false,
             },
+            showlegend: false,
             legend: {
               title: { text: clusterGroupTitle || "설명" },
               orientation: "h",
@@ -766,26 +877,27 @@ export default function KMeansVisualization({ result, explanation }) {
               color: "#1D1D1F",
             },
             hovermode: "closest",
+            autosize: true,
           }}
           config={{ responsive: true }}
         />
         {/* Axis Descriptions */}
-        {xAxisDescription && (
+        {xAxisTitle && xAxisDescription && (
           <Typography
             variant="body2"
             gutterBottom
             className={classes.typographyBody2}
           >
-            {xAxisDescription}
+            <strong>{`${xAxisTitle} (x)`}</strong>: {xAxisDescription}
           </Typography>
         )}
-        {yAxisDescription && (
+        {yAxisTitle && yAxisDescription && (
           <Typography
             variant="body2"
             gutterBottom
             className={classes.typographyBody2}
           >
-            {yAxisDescription}
+            <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
           </Typography>
         )}
         {/* Cluster Group Description */}
@@ -802,18 +914,38 @@ export default function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // Render clustered data table
+  // Dynamically generate columns based on data keys, excluding specific columns if needed
   const renderClusteredDataTable = () => {
     if (!clusterData.length) return null;
 
-    // Dynamically generate columns based on data keys
-    const columns = Object.keys(clusterData[0]).map((key) => ({
+    const excludeColumns = ["Cluster_Anomaly"]; // 필요에 따라 제외할 열 설정
+    const dataKeys = Object.keys(clusterData[0]).filter(
+      (key) => !excludeColumns.includes(key)
+    );
+
+    const columns = dataKeys.map((key) => ({
       field: key,
       headerName: key,
       flex: 1,
       minWidth: 150,
     }));
+
+    // Optionally include excluded columns separately
+    excludeColumns.forEach((key) => {
+      columns.push({
+        field: key,
+        headerName: key.replace("_", " "),
+        flex: 1,
+        minWidth: 100,
+        type: "number",
+      });
+    });
+
     const rows = clusterData.map((row, index) => ({ id: index, ...row }));
+
+    // 로그: columns과 rows 확인
+    console.log("DataGrid Columns:", columns);
+    console.log("DataGrid Rows:", rows);
 
     return (
       <div style={{ height: 500, width: "100%" }}>
@@ -843,66 +975,58 @@ export default function KMeansVisualization({ result, explanation }) {
             {explanation.report_title || "AI 모델 분석 보고서"}
           </h1>
 
-          <Tabs defaultValue="clusters" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="clusters">Clusters</TabsTrigger>
+          {/* 3. Add Overview and Model Performance Sections */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {explanation.overview_section_title || "개요"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Typography variant="h6">분석 목적</Typography>
+              <Typography variant="body1" gutterBottom>
+                {analysis_purpose || "분석 목적이 제공되지 않았습니다."}
+              </Typography>
+
+              <Typography variant="h6">데이터 설명</Typography>
+              <Typography variant="body1" gutterBottom>
+                {data_description || "데이터 설명이 제공되지 않았습니다."}
+              </Typography>
+
+              <Typography variant="h6">사용된 모델</Typography>
+              <Typography variant="body1" gutterBottom>
+                {models_used?.model_description ||
+                  "모델 설명이 제공되지 않았습니다."}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Tabs
+            defaultValue={isAnomalyDetection ? "anomalies" : "clusters"}
+            className="w-full"
+          >
+            <TabsList
+              className={`grid w-full ${
+                isAnomalyDetection ? "grid-cols-3" : "grid-cols-2"
+              }`}
+            >
               {isAnomalyDetection && (
-                <TabsTrigger value="anomalies">Anomalies</TabsTrigger>
+                <TabsTrigger value="anomalies">이상치</TabsTrigger>
               )}
-              <TabsTrigger value="data">Data Table</TabsTrigger>
+              <TabsTrigger value="clusters">군집 분포</TabsTrigger>
+              <TabsTrigger value="data">모든 데이터 확인하기</TabsTrigger>
             </TabsList>
 
-            {/* Clusters Tab */}
-            <TabsContent value="clusters">
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {visualizationsInfo[0]?.title || "Cluster Distribution"}
-                  </CardTitle>
-                  <CardDescription>
-                    {visualizationsInfo[0]?.description ||
-                      "Overview of cluster sizes and their distribution"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  {renderClusterDistribution()}
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {visualizationsInfo[1]?.title || "Cluster Scatter Plot"}
-                  </CardTitle>
-                  <CardDescription>
-                    {visualizationsInfo[1]?.description ||
-                      "Visualization of clusters in 2D space"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-6 relative">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute top-2 right-2 z-10"
-                    onClick={() => setShowInset(!showInset)}
-                  >
-                    {showInset ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                  {renderClusterScatterPlot()}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Anomalies Tab */}
+            {/* Anomalies Tab Content 먼저 배치 */}
             {isAnomalyDetection && (
               <TabsContent value="anomalies">
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {explanation.anomaly_plot_title || "Anomaly Detection"}
+                      {explanation.anomaly_plot_title || "이상치 탐지"}
                     </CardTitle>
                     <CardDescription>
                       {visualizationsInfo[2]?.description ||
-                        "Visualization of detected anomalies within clusters"}
+                        "클러스터 내에서 감지된 이상치를 시각화합니다."}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -911,7 +1035,7 @@ export default function KMeansVisualization({ result, explanation }) {
                         htmlFor="anomaly-slider"
                         className="block text-sm font-medium text-gray-700 mb-1"
                       >
-                        {explanation.slider_title || "Anomalies per cluster"}:{" "}
+                        {explanation.slider_title || "클러스터 당 이상치 수"}:{" "}
                         {numAnomalies}
                       </label>
                       <Slider
@@ -931,7 +1055,11 @@ export default function KMeansVisualization({ result, explanation }) {
                         className="absolute top-2 right-2 z-10"
                         onClick={() => setShowInset(!showInset)}
                       >
-                        {showInset ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showInset ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </Button>
                       {renderAnomalyScatterPlot()}
                     </div>
@@ -940,15 +1068,33 @@ export default function KMeansVisualization({ result, explanation }) {
               </TabsContent>
             )}
 
-            {/* Data Table Tab */}
+            {/* Clusters Tab Content 다음에 배치 */}
+            <TabsContent value="clusters">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {visualizationsInfo[0]?.title || "클러스터 분포"}
+                  </CardTitle>
+                  <CardDescription>
+                    {visualizationsInfo[0]?.description ||
+                      "클러스터의 크기 및 분포에 대한 개요"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {renderClusterDistribution()}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Data Table Tab Content 마지막에 배치 */}
             <TabsContent value="data">
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {explanation.data_table_title || "Clustered Data Sample"}
+                    {explanation.data_table_title || "클러스터링된 데이터 샘플"}
                   </CardTitle>
                   <CardDescription>
-                    Detailed view of the clustered data points
+                    클러스터링된 데이터 포인트의 상세 보기
                   </CardDescription>
                 </CardHeader>
                 <CardContent>{renderClusteredDataTable()}</CardContent>
@@ -956,18 +1102,21 @@ export default function KMeansVisualization({ result, explanation }) {
             </TabsContent>
           </Tabs>
 
+          {/* 클러스터 정보 카드 추가 */}
+          {renderClusterInformation()}
+
           {/* Key Findings and Recommendations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle>
-                  {explanation.key_findings_section_title || "Key Findings"}
+                  {explanation.key_findings_section_title || "주목할만한 부분"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="list-disc pl-5 space-y-2">
                   {keyFindings.map((finding, index) => (
-                    <li key={index}>
+                    <li key={index} className={classes.listItem}>
                       <strong>{finding.finding}</strong>: {finding.impact}
                     </li>
                   ))}
@@ -977,25 +1126,78 @@ export default function KMeansVisualization({ result, explanation }) {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  {explanation.recommendations_section_title ||
-                    "Recommendations"}
+                  {explanation.recommendations_section_title || "권장 사항"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="list-disc pl-5 space-y-2">
                   {recommendations.immediate_actions &&
                     recommendations.immediate_actions.map((action, index) => (
-                      <li key={index}>{action}</li>
+                      <li key={index} className={classes.listItem}>
+                        {action}
+                      </li>
                     ))}
                   {recommendations.further_analysis &&
                     recommendations.further_analysis.map((action, index) => (
-                      <li key={index}>{action}</li>
+                      <li key={index} className={classes.listItem}>
+                        {action}
+                      </li>
                     ))}
                 </ul>
               </CardContent>
             </Card>
           </div>
         </>
+      )}
+
+      {/* Model Performance Section */}
+      {modelPerformance.metrics && modelPerformance.metrics.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {explanation.model_performance_section_title || "모델 성능"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Render Metrics */}
+            <Typography variant="h6">주요 메트릭</Typography>
+            {modelPerformance.metrics.map((metric, index) => (
+              <div key={index} className="mb-2">
+                <Typography variant="body1">
+                  <strong>{metric.metric_name}:</strong> {metric.metric_value}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {metric.interpretation}
+                </Typography>
+              </div>
+            ))}
+
+            {/* Render Prediction Analysis */}
+            {modelPerformance.prediction_analysis && (
+              <>
+                <Typography variant="h6" className="mt-4">
+                  예측 분석
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>전체 정확도:</strong>{" "}
+                  {modelPerformance.prediction_analysis.overall_accuracy}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>주목할 만한 패턴:</strong>
+                </Typography>
+                <ul className="list-disc pl-5">
+                  {modelPerformance.prediction_analysis.notable_patterns.map(
+                    (pattern, idx) => (
+                      <li key={idx}>
+                        <Typography variant="body2">{pattern}</Typography>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -1019,6 +1221,7 @@ KMeansVisualization.propTypes = {
       analysis_purpose: PropTypes.string,
       data_description: PropTypes.string,
       models_used: PropTypes.shape({
+        model_name: PropTypes.string,
         model_description: PropTypes.string,
       }),
     }),
@@ -1049,8 +1252,22 @@ KMeansVisualization.propTypes = {
       cluster_title: PropTypes.arrayOf(PropTypes.string),
       cluster_description: PropTypes.arrayOf(PropTypes.string),
     }),
+    model_performance: PropTypes.shape({
+      metrics: PropTypes.arrayOf(
+        PropTypes.shape({
+          metric_name: PropTypes.string.isRequired,
+          metric_value: PropTypes.string.isRequired,
+          interpretation: PropTypes.string.isRequired,
+        })
+      ),
+      prediction_analysis: PropTypes.shape({
+        overall_accuracy: PropTypes.string,
+        notable_patterns: PropTypes.arrayOf(PropTypes.string),
+      }),
+    }), // Updated to reflect the structure
     report_title: PropTypes.string,
     overview_section_title: PropTypes.string,
+    model_performance_section_title: PropTypes.string, // Added for model performance
     key_findings_section_title: PropTypes.string,
     recommendations_section_title: PropTypes.string,
     data_table_title: PropTypes.string,

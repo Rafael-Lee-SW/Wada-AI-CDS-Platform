@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 
 // Dynamically import all visualization components with loading fallback
 const KMeansVisualization = dynamic(
-  () =>
-    import("../chat/components/analyzeReport/KMeansVisualization.jsx"),
+  () => import("../chat/components/analyzeReport/KMeansVisualization.jsx"),
   { ssr: false, loading: () => <p>Loading K-Means Visualization...</p> }
 );
 
@@ -15,7 +14,10 @@ const LogisticRegressionVisualization = dynamic(
     import(
       "../chat/components/analyzeReport/LogisticsRegressionVisualization.jsx"
     ),
-  { ssr: false, loading: () => <p>Loading Logistic Regression Visualization...</p> }
+  {
+    ssr: false,
+    loading: () => <p>Loading Logistic Regression Visualization...</p>,
+  }
 );
 
 const ClassifierVisualization = dynamic(
@@ -37,7 +39,10 @@ const RegressionVisualization = dynamic(
 const SupportVectorVisualization = dynamic(
   () =>
     import("../chat/components/analyzeReport/SupporVectorVisualization.jsx"),
-  { ssr: false, loading: () => <p>Loading Support Vector Machine Visualization...</p> }
+  {
+    ssr: false,
+    loading: () => <p>Loading Support Vector Machine Visualization...</p>,
+  }
 );
 
 const NeuralNetworkVisualization = dynamic(
@@ -49,13 +54,25 @@ const NeuralNetworkVisualization = dynamic(
 // Define a list of all available visualizations with their corresponding components and data paths
 const visualizationsList = [
   {
-    name: "K-Means",
+    name: "K-Means-anomaly",
     component: KMeansVisualization,
     resultPath: "/json/test_6.json",
     explanationPath: "/json/test_6_explanation.json",
   },
   {
-    name: "Logistic Regression",
+    name: "K-Means-segmentation",
+    component: KMeansVisualization,
+    resultPath: "/json/test_5.json",
+    explanationPath: "/json/test_5_explanation.json",
+  },
+  {
+    name: "Logistic Regression-binary",
+    component: LogisticRegressionVisualization,
+    resultPath: "/json/test_4.json",
+    explanationPath: "/json/test_4_explanation.json",
+  },
+  {
+    name: "Logistic Regression-multi",
     component: LogisticRegressionVisualization,
     resultPath: "/json/test_4.json",
     explanationPath: "/json/test_4_explanation.json",
@@ -125,8 +142,14 @@ export default function Test() {
         const resultData = await resultResponse.json();
         const explanationData = await explanationResponse.json();
 
-        console.log(`Fetched result data for ${selectedVisualization.name}:`, resultData);
-        console.log(`Fetched explanation data for ${selectedVisualization.name}:`, explanationData);
+        console.log(
+          `Fetched result data for ${selectedVisualization.name}:`,
+          resultData
+        );
+        console.log(
+          `Fetched explanation data for ${selectedVisualization.name}:`,
+          explanationData
+        );
 
         setJsonResult(resultData);
         setJsonExplanation(explanationData);
@@ -142,7 +165,8 @@ export default function Test() {
   }, [selectedVisualization]);
 
   // URL of the CSV file to download
-  const csvDownloadUrl = "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/fe692d91-b65e-4239-81a4-8bc70afe1a67.csv";
+  const csvDownloadUrl =
+    "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/fe692d91-b65e-4239-81a4-8bc70afe1a67.csv";
 
   return (
     <div className="container mx-auto p-4 space-y-8">
@@ -152,10 +176,11 @@ export default function Test() {
           <button
             key={viz.name}
             onClick={() => setSelectedVisualization(viz)}
-            className={`px-4 py-2 rounded-md border ${selectedVisualization.name === viz.name
-              ? "bg-blue-500 text-white border-blue-500"
-              : "bg-white text-blue-500 border-blue-500 hover:bg-blue-50"
-              } transition duration-200`}
+            className={`px-4 py-2 rounded-md border ${
+              selectedVisualization.name === viz.name
+                ? "bg-blue-500 text-white border-blue-500"
+                : "bg-white text-blue-500 border-blue-500 hover:bg-blue-50"
+            } transition duration-200`}
           >
             {viz.name}
           </button>
@@ -172,7 +197,6 @@ export default function Test() {
           Download CSV
         </a>
       </div>
-
 
       {/* Loading and Error States */}
       {isLoading && <p>Loading visualization...</p>}
