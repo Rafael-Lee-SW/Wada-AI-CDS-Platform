@@ -1,5 +1,6 @@
 <configuration>
     <property name="MESSAGE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %logger{36} - %msg %n" />
+    <property name="TIME_ZONE" value="Asia/Seoul" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -10,7 +11,7 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/logs/backend.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/backend.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/logs/backend.%d{yyyy-MM-dd, ${TIME_ZONE}}log</fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>

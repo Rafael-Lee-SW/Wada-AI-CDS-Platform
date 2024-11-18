@@ -36,13 +36,13 @@ public class SelectedModelDispatchController {
     }
 
     @PostMapping("/conversation")
-    public ModelConversationResponse HandleConversation(@RequestBody Map<String, Object> request){
+    public ModelConversationResponse handleConversation(@RequestBody Map<String, Object> request){
         String chatRoomId = (String) request.get("chatRoomId");
         int requestId = (Integer) request.get("requestId");
         String text = (String) request.get("text");
         log.info("Received chatRoomId: {}, requestId: {} , text: {}" , chatRoomId, requestId , text);
 // ModelDispatchService의 Conversation 메서드 호출
-        String answer = modelDispatchService.Conversation(chatRoomId, requestId, text);
+        String answer = modelDispatchService.conversation(chatRoomId, requestId, text);
 
         // 응답 데이터 생성 및 반환
         return new ModelConversationResponse(requestId, answer, LocalDateTime.now());

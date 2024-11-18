@@ -156,7 +156,7 @@ public class ModelDispatchService {
         }
     }
 
-    public String Conversation(String chatRoomId, int requestId, String answer) {
+    public String conversation(String chatRoomId, int requestId, String answer) {
         // Step 1: MongoDB에서 chatRoomId와 requestId로 Document 조회
         Query query = new Query();
         query.addCriteria(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
@@ -218,7 +218,19 @@ public class ModelDispatchService {
 
         log.info("Step 9: ConversationRecord updated or inserted with new entry for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
-        return gptResponse;
+        return changeGptStringToApiString(gptResponse);
     }
+
+    private String changeGptStringToApiString(String gptString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(gptString);
+			return rootNode.at("/choices/0/message/content").asText();
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+	}
 }
 
