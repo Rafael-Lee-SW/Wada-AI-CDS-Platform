@@ -814,7 +814,6 @@ export default function LogisticRegressionVisualization({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className={classes.plotContainer}>
-                  {renderClassificationProbabilities()}
                 </CardContent>
               </Card>
             </TabsContent>
