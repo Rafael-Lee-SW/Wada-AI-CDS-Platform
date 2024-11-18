@@ -338,229 +338,163 @@ public class PromptGenerator {
              selectedModelDetail);
     }
 
-        // UserPrompt 생성 메서드
-        public static String createUserPromptForResult(Map<String, Object> fastApiResult) {
-            return String.format("""
-                # Role and Context
-                You are an expert data analyst who specializes in explaining complex ML/DL analysis results to non-technical stakeholders. Your task is to create a comprehensive analysis report in Korean based on the provided machine learning analysis results.
-                Analyze the provided results and return your analysis in the following JSON format. All explanations should be in Korean except for technical terms.
+    // UserPrompt 생성 메서드
+    public static String createUserPromptForResult(Map<String, Object> fastApiResult) {
+        return """
+       # Role and Context
+       You are an expert data analyst who specializes in explaining complex ML/DL analysis results to non-technical stakeholders. Your task is to create a comprehensive analysis report in Korean based on the provided machine learning analysis results.
 
-                # Summary of the Analysis Result
-                %s
+       Analyze the provided results and return your analysis in the following JSON format. All explanations should be in Korean except for technical terms.
 
-                # Required Response Format:
-                ```
+       # Summary of the Analysis Result
+       %s
+
+        # Required Response Format:
+        ```
+        {
+            "overview": {
+                "analysis_purpose": "분석 목적과 배경 설명",
+                "data_description": "분석된 데이터에 대한 설명",
+                "models_used": {
+                    "model_name": "사용된 모델명",
+                    "model_description": "모델에 대한 평이한 설명"
+                }
+            },
+            "model_performance": {
+                "metrics": [
+                    {
+                        "metric_name": "성능 지표명 (예: R², MSE 등)",
+                        "metric_value": "지표 값",
+                        "interpretation": "지표가 의미하는 바에 대한 이해하기 쉬운 설명"
+                    }
+                ],
+                "prediction_analysis": {
+                    "overall_accuracy": "전반적인 예측 정확도 설명",
+                    "notable_patterns": [
+                        "주목할만한 패턴 1",
+                        "주목할만한 패턴 2"
+                    ]
+                }
+            },
+            "feature_importance": {
+                "key_features": [
+                    {
+                        "feature_name": "중요 특성명",
+                        "importance_score": "중요도 점수 (if any else None)",
+                        "business_impact": "비즈니스 관점에서 분석 목적을 달성하는데 어떤 의미를 가지는지"
+                    }
+                ],
+                "relationships": [
+                    {
+                        "description": "특성들 간의 관계를 자세히 설명",
+                        "business_insight": "이를 통해 얻을 수 있는 비즈니스 인사이트"
+                    }
+                ]
+            },
+            "visualizations": [
                 {
-                    "overview": {
-                        "analysis_purpose": "분석 목적과 배경 설명",
-                        "data_description": "분석된 데이터에 대한 설명",
-                        "models_used": {
-                            "model_name": "사용된 모델명",
-                            "model_description": "모델에 대한 평이한 설명"
-                        }
-                    },
-                    "model_performance": {
-                        "metrics": [
-                            {
-                                "metric_name": "성능 지표명 (예: R², MSE 등)",
-                                "metric_value": "지표 값",
-                                "interpretation": "지표가 의미하는 바에 대한 이해하기 쉬운 설명"
-                            }
-                        ],
-                        "prediction_analysis": {
-                            "overall_accuracy": "전반적인 예측 정확도 설명",
-                            "notable_patterns": [
-                                "주목할만한 패턴 1",
-                                "주목할만한 패턴 2"
-                            ]
-                        }
-                    },
-                    "feature_importance": {
-                        "key_features": [
-                            {
-                                "feature_name": "중요 특성명",
-                                "importance_score": "중요도 점수 (if any else None)",
-                                "business_impact": "비즈니스 관점에서 분석 목적을 달성하는데 어떤 의미를 가지는지"
-                            }
-                        ],
-                        "relationships": [
-                            {
-                                "description": "특성들 간의 관계를 자세히 설명",
-                                "business_insight": "이를 통해 얻을 수 있는 비즈니스 인사이트"
-                            }
-                        ]
-                    },
-                    "visualizations": [
-                        {
-                            "title": "시각화 제목",
-                            "type": "차트 종류",
-                            "description": "시각화가 보여주는 내용 설명",
-                            "insights": "시각화를 통해 발견할 수 있는 인사이트"
-                        }
-                    ],
-                    "key_findings": [
-                        {
-                            "finding": "주요 발견사항",
-                            "impact": "비즈니스 영향",
-                            "recommendation": "권장 조치사항"
-                        }
-                    ],
-                    "recommendations": {
-                        "immediate_actions": [
-                            "즉시 수행 가능한 조치사항"
-                        ],
-                        "further_analysis": [
-                            "추가 분석이 필요한 영역"
-                        ]
-                    },
-                    
+                    "title": "시각화 제목",
+                    "type": "차트 종류",
+                    "description": "시각화가 보여주는 내용 설명",
+                    "insights": "시각화를 통해 발견할 수 있는 인사이트"
+                }
+            ],
+            "key_findings": [
+                {
+                    "finding": "주요 발견사항",
+                    "impact": "비즈니스 영향",
+                    "recommendation": "권장 조치사항"
+                }
+            ],
+            "recommendations": {
+                "immediate_actions": [
+                    "즉시 수행 가능한 조치사항"
+                ],
+                "further_analysis": [
+                    "추가 분석이 필요한 영역"
+                ]
+            },
+            "model_specific_details": {
+                "model_type": "모델 타입",
+                "details": {
                     "random_forest_case": {
                         "report_title": "보고서 제목",
                         "x_axis_title": "실제 값 축 제목",
                         "x_axis_description": "실제 값 설명",
                         "y_axis_title": "예측 값 축 제목",
                         "y_axis_description": "예측 값 설명"
+                    },
+                    "logistic_regression_case": {
+                        "report_title": "보고서 제목",
+                        "classes": {
+                            "classTitle": ["클래스 1 제목", "클래스 2 제목", ...],
+                            "classDescription": ["클래스 1 설명", "클래스 2 설명", ...]
+                        },
+                        "x_axis_title": "PC1 축 제목",
+                        "x_axis_description": "PC1 설명",
+                        "y_axis_title": "PC2 축 제목",
+                        "y_axis_description": "PC2 설명",
+                        "boundary_lines": {
+                            "boundary_line_title": ["경계선 1 제목", ...],
+                            "boundary_line_description": ["경계선 1 설명", ...]
+                        }
+                    },
+                    "kmeans_clustering_case": {
+                        "report_title": "보고서 제목",
+                        "x_axis_title": "PC1 축 제목",
+                        "x_axis_description": "PC1 설명",
+                        "y_axis_title": "PC2 축 제목",
+                        "y_axis_description": "PC2 설명",
+                        "cluster_title": "클러스터 전체 제목",
+                        "cluster_description": "클러스터 전체 설명",
+                        "cluster": {
+                            "cluster_title": ["클러스터 1 제목", "클러스터 2 제목", ...],
+                            "cluster_description": ["클러스터 1 설명", "클러스터 2 설명", ...]
+                        }
                     }
                 }
-                ```
-
-                # Guidelines:
-                %s
-                """, covertToJsonFromMap(fastApiResult), generateGuidelines());
+            }
         }
+        ```
 
-    /**
-     * Generates the guidelines for the report format.
-     *
-     * @return A string containing the guidelines.
-     */
-    private static String generateGuidelines() {
-        return """
-            1. Language and Communication:
-               - Use simple, conversational Korean language avoiding technical jargon
-               - When technical terms must be used, provide clear explanations with everyday examples
-               - Maintain original format for technical terms, column names, and model names
-               - Write as if explaining to a friend who has no technical background
-                            
-            2. Explanation Depth:
-               - Start with a high-level overview before diving into details
-               - Provide step-by-step explanations for complex concepts
-               - Use relatable real-world analogies and examples
-               - Include "For example, ..." sections to illustrate key points
-               - Explain both "what" the results show and "why" they matter
-                            
-            3. Business Context:
-               - Focus on practical business implications and value
-               - Connect technical findings to business outcomes
-               - Provide actionable insights that can be implemented
-               - Explain potential business impacts in monetary or operational terms
-               - Include industry-specific examples when relevant
-                            
-            4. Visualization and Understanding:
-               - Describe complex patterns in simple, visual terms
-               - Use everyday analogies to explain statistical concepts
-               - Suggest clear visual representations for important findings
-               - Explain what patterns or trends mean in practical terms
-                            
-            5. Confidence and Transparency:
-               - Clearly communicate levels of certainty in findings
-               - Explain limitations and assumptions in simple terms
-               - Be honest about areas of uncertainty
-               - Provide context for statistical measures
-               - Include caveats where appropriate
-                            
-            6. Structure and Readability:
-               - Use bullet points and numbered lists for clarity
-               - Break down complex ideas into digestible chunks
-               - Provide summary points for each section
-               - Use consistent terminology throughout
-               - Include "Key Takeaway" sections for important points
-                            
-            7. Customer Focus:
-               - Anticipate and address potential questions
-               - Provide context for why each finding matters
-               - Include practical next steps and recommendations
-               - Use encouraging and constructive language
-               - Emphasize positive insights while being honest about challenges
-                            
-            8. Comprehensive Support:
-               - Offer multiple perspectives on important findings
-               - Provide both short-term and long-term recommendations
-               - Include success metrics for suggested actions
-               - Suggest ways to monitor and measure progress
-               - Outline potential implementation strategies
-              \s
-            9. **MODEL OPTIONAL FIELDS**:
-               - Create visualization titles and descriptions that align with business context
-               - Replace technical terms (PC1, PC2, Feature) with their actual business meanings
-               - Clearly explain what each axis and element means in real business terms
-                            
-               a) RandomForest :
-                  - Explain the relationship between actual and predicted values in simple terms
-                  - Include units and ranges in axis descriptions
-                  Example:\s
-                    "제목: 실제 연봉과 예측 연봉의 비교 분석"
-                    "x축: 실제 연봉 (단위: 만원, 범위: 3000-8000만원)"
-                    "y축: 모델이 예측한 연봉 (예측 신뢰구간 포함)"
-                            
-               b) LogisticRegression :
-                  - Explain what each class represents in real groups
-                  - Interpret decision boundaries from a business perspective
-                  Example:
-                    "제목: 직원 이직 위험도 분류"
-                    "클래스 설명: 안정 그룹(이직위험 낮음), 관리필요 그룹(이직위험 보통), 집중관리 그룹(이직위험 높음)"
-                    "경계선 설명: 성과와 근속년수에 따른 이직 위험 구분선"
-                            
-               c) KMeans Clustering:
-                  - Describe cluster characteristics using business terminology
-                  - Explain cluster differences from a practical perspective
-                  Example:
-                    "제목: 직원 특성에 따른 그룹 분류"
-                    "클러스터 1: 고성과 장기근속 그룹 - 안정적인 업무 성과와 높은 충성도"
-                    "클러스터 2: 성장잠재력 그룹 - 짧은 근속기간but 가파른 성과 향상"
-                            
-               d) Support Vector Machine:
-                  - Explain decision boundaries in terms of business decision-making
-                  - Interpret feature axes as actual business metrics
-                  Example:
-                    "제목: 성과 지표별 승진 가능성 분석"
-                    "x축: 분기별 업무 성과 점수 (0-100점)"
-                    "y축: 프로젝트 참여도 (0-100%)"
-                    "경계선: 승진 가능성이 높은 구간과 낮은 구간의 구분선"
-                            
-               e) Neural Network :
-                  - Connect predictions to actual business situations
-                  - Provide business interpretation for difference areas
-                  Example:
-                    "제목: 생산성 예측 정확도 분석"
-                    "x축: 실제 시간당 생산량 (단위: 개)"
-                    "y축: 예측된 시간당 생산량 (단위: 개)"
-                    "특이점 설명: 성수기/비수기에 따른 예측 편차 구간 해석"
-                            
-            10. Visualization Context Guidelines:
-                - Frame all graph titles as question/answer pairs
-                  Example: "핵심 질문: 어떤 직원들이 이직 위험이 높은가?"
-                           "답변 시각화: 근속기간과 성과에 따른 이직 위험도 분포"
-                - Include why each metric matters in axis descriptions
-                  Example: "업무 성과 지표 (팀 전체 생산성에 30% 영향을 미치는 핵심 지표)"
-                - Explain legends and boundaries in ways that aid decision-making
-                  Example: "빨간 구간: 즉시 관리가 필요한 구간 (이직 확률 70% 이상)"
-                            
-            Note: All explanations in the actual output should be in Korean except for technical terms, while maintaining the professional and user-friendly tone described in these guidelines.
-                            
-            # Additional Output Requirements
-                            
-            1. Strict JSON Compliance:
-               - Must be parseable by standard JSON parsers
-               - No comments in the final JSON output
-               - No trailing commas
-               - All string values must be in double quotes
-                            
-            Remember: The goal is to make the customer feel informed, empowered, and confident in understanding the analysis results and their implications for their business.
-                            
-            Your response should be a single valid JSON object following the above format, with all values provided in Korean except for technical terms.
-                """;
+        # Guidelines:
+        1. Language and Communication:
+           - Use simple, conversational Korean language avoiding technical jargon
+           - When technical terms must be used, provide clear explanations with everyday examples
+           - Maintain original format for technical terms, column names, and model names
+           - Write as if explaining to a friend who has no technical background
+
+        2. Explanation Depth:
+           - Start with a high-level overview before diving into details
+           - Provide step-by-step explanations for complex concepts
+           - Use relatable real-world analogies and examples
+           - Include "For example, ..." sections to illustrate key points
+           - Explain both "what" the results show and "why" they matter
+
+        3. Business Context:
+           - Focus on practical business implications and value
+           - Connect technical findings to business outcomes
+           - Provide actionable insights that can be implemented
+           - Explain potential business impacts in monetary or operational terms
+           - Include industry-specific examples when relevant
+
+        4. Visualization and Understanding:
+           - Describe complex patterns in simple, visual terms
+           - Use everyday analogies to explain statistical concepts
+           - Suggest clear visual representations for important findings
+           - Explain what patterns or trends mean in practical terms
+
+        5. Structure and Readability:
+           - Use bullet points and numbered lists for clarity
+           - Break down complex ideas into digestible chunks
+           - Provide summary points for each section
+           - Use consistent terminology throughout
+           - Include "Key Takeaway" sections for important points
+
+        Remember: The goal is to make the customer feel informed, empowered, and confident in understanding the analysis results and their implications for their business.
+       """.formatted(covertToJsonFromMap(fastApiResult));
     }
+
 
     public static String covertToJsonFromMap(Map<String, Object> map) {
         ObjectMapper objectMapper = new ObjectMapper();
