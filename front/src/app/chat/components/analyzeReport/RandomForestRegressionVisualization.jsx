@@ -4,7 +4,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
 
-// Import custom UI components from your template
+// 직접 정의한 UI 컴포넌트(Card, tabs, table etc...)
 import {
   Card,
   CardContent,
@@ -21,18 +21,27 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Typography } from "@mui/material";
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-function RandomForestRegressorVisualization({ result, explanation }) {
+// Custom Styles
+import useAnalyzingKmeansStyles from "/styles/analyzingKmeansStyle.js";
+
+export default function RandomForestRegressorVisualization({
+  result,
+  explanation,
+}) {
+  const classes = useAnalyzingKmeansStyles();
+
   // Destructure explanation with default values
   const {
     overview = {},
     key_findings = [],
     recommendations = {},
     visualizations = [],
-    report_title = "Regression Model Analysis Report",
+    report_title = "랜덤 포레스트 AI 모델 분석 보고서",
     "x-axis_title": xAxisTitle = "",
     "x-axis_description": xAxisDescription = "",
     "y-axis_title": yAxisTitle = "",
@@ -79,13 +88,14 @@ function RandomForestRegressorVisualization({ result, explanation }) {
           },
         ]}
         layout={{
-          title: visualizations[0]?.title || "Feature Importances",
+          title: visualizations[0]?.title || "특성 중요도",
           xaxis: {
-            title: "Feature",
+            title: "특성",
             automargin: true,
           },
           yaxis: {
-            title: "Importance",
+            title: "중요도",
+            tickformat: ".0%",
             automargin: true,
           },
           margin: { l: 50, r: 50, t: 50, b: 100 },
@@ -103,17 +113,17 @@ function RandomForestRegressorVisualization({ result, explanation }) {
     const r2 = result.r2;
 
     if (typeof mse !== "number" || typeof r2 !== "number") {
-      console.error("Invalid regression metrics:", mse, r2);
+      console.error("유효하지 않은 특성 중요도 데이터:", mse, r2);
       return null;
     }
 
     const metrics = [
       {
-        Metric: "Mean Squared Error (MSE)",
+        Metric: "평균 제곱 오차 (MSE)",
         Value: mse.toFixed(4),
       },
       {
-        Metric: "R² Score",
+        Metric: "R² 점수",
         Value: r2.toFixed(4),
       },
     ];
@@ -123,8 +133,8 @@ function RandomForestRegressorVisualization({ result, explanation }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Metric</TableHead>
-              <TableHead>Value</TableHead>
+              <TableHead>매트릭(Metric)</TableHead>
+              <TableHead>값</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -149,7 +159,7 @@ function RandomForestRegressorVisualization({ result, explanation }) {
       !Array.isArray(y_pred) ||
       !Array.isArray(identifier)
     ) {
-      console.error("Invalid or missing data in graph2:", result.graph2);
+      console.error("유효하지 않거나 누락된 graph2 데이터:", result.graph2);
       return null;
     }
 
@@ -176,31 +186,25 @@ function RandomForestRegressorVisualization({ result, explanation }) {
             ),
             marker: { color: "blue", size: 8, opacity: 0.6 },
             hovertemplate:
-              "%{text}<br>Actual: %{x}<br>Predicted: %{y}<extra></extra>",
+              "%{text}<br>실제 값: %{x}<br>예측 값: %{y}<extra></extra>",
           },
           {
             type: "scatter",
             mode: "lines",
-            x: [
-              Math.min(...y_test, ...y_pred),
-              Math.max(...y_test, ...y_pred),
-            ],
-            y: [
-              Math.min(...y_test, ...y_pred),
-              Math.max(...y_test, ...y_pred),
-            ],
-            name: "Perfect Prediction",
+            x: [Math.min(...y_test, ...y_pred), Math.max(...y_test, ...y_pred)],
+            y: [Math.min(...y_test, ...y_pred), Math.max(...y_test, ...y_pred)],
+            name: "완벽한 예측",
             line: { color: "red", dash: "dash" },
           },
         ]}
         layout={{
-          title: visualizations[1]?.title || "Actual vs. Predicted Values",
+          title: visualizations[1]?.title || "실제 값 vs 예측 값",
           xaxis: {
-            title: "Actual Values",
+            title: "실제 값",
             automargin: true,
           },
           yaxis: {
-            title: "Predicted Values",
+            title: "예측 값",
             automargin: true,
           },
           height: 600,
@@ -220,7 +224,7 @@ function RandomForestRegressorVisualization({ result, explanation }) {
       !Array.isArray(y_pred) ||
       !Array.isArray(identifier)
     ) {
-      console.error("Invalid or missing data in graph2:", result.graph2);
+      console.error("유효하지 않거나 누락된 graph2 데이터:", result.graph2);
       return null;
     }
 
@@ -241,30 +245,28 @@ function RandomForestRegressorVisualization({ result, explanation }) {
             y: df_residual.map((item) => item.Residual),
             text: df_residual.map(
               (item) =>
-                `ID: ${item.Identifier}<br>Residual: ${item.Residual.toFixed(
-                  2
-                )}`
+                `ID: ${item.Identifier}<br>잔차: ${item.Residual.toFixed(2)}`
             ),
             marker: { color: "green", size: 8, opacity: 0.6 },
-            hovertemplate: "ID: %{x}<br>Residual: %{y}<extra></extra>",
+            hovertemplate: "ID: %{x}<br>잔차: %{y}<extra></extra>",
           },
           {
             type: "scatter",
             mode: "lines",
             x: [Math.min(...identifier), Math.max(...identifier)],
             y: [0, 0],
-            name: "Zero Residual",
+            name: "잔차 0",
             line: { color: "red", dash: "dash" },
           },
         ]}
         layout={{
-          title: "Residuals of Predictions",
+          title: "예측 값의 잔차",
           xaxis: {
-            title: "Member Identifier",
+            title: "멤버 식별자",
             automargin: true,
           },
           yaxis: {
-            title: "Residual (Actual - Predicted)",
+            title: "잔차 (실제 값 - 예측 값)",
             automargin: true,
           },
           height: 600,
@@ -284,7 +286,7 @@ function RandomForestRegressorVisualization({ result, explanation }) {
       !Array.isArray(y_pred) ||
       !Array.isArray(identifier)
     ) {
-      console.error("Invalid or missing data in graph2:", result.graph2);
+      console.error("유효하지 않거나 누락된 graph2 데이터:", result.graph2);
       return null;
     }
 
@@ -301,10 +303,10 @@ function RandomForestRegressorVisualization({ result, explanation }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Identifier</TableHead>
-              <TableHead>Actual</TableHead>
-              <TableHead>Predicted</TableHead>
-              <TableHead>Residual</TableHead>
+              <TableHead>식별자</TableHead>
+              <TableHead>실제 값</TableHead>
+              <TableHead>예측 값</TableHead>
+              <TableHead>잔차</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -334,130 +336,257 @@ function RandomForestRegressorVisualization({ result, explanation }) {
   // Final Return
   return (
     <div className="container mx-auto p-4 space-y-8">
-      {/* Report Title */}
-      <h1 className="text-4xl font-bold text-center mb-8">
-        {report_title || "Regression Model Analysis Report"}
-      </h1>
+      {result && explanation && (
+        <>
+          <h1 className="text-4xl font-bold text-center mb-8">
+            {report_title || "회귀 모델 분석 보고서"}
+          </h1>
 
-      {/* Overview */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Overview</h2>
-        <p>{overview.analysis_purpose}</p>
-        <p>{overview.data_description}</p>
-        <p>{overview.models_used?.model_description}</p>
-      </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="feature_importance" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="feature_importance">Feature Importances</TabsTrigger>
-          <TabsTrigger value="regression_metrics">Regression Metrics</TabsTrigger>
-          <TabsTrigger value="actual_vs_predicted">Actual vs Predicted</TabsTrigger>
-          <TabsTrigger value="residuals">Residuals</TabsTrigger>
-          <TabsTrigger value="predictions_overview">Predictions</TabsTrigger>
-        </TabsList>
-
-        {/* Feature Importances Tab */}
-        <TabsContent value="feature_importance">
+          {/* Overview Section */}
           <Card>
             <CardHeader>
-              <CardTitle>{visualizations[0]?.title || "Feature Importances"}</CardTitle>
-              <CardDescription>
-                {visualizations[0]?.description || "Importance of each feature in the model"}
-              </CardDescription>
+              <CardTitle>
+                {explanation.overview_section_title || "개요"}
+              </CardTitle>
             </CardHeader>
-            <CardContent>{renderFeatureImportances()}</CardContent>
+            <CardContent>
+              <Typography variant="h6">분석 목적</Typography>
+              <Typography variant="body1" gutterBottom>
+                {overview.analysis_purpose ||
+                  "분석 목적이 제공되지 않았습니다."}
+              </Typography>
+
+              <Typography variant="h6">데이터 설명</Typography>
+              <Typography variant="body1" gutterBottom>
+                {overview.data_description ||
+                  "데이터 설명이 제공되지 않았습니다."}
+              </Typography>
+
+              <Typography variant="h6">사용된 모델</Typography>
+              <Typography variant="body1" gutterBottom>
+                {overview.models_used?.model_description ||
+                  "모델 설명이 제공되지 않았습니다."}
+              </Typography>
+            </CardContent>
           </Card>
-        </TabsContent>
 
-        {/* Regression Metrics Tab */}
-        <TabsContent value="regression_metrics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Regression Metrics</CardTitle>
-            </CardHeader>
-            <CardContent>{renderRegressionMetrics()}</CardContent>
-          </Card>
-        </TabsContent>
+          {/* Tabs Section */}
+          <Tabs defaultValue="feature_importance" className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="feature_importance">
+                {visualizations[0]?.title || "특성 중요도"}
+              </TabsTrigger>
+              <TabsTrigger value="regression_metrics">
+                {visualizations[1]?.title || "모델 성능표"}
+              </TabsTrigger>
+              <TabsTrigger value="actual_vs_predicted">
+                {visualizations[2]?.title || "실제 값 vs 예측 값"}
+              </TabsTrigger>
+              <TabsTrigger value="residuals">
+                {visualizations[3]?.title || "잔차값(Residuals)"}
+              </TabsTrigger>
+              <TabsTrigger value="predictions_overview">
+                {visualizations[4]?.title || "전체 예측 데이터"}
+              </TabsTrigger>
+            </TabsList>
 
-        {/* Actual vs Predicted Tab */}
-        <TabsContent value="actual_vs_predicted">
-          <Card>
-            <CardHeader>
-              <CardTitle>{visualizations[1]?.title || "Actual vs Predicted"}</CardTitle>
-            </CardHeader>
-            <CardContent>{renderActualVsPredictedScatter()}</CardContent>
-          </Card>
-        </TabsContent>
+            {/* Feature Importances Tab Content */}
+            <TabsContent value="feature_importance">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {visualizations[0]?.title || "특성 중요도"}
+                  </CardTitle>
+                  <CardDescription>
+                    {visualizations[0]?.description ||
+                      "분석에 있어서 각 특성이 얼마나 영향을 발휘하는 지를 나타냅니다."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{renderFeatureImportances()}</CardContent>
+              </Card>
+            </TabsContent>
 
-        {/* Residuals Tab */}
-        <TabsContent value="residuals">
-          <Card>
-            <CardHeader>
-              <CardTitle>Residuals of Predictions</CardTitle>
-            </CardHeader>
-            <CardContent>{renderResidualsPlot()}</CardContent>
-          </Card>
-        </TabsContent>
+            {/* Regression Metrics Tab Content */}
+            <TabsContent value="regression_metrics">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {visualizations[1]?.title || "모델 성능표"}
+                  </CardTitle>
+                  <CardDescription>
+                    {visualizations[1]?.description ||
+                      "회귀 모델의 성능을 보여줍니다."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{renderRegressionMetrics()}</CardContent>
+              </Card>
+            </TabsContent>
 
-        {/* Predictions Overview Tab */}
-        <TabsContent value="predictions_overview">
-          <Card>
-            <CardHeader>
-              <CardTitle>Predictions Overview</CardTitle>
-            </CardHeader>
-            <CardContent>{renderPredictionsTable()}</CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            {/* Actual vs Predicted Tab Content */}
+            <TabsContent value="실제 값 vs 예측 값">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {visualizations[2]?.title || "실제 값 vs 예측 값"}
+                  </CardTitle>
+                  <CardDescription>
+                    {visualizations[2]?.description ||
+                      "실제 값 vs 예측 값에 대한 분포도를 나타냅니다."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{renderActualVsPredictedScatter()}</CardContent>
+              </Card>
+            </TabsContent>
 
-      {/* Key Findings and Recommendations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Key Findings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Findings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-5 space-y-2">
-              {key_findings.map((finding, index) => (
-                <li key={index}>
-                  <strong>{finding.finding}</strong>: {finding.impact}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+            {/* Residuals Tab Content */}
+            <TabsContent value="residuals">
+              <Card>
+                <CardHeader>
+                  <CardTitle>예측의 잔차를 나타냅니다.</CardTitle>
+                  <CardDescription>
+                    실제 값과 예측값의 차이를 그래프로 나타냅니다. (실제 값 - 예측 값)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{renderResidualsPlot()}</CardContent>
+              </Card>
+            </TabsContent>
 
-        {/* Recommendations */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recommendations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recommendations.immediate_actions && recommendations.immediate_actions.length > 0 && (
-              <>
-                <h3 className="text-lg font-semibold mb-2">Immediate Actions</h3>
+            {/* Predictions Overview Tab Content */}
+            <TabsContent value="predictions_overview">
+              <Card>
+                <CardHeader>
+                  <CardTitle>전체 예측 데이터</CardTitle>
+                  <CardDescription>
+                    모든 점들에 대한 실제 값, 예측 값, 잔차를 나타냅니다.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{renderPredictionsTable()}</CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+
+          {/* Key Findings and Recommendations */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Key Findings */}
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {explanation.key_findings_section_title || "주목할만한 부분"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <ul className="list-disc pl-5 space-y-2">
-                  {recommendations.immediate_actions.map((action, index) => (
-                    <li key={index}>{action}</li>
+                  {key_findings.map((finding, index) => (
+                    <li key={index} className={classes.listItem}>
+                      <strong>{finding.finding}</strong>: {finding.impact}
+                    </li>
                   ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Recommendations */}
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {explanation.recommendations_section_title ||
+                    "추천"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recommendations.immediate_actions &&
+                  recommendations.immediate_actions.length > 0 && (
+                    <>
+                      <h3 className="text-lg font-semibold mb-2">
+                        즉각적인 조치
+                      </h3>
+                      <ul className="list-disc pl-5 space-y-2">
+                        {recommendations.immediate_actions.map(
+                          (action, index) => (
+                            <li key={index} className={classes.listItem}>
+                              {action}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </>
+                  )}
+                {recommendations.further_analysis &&
+                  recommendations.further_analysis.length > 0 && (
+                    <>
+                      <h3 className="text-lg font-semibold mb-2">
+                        향후 분석 가능성
+                      </h3>
+                      <ul className="list-disc pl-5 space-y-2">
+                        {recommendations.further_analysis.map(
+                          (action, index) => (
+                            <li key={index} className={classes.listItem}>
+                              {action}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </>
+                  )}
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
+
+      {/* Model Performance Section */}
+      {result && explanation && explanation.model_performance && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {explanation.model_performance_section_title ||
+                "모델 성능"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Render Metrics */}
+            <Typography variant="h6">중요 지표</Typography>
+            {explanation.model_performance.metrics.map((metric, index) => (
+              <div key={index} className="mb-2">
+                <Typography variant="body1">
+                  <strong>{metric.metric_name}:</strong> {metric.metric_value}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {metric.interpretation}
+                </Typography>
+              </div>
+            ))}
+
+            {/* Render Prediction Analysis */}
+            {explanation.model_performance.prediction_analysis && (
+              <>
+                <Typography variant="h6" className="mt-4">
+                  예측 모델 분석
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>정확도:</strong>{" "}
+                  {
+                    explanation.model_performance.prediction_analysis
+                      .overall_accuracy
+                  }
+                </Typography>
+                <Typography variant="body1">
+                  <strong>주목할만한 부분:</strong>
+                </Typography>
+                <ul className="list-disc pl-5">
+                  {explanation.model_performance.prediction_analysis.notable_patterns.map(
+                    (pattern, idx) => (
+                      <li key={idx}>
+                        <Typography variant="body2">{pattern}</Typography>
+                      </li>
+                    )
+                  )}
                 </ul>
               </>
             )}
-            {recommendations.further_analysis && recommendations.further_analysis.length > 0 && (
-              <>
-                <h3 className="text-lg font-semibold mb-2">Further Analysis</h3>
-                <ul className="list-disc pl-5 space-y-2">
-                  {recommendations.further_analysis.map((action, index) => (
-                    <li key={index}>{action}</li>
-                  ))}
-                </ul>
-              </>
-            )}
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   );
 }
@@ -505,7 +634,6 @@ RandomForestRegressorVisualization.propTypes = {
     visualizations: PropTypes.arrayOf(
       PropTypes.shape({
         title: PropTypes.string,
-        type: PropTypes.string,
         description: PropTypes.string,
         insights: PropTypes.string,
       })
@@ -515,7 +643,23 @@ RandomForestRegressorVisualization.propTypes = {
     "x-axis_description": PropTypes.string,
     "y-axis_title": PropTypes.string,
     "y-axis_description": PropTypes.string,
+    model_performance: PropTypes.shape({
+      metrics: PropTypes.arrayOf(
+        PropTypes.shape({
+          metric_name: PropTypes.string.isRequired,
+          metric_value: PropTypes.string.isRequired,
+          interpretation: PropTypes.string.isRequired,
+        })
+      ).isRequired,
+      prediction_analysis: PropTypes.shape({
+        overall_accuracy: PropTypes.string,
+        notable_patterns: PropTypes.arrayOf(PropTypes.string),
+      }),
+      model_performance_section_title: PropTypes.string,
+    }),
+    overview_section_title: PropTypes.string,
+    model_performance_section_title: PropTypes.string,
+    key_findings_section_title: PropTypes.string,
+    recommendations_section_title: PropTypes.string,
   }).isRequired,
 };
-
-export default RandomForestRegressorVisualization;
