@@ -69,7 +69,6 @@ public class MLRecommendationService {
 
 	public String recommend(String sessionId, String chatRoomId, String analysisPurpose, List<MultipartFile> files) {
 
-		log.info("Step 1: Start recommendation process");
 		long maxFileSize = 2 * 1024 * 1024; // 2MB
 
 		// 파일 크기 검증
@@ -82,21 +81,17 @@ public class MLRecommendationService {
 
 		Guest guest = guestRepository.findById(sessionId)
 			.orElseGet(() -> guestRepository.save(Guest.create(sessionId)));
-		log.info("Step 1-1: Guest retrieved or created with sessionId={}", sessionId);
 
 		String fileName = files.get(0).getOriginalFilename();
 		ChatRoom chatRoom = chatRoomRepository.findByIdAndGuestId(chatRoomId, guest.getId())
 			.orElseGet(() -> {
-				log.info("ChatRoom with chatRoomId={} not found for guest with sessionId={}. Creating new ChatRoom.", chatRoomId, sessionId);
 				return chatRoomRepository.save(ChatRoom.create(chatRoomId, guest));
 			});
-		log.info("Step 1-2: ChatRoom retrieved or created with chatRoomId={}", chatRoomId);
 
 		List<Map<String, Object>> inputDataList = new ArrayList<>();
 		List<String> fileUrls = new ArrayList<>();
 
 		// Step 3: CSV 파일 파싱 및 S3 업로드
-		log.info("Step 3: Parsing CSV file and uploading to S3");
 		List<CompletableFuture<Void>> futures = files.stream().map(file ->
 			CompletableFuture.runAsync(() -> {
 				try {
@@ -104,21 +99,14 @@ public class MLRecommendationService {
 					String[] headers = csvResult.headers();
 					List<String[]> rows = csvResult.rows();
 
-					// 디버깅: CSV 파싱 결과 확인
-					log.info("Parsed headers for file '{}': {}", file.getOriginalFilename(), Arrays.toString(headers));
-					log.info("Parsed rows count for file '{}': {}", file.getOriginalFilename(), rows.size());
 
 					if (rows.isEmpty() || headers == null) {
-						log.error("CSV file '{}' contains no valid data or headers are missing.", file.getOriginalFilename());
-						log.info("row is empty for file '{}'", file.getOriginalFilename());
 					}
 
 					List<String[]> randomRows = getRandomRows(rows, RANDOM_SELECT_ROWS);
 					String jsonData = convertToJson(headers, randomRows);
-					log.info("Step 3: Parsed random rows as JSON: {}", jsonData);
 
 					// Step 2: 파일 업로드 및 URL 저장
-					log.info("Step 2: Uploading file '{}' to S3", file.getOriginalFilename());
 					String fileUrl = s3Client.upload(toAttachedFile(file));
 					synchronized (fileUrls) {
 						fileUrls.add(fileUrl);
@@ -126,7 +114,6 @@ public class MLRecommendationService {
 
 					File fileEntity = File.create(UUID.randomUUID().toString(), chatRoom, fileUrl);
 					fileRepository.save(fileEntity);
-					log.info("Step 2: File '{}' uploaded to S3 with URL: {}", file.getOriginalFilename(), fileUrl);
 
 					// Step 4: Prompt 생성
 					Map<String, Object> modelParams = new HashMap<>();
@@ -136,7 +123,6 @@ public class MLRecommendationService {
 					synchronized (inputDataList) {
 						inputDataList.add(modelParams);
 					}
-					log.info("Step 4: Generated prompt for GPT model with file: {}", file.getOriginalFilename());
 
 				} catch (Exception e) {
 					log.error("Error processing file '{}': {}", file.getOriginalFilename(), e.getMessage(), e);
@@ -148,7 +134,6 @@ public class MLRecommendationService {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
 		// Step 4.5: 파싱된 값 로그 출력
-		log.info("Step 4.5: Logging parsed data before GPT call");
 		if (inputDataList.isEmpty()) {
 			log.error("Step 4.5: inputDataList is empty. No data to process for GPT call.");
 			return "CSV 파일에 유효한 데이터가 없습니다.";
@@ -156,7 +141,6 @@ public class MLRecommendationService {
 		inputDataList.forEach(data -> log.info("Parsed inputData: {}", data));
 
 		// Step 5: GPT 호출 및 응답 처리
-		log.info("Step 5: Calling GPT model");
 		String header = "Bearer " + apiKey;
 		String body = PromptGenerator.createRecommendedModelFromLLM(inputDataList, analysisPurpose);
 
@@ -165,21 +149,18 @@ public class MLRecommendationService {
 		String gptResponse = null;
 		try {
 			gptResponse = gptClient.callFunction(header, request);
-			log.info("Step 5: GPT model response received");
 		} catch (Exception e) {
 			log.error("Step 5: Error calling GPT model: {}", e.getMessage(), e);
 			return "GPT 모델 호출 중 오류가 발생했습니다.";
 		}
 
 		// GPT 응답 디버깅
-		log.info("GPT Response: {}", gptResponse);
 
 		int requestToken = calculateTokens(body);
 		int responseToken = calculateTokens(gptResponse);
 
 		// Step 6: MongoDB에 GPT 응답 및 파일 URL 리스트 저장
 		int requestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, analysisPurpose, requestToken, responseToken, inputDataList, fileName);
-		log.info("Step 6: GPT response and file paths saved to MongoDB with requestId={}", requestId);
 
 		return createResponse(gptResponse, requestId);
 	}
@@ -229,7 +210,6 @@ public class MLRecommendationService {
 			analysisRequest.put("fileName",fileName);
 
 			mongoTemplate.save(new Document(analysisRequest), "MongoDB");
-			log.info("Saved data with chatRoomId: {} and requestId: {}", chatRoomId, newRequestId);
 
 			return newRequestId;
 
@@ -262,12 +242,10 @@ public class MLRecommendationService {
 	}
 
 	private String createResponse(String jsonResponse, int requestId) {
-		log.info("jsonResponse " + jsonResponse);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode rootNode = mapper.readTree(jsonResponse);
 			String messageContent = rootNode.get("choices").get(0).get("message").get("content").asText();
-			log.info("message: " + messageContent);
 			JsonNode jsonNode = mapper.readTree(messageContent);
 
 			((ObjectNode) jsonNode).put("requestId", requestId);
@@ -296,7 +274,6 @@ public class MLRecommendationService {
 	 * Step2
 	 */
 	public Object mlRecommendationExceptChosenService(String chatRoomId, int requestId) {
-		log.info("Step 1: Start fetching data for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 2: MongoDB에서 chatRoomId와 requestId로 데이터 조회
 		Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
@@ -306,7 +283,6 @@ public class MLRecommendationService {
 			log.error("Step 2: Data not found for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
-		log.info("Step 2: Data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 		Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
 
 		// Step 3: 필요한 필드를 기존 데이터에서 추출 및 null 체크
@@ -332,20 +308,17 @@ public class MLRecommendationService {
 			log.error("Step 4: model_recommendations field is missing or invalid in MongoDB data for chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 			throw new BusinessException(SessionErrorCode.NOT_EXIST_SESSION_ID);
 		}
-		log.info("Step 4: model_recommendations field is valid for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 5: model_recommendations 필드에서 isSelected가 true인 항목을 제외
 		List<Map<String, Object>> filteredRecommendations = modelRecommendations.stream()
 			.filter(model -> !Boolean.TRUE.equals(model.get("isSelected")))
 			.collect(Collectors.toList());
 
-		log.info("Step 5: Filtered model recommendations for chatRoomId: {}, requestId: {}. Total recommendations: {}", chatRoomId, requestId, filteredRecommendations.size());
 
 		// Step 6: 새 requestId 생성 - chatRoomId로 조회된 객체 수 + 1
 		Query countQuery = new Query(Criteria.where("chatRoomId").is(chatRoomId));
 		long existingCount = mongoTemplate.count(countQuery, "MongoDB");
 		int newRequestId = (int) existingCount + 1;
-		log.info("Step 6: Generated new requestId: {}", newRequestId);
 
 		// Step 7: 새로운 Document에 필드 저장
 		Document newDocument = new Document();
@@ -361,7 +334,6 @@ public class MLRecommendationService {
 		));
 
 		mongoTemplate.insert(newDocument, "MongoDB");
-		log.info("Step 7: Saved filtered recommendations to MongoDB with new requestId: {}", newRequestId);
 
 		// Step 8: 필요한 형식으로 응답 반환
 		Map<String, Object> response = new HashMap<>();
@@ -374,7 +346,6 @@ public class MLRecommendationService {
 	}
 
 	public Object alternativeRecommend(String chatRoomId, int requestId, String newRequirement) {
-		log.info("Step 1: Start alternative recommendation process for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 2: MongoDB에서 요청 문서 조회
 		Query query = new Query();
@@ -385,11 +356,9 @@ public class MLRecommendationService {
 			log.warn("Step 2: No data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 			return "데이터를 찾을 수 없습니다.";
 		}
-		log.info("Step 2: Found MongoDB document for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 3: Document를 Map으로 변환
 		Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
-		log.info("Step 3: Converted MongoDB document to Map for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 4: 필요한 데이터 추출
 		Object requirement = chatRoomData.get("requirement");
@@ -397,29 +366,22 @@ public class MLRecommendationService {
 		List<Map<String, Object>> inputDataList = (List<Map<String, Object>>) chatRoomData.get("inputDataList");
 		String fileName = (String) chatRoomData.get("fileName");
 		Object recommendedModelFromLLM = chatRoomData.get("RecommendedModelFromLLM");
-		log.info("Step 4: Extracted requirement, fileUrls, inputDataList, and recommendedModelFromLLM for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 5: System Prompt 및 User Prompt 생성
 		String systemPrompt = promptGenerator.createSystemPromptForAlternative(requirement, inputDataList, recommendedModelFromLLM);
 		String userPrompt = promptGenerator.createUserPromptForAlternative(newRequirement);
-		log.info("Step 5: Generated systemPrompt and userPrompt for alternative recommendation for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 6: GPT 요청
 		GptResultRequest gptRequest = new GptResultRequest(systemPrompt, userPrompt);
 		String gptResponse = gptClient.callFunctionWithResultRequest("Bearer " + apiKey, gptRequest);
-		log.info("Step 6: Received GPT response for alternative recommendation for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
 		// Step 7: MongoDB에 GPT 응답 저장
 		int requestToken = calculateTokens(systemPrompt + userPrompt);
 		int responseToken = calculateTokens(gptResponse);
-		log.info("gptResponse: {}", gptResponse);
 
 		int newRequestId = saveGptResponseToMongo(gptResponse, chatRoomId, fileUrls, newRequirement, requestToken, responseToken, inputDataList,fileName);
-		log.info("Step 7: Saved GPT response to MongoDB with newRequestId: {} for chatRoomId: {}", newRequestId, chatRoomId);
 
-		// Step 8: 응답 포맷팅
 		String formattedResponse = createResponse(gptResponse, newRequestId);
-		log.info("Step 8: Created formatted response for newRequestId: {}", newRequestId);
 
 		return formattedResponse;
 	}

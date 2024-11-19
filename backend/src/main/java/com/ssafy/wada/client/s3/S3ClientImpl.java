@@ -26,7 +26,6 @@ public class S3ClientImpl implements S3Client {
 
 	@Override
 	public String upload(AttachedFile file) {
-		log.info("upload");
 		Map<String, String> metadata = new HashMap<>();
 		metadata.put("file-type", "csv");
 
@@ -49,7 +48,6 @@ public class S3ClientImpl implements S3Client {
 	}
 
 	private String executePut(PutObjectRequest request) {
-		log.info("executePut");
 		amazonS3.putObject(request.withCannedAcl(CannedAccessControlList.PublicRead));
 		StringBuilder sb = new StringBuilder(url);
 		if (!url.endsWith("/"))
@@ -57,7 +55,6 @@ public class S3ClientImpl implements S3Client {
 		sb.append(bucketName);
 		sb.append("/");
 		sb.append(request.getKey());
-		log.info(sb.toString());
 		return sb.toString();
 	}
 }

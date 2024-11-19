@@ -22,10 +22,5 @@ public class EnvLogger {
 		String fastApiUrl = environment.getProperty("FAST_API_URL");
 		String gptKey = environment.getProperty("GPT_KEY");
 
-		log.info("Active Profile: {}", activeProfile);
-		log.info("Database URL: {}", dbUrl);
-		log.info("MongoDB URL: {}", mongoUrl);
-		log.info("FastAPI URL: {}", fastApiUrl);
-		log.info("GPT KEY: {}", gptKey);
 	}
 }

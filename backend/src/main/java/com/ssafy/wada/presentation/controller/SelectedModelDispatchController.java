@@ -27,9 +27,6 @@ public class SelectedModelDispatchController {
         int requestId = request.getRequestId();
         int selectedModel = request.getSelectedModel();  // selectedModel 추출
 
-        log.info("Received chatRoomId: {}", chatRoomId);
-        log.info("Received requestId: {}", requestId);
-        log.info("Received selectedModel: {}", selectedModel);
 
         // ModelDispatchService에 chatRoomId와 selectedModel 전달
         return modelDispatchService.dispatchModel(chatRoomId,requestId, selectedModel);
@@ -40,7 +37,6 @@ public class SelectedModelDispatchController {
         String chatRoomId = (String) request.get("chatRoomId");
         int requestId = (Integer) request.get("requestId");
         String text = (String) request.get("text");
-        log.info("Received chatRoomId: {}, requestId: {} , text: {}" , chatRoomId, requestId , text);
 // ModelDispatchService의 Conversation 메서드 호출
         String answer = modelDispatchService.conversation(chatRoomId, requestId, text);
 

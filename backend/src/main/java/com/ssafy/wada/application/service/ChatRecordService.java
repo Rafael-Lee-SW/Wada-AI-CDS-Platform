@@ -43,12 +43,9 @@ public class ChatRecordService {
             log.warn("No guest found for sessionId: {}", sessionId);
             return Collections.emptyList();
         }
-        log.info("Fetching chat history for each ChatRoom associated with sessionId: {}",
-            sessionId);
 
         return guest.getChatRooms().stream().flatMap(chatRoom -> {
             String chatRoomId = chatRoom.getId();
-            log.info("Processing ChatRoom with chatRoomId: {}", chatRoomId);
 
             Query query = new Query(
                 Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(1)
@@ -56,7 +53,6 @@ public class ChatRecordService {
             List<Document> chatRoomDataList = mongoTemplate.find(query, Document.class, "MongoDB");
 
             if (!chatRoomDataList.isEmpty()) {
-                log.info("Data found in MongoDB for chatRoomId: {}", chatRoomId);
                 return chatRoomDataList.stream().map(chatRoomData -> new ChatHistoryResponse(
                     chatRoomId,
                     (String) chatRoomData.get("fileName"),
@@ -74,7 +70,6 @@ public class ChatRecordService {
 
     @Transactional
     public List<ChatHistoryDetailResponse> getChatHistoryDetail(String sessionId, String chatRoomId) {
-        log.info("Fetching Guest with sessionId: {} to validate access to chatRoomId: {}", sessionId, chatRoomId);
         Guest guest = guestRepository.findById(sessionId)
             .orElseThrow(() -> new IllegalArgumentException("No guest found for sessionId: " + sessionId));
 
@@ -85,7 +80,6 @@ public class ChatRecordService {
             throw new IllegalArgumentException("Access denied for chatRoomId: " + chatRoomId);
         }
 
-        log.info("Fetching all chat history entries for chatRoomId: {} in MongoDB", chatRoomId);
         Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId));
         List<Document> chatRoomDataList = mongoTemplate.find(query, Document.class, "MongoDB");
 

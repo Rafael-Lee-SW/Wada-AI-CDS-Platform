@@ -32,10 +32,6 @@ public class MLModelRecommendController {
 		@RequestParam("files") List<MultipartFile> files,
 		@RequestParam("chatRoomId") String chatRoomId,
 		@RequestParam("requirement") String requirement) {
-		log.info("Request received with parameters:");
-		log.info("sessionId: {}", sessionId);
-		log.info("chatRoomId: {}", chatRoomId);
-		log.info("requirement: {}", requirement);
 		return ResponseEntity.ok(mlRecommendationService.recommend(sessionId, chatRoomId, requirement, files));
 	}
 
@@ -46,7 +42,6 @@ public class MLModelRecommendController {
 		String chatRoomId = (String) payload.get("chatRoomId");
 		int requestId = (int) payload.get("requestId");
 
-		log.info("Received request for model recommendation with chatRoomId: {} and requestId: {}", chatRoomId, requestId);
 		return ResponseEntity.ok(mlRecommendationService.mlRecommendationExceptChosenService(chatRoomId, requestId));
 	}
 
@@ -59,9 +54,6 @@ public class MLModelRecommendController {
 		String chatRoomId = (String) payload.get("chatRoomId");
 		int requestId = (int) payload.get("requestId");
 		String newRequirement = (String) payload.get("newRequirement");
-		log.info("chatRoomId: {}", chatRoomId);
-		log.info("requestId: {}", requestId);
-		log.info("newRequirement: {}", newRequirement);
 		return ResponseEntity.ok(mlRecommendationService.alternativeRecommend(chatRoomId, requestId, newRequirement));
 	}
 }

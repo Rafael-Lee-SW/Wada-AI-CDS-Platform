@@ -24,7 +24,6 @@ public class ChatRecordController {
     // 전체 대화 기록 조회
     @GetMapping(value = "/all", produces = "application/json")
     public ResponseEntity<List<ChatHistoryResponse>> getAllChatHistory(@SessionId String sessionId) {
-        log.info("Fetching all chat history for sessionId: {}", sessionId);
         List<ChatHistoryResponse> allChatHistory = chatRecordService.getAllChatHistory(sessionId);
         return ResponseEntity.ok(allChatHistory);
     }
@@ -35,7 +34,6 @@ public class ChatRecordController {
         @SessionId String sessionId,
         @RequestParam("chatRoomId") String chatRoomId) {
 
-        log.info("Fetching chat history detail for sessionId: {} and chatRoomId: {}", sessionId, chatRoomId);
         List<ChatHistoryDetailResponse> chatHistory = chatRecordService.getChatHistoryDetail(sessionId, chatRoomId);
         return ResponseEntity.ok(chatHistory);
     }
