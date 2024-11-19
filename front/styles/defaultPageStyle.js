@@ -4,6 +4,8 @@ const styles = {
         flexDirection: 'column',
         flex: 1,
         justifyContent: 'space-between', 
+        marginBottom: '110px',
+        marginTop: '50px'
     },
     messageBox: {
         marginTop: '50px',
@@ -11,7 +13,6 @@ const styles = {
         padding: '20px',
         flex: 1,
         backgroundColor: '#fff',
-        boxShadow: '0 0 5px rgba(0,0,0,0.1)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -22,7 +23,7 @@ const styles = {
         opacity: '0.7'
     },
     message: {
-        fontSize: '20px',
+        fontSize: '16px',
     },
 }
 

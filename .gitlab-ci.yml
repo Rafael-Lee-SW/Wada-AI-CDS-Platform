@@ -1,20 +1,18 @@
 stages:
   - build
 
-variables:
-  DOCKER_IMAGE_NAME: "ml-fastapi"
-  DOCKER_IMAGE_TAG: "latest"
-  DOCKER_REGISTRY: "docker.io"
-  SSH_KEY_PATH: "/home/ubuntu/MLAL.pem"
-  EC2_IP: "3.34.133.111"
-
 build:
   stage: build
+  image: gradle:6.9.3-jdk17
+  before_script:
+    - echo "[INFO] YML Settings"
+    - chmod +x backend/gradlew
+    - cd backend
   script:
-  - scp -i $SSH_KEY_PATH -r ml-ray-fastapi-platform ec2-user@$EC2_IP:/home/ec2-user/
-  - ssh -i $SSH_KEY_PATH ec2-user@$EC2_IP "
-        sh /home/ec2-user/ml.sh
-      "
+    - ./gradlew clean build -x test
+    - cp build/libs/backend-0.0.1-SNAPSHOT.jar /home/ubuntu/back
+    - cd /home/ubuntu/back
+    - sh back.sh
   only:
     - /.*\/master$/  
   tags:

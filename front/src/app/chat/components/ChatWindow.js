@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from "uuid"
 import DefaultPage from "./DefaultPage";
 import SelectML from "./SelectML";
 import ChatContent from "./ChatContent";
+import { fetchModel, createAnalyze } from "@/api";
+import Loading from "./Loading";
 
 export default function Home() {
 
@@ -20,6 +22,14 @@ export default function Home() {
     const [result, setResult] = useState(null);
     const [chatRoomId, setChatRoomId] = useState('');
     const [sessionId, setSessionId] = useState('');
+    const [chatList, setChatList] = useState([]);
+
+    // 새로운 채팅이 시작될 때? 마다 채팅 기록 불러오기
+
+    const handlePageChange = (event) => {
+        event.preventDefault();
+        setPage('default');
+    }
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]); 
@@ -41,15 +51,10 @@ export default function Home() {
         formData.append("file", file); 
         formData.append("message", message); 
 
-        // api 연결 필요
         try {
-            const response = await fetch("요청api", {
-                method: "POST",
-                body: formData, 
-                headers: {
-                'sessionId': sessionId
-                }
-            });
+            // const response = await fetchModel(formData, sessionId);
+
+            // const result = response.data;
             
             // 테스트용
             const result = {
@@ -164,15 +169,10 @@ export default function Home() {
                 "chatRoomId": chatRoomId,
                 "selectedModel": index,
             }
-            // 요청 방식 확인 필요
-            const response = await fetch("요청api", { 
-                method: "POST", 
-                body: data, 
-                headers: {
-                'sessionId': sessionId
-                }});
-            // 분석 결과
-            const result = await response.result();
+            
+            const response = await createAnalyze(data, sessionId); 
+            // 분석 결과 (형식확인 필요)
+            const result = response.result();
 
             // 최종 분석 결과 저장
             setResult(result); 
@@ -201,26 +201,27 @@ export default function Home() {
                     </div>
                     <div style={styles.menuItem}>
                         <img style={styles.arrow} src="/img/arrow.png" alt="arrow"/>
-                        <p>분석 기록 1</p>
+                        <p style={styles.chatList}>대화 기록 1</p>
                     </div>
                     <div style={styles.menuItem}>
                         <img style={styles.arrow} src="/img/arrow.png" alt="arrow"/>
-                        <p>분석 기록 2</p>
+                        <p style={styles.chatList}>대화 기록 2</p>
                     </div>
                     <div style={styles.menuItem}>
                         <img style={styles.arrow} src="/img/arrow.png" alt="arrow"/>
-                        <p>분석 기록 3</p>
+                        <p style={styles.chatList}>대화 기록 3</p>
                     </div>
                 </div>
             </div>
             <div style={styles.header}>
-                <span style={styles.headerMessage}>원하는Da로</span>
+                <span style={styles.headerMessage} onClick={handlePageChange}>원하는Da로</span>
             </div>
 
             {page === 'default' && <DefaultPage />}
             {page === 'selectML' && <SelectML chatRoomId={chatRoomId} models={models} purpose={purpose} overview={overview} onModelSelect={handleModelSelect} />}
             {/* 채팅 컴포넌트에서 분석결과 탭을 누르면 왼쪽에는 채팅, 오른쪽에는 대시보드가 나오도록 랜더링 */}
             {page === 'chatContent' && <ChatContent file={submittedFile} message={submittedMessage} result={result}/>}
+            {page === 'loading' && <Loading/>}
 
             <div style={styles.inputWrapper}>
                 {file && (
@@ -254,13 +255,12 @@ export default function Home() {
                         value={message}
                         onChange={handleMessage}
                     />
-                    <button 
-                        type="submit"
-                        style={styles.inputButton} 
+                    <img
+                        src="/img/inputButton.png"
+                        alt="inputButton"
                         onClick={handleSubmit}
-                    >
-                        전송
-                    </button>
+                        style={styles.inputButton}
+                    />
                 </div>
             </div>
         </div>
