@@ -1,0 +1,312 @@
+EmpID,PerfScoreID,EmpSatisfaction,EngagementSurvey,SpecialProjectsCount,Absences,DaysLateLast30,Department,Position,Salary,ManagerID
+10026,4,5,4.6,0,1,0,Production       ,Production Technician I,62506,22.0
+10084,3,3,4.96,6,17,0,IT/IS,Sr. DBA,104437,4.0
+10196,3,3,3.02,0,3,0,Production       ,Production Technician II,64955,20.0
+10088,3,5,4.84,0,15,0,Production       ,Production Technician I,64991,16.0
+10069,3,4,5.0,0,2,0,Production       ,Production Technician I,50825,39.0
+10002,4,5,5.0,0,15,0,Production       ,Production Technician I,57568,11.0
+10194,3,3,3.04,4,19,0,Software Engineering,Software Engineer,95660,10.0
+10062,3,4,5.0,0,19,0,Production       ,Production Technician I,59365,19.0
+10114,3,3,4.46,0,4,0,Production       ,Production Technician I,47837,12.0
+10250,3,5,5.0,6,16,0,IT/IS,IT Support,50178,7.0
+10252,3,4,4.2,0,12,0,Production       ,Production Technician I,54670,14.0
+10242,3,3,4.2,0,15,0,Production       ,Production Technician I,47211,20.0
+10012,4,4,4.28,5,9,0,IT/IS,Data Analyst,92328,4.0
+10265,3,4,4.6,0,7,0,Production       ,Production Technician I,58709,18.0
+10066,3,5,5.0,0,1,0,Production       ,Production Technician I,52505,22.0
+10061,3,4,5.0,0,20,0,Production       ,Production Technician I,57834,18.0
+10023,4,3,4.4,0,16,0,Production       ,Production Technician II,70131,18.0
+10055,3,5,5.0,0,12,0,Production       ,Production Technician I,59026,16.0
+10245,3,4,4.5,5,8,0,IT/IS,Database Administrator,110000,4.0
+10277,3,4,4.2,0,13,0,Production       ,Production Technician I,53250,
+10046,3,3,5.0,0,13,0,Production       ,Production Technician I,51044,11.0
+10226,3,3,4.2,0,2,0,Production       ,Production Technician I,64919,19.0
+10003,4,3,5.0,0,19,0,Production       ,Production Technician I,62910,12.0
+10294,2,3,2.0,0,3,2,Production       ,Production Technician II,66441,22.0
+10267,3,5,4.8,0,5,0,Production       ,Production Technician II,57815,16.0
+10199,3,5,3.5,7,2,0,IT/IS,Enterprise Architect,103613,4.0
+10081,3,4,5.0,3,4,0,Admin Offices,Sr. Accountant,106367,3.0
+10175,3,3,3.39,0,14,0,Production       ,Production Manager,74312,2.0
+10177,3,4,3.35,0,6,0,Production       ,Production Technician I,53492,14.0
+10238,3,2,4.5,6,14,0,Admin Offices,Accountant I,63000,1.0
+10184,3,3,3.19,0,9,0,Production       ,Production Technician II,65288,
+10203,3,5,3.5,0,17,0,Production       ,Production Technician I,64375,20.0
+10188,3,5,3.14,0,19,1,Sales,Area Sales Manager,74326,17.0
+10107,3,4,4.51,0,3,0,Production       ,Production Technician II,63763,11.0
+10181,3,5,3.25,0,15,0,Production       ,Production Technician II,62162,19.0
+10150,3,3,3.84,5,4,0,Software Engineering,Software Engineering Manager,77692,5.0
+10001,4,3,5.0,0,14,0,Production       ,Production Manager,72640,2.0
+10085,3,4,4.96,6,3,0,Software Engineering,Software Engineer,93396,10.0
+10115,3,3,4.43,0,14,0,Production       ,Production Technician I,52846,18.0
+10082,3,5,5.0,6,7,0,IT/IS,Sr. DBA,100031,4.0
+10040,3,5,5.0,0,7,0,Sales,Area Sales Manager,71860,17.0
+10067,3,4,5.0,0,11,0,Production       ,Production Technician I,61656,22.0
+10108,3,5,4.5,7,8,0,IT/IS,BI Director,110929,5.0
+10210,3,4,3.3,0,11,0,Production       ,Production Technician I,54237,16.0
+10154,3,5,3.8,0,4,0,Production       ,Production Technician I,60380,
+10200,3,5,3.0,0,17,0,Sales,Area Sales Manager,66808,21.0
+10240,3,4,4.3,0,3,0,Production       ,Production Technician I,64786,11.0
+10168,3,5,3.58,0,3,0,Production       ,Production Technician I,64816,19.0
+10220,3,3,4.7,6,2,0,IT/IS,IT Support,68678,6.0
+10275,3,5,4.2,0,9,0,Production       ,Production Technician II,64066,12.0
+10269,3,4,4.2,0,6,0,Production       ,Production Technician II,59369,14.0
+10029,4,4,4.1,0,5,0,Production       ,Production Technician I,50373,12.0
+10261,3,5,4.4,0,3,0,Production       ,Production Technician I,63108,14.0
+10292,2,3,2.0,0,16,5,Production       ,Production Technician I,59144,20.0
+10282,2,2,4.13,0,3,3,Production       ,Production Manager,68051,2.0
+10019,4,5,3.7,0,15,0,Production       ,Director of Operations,170500,2.0
+10094,3,5,4.73,0,6,0,Production       ,Production Technician I,63381,18.0
+10193,3,3,3.04,6,2,0,IT/IS,Data Analyst,83552,4.0
+10132,3,5,4.12,0,15,0,Production       ,Production Technician I,56149,22.0
+10083,3,3,5.0,4,5,0,IT/IS,Sr. Network Engineer,92329,7.0
+10099,3,4,4.62,0,8,0,Sales,Sales Manager,65729,15.0
+10212,3,5,3.1,8,19,0,IT/IS,Sr. Network Engineer,85028,7.0
+10056,3,3,5.0,0,1,0,Production       ,Production Technician I,57583,16.0
+10143,3,4,3.96,0,6,0,Production       ,Production Technician II,56294,20.0
+10311,1,4,4.3,3,2,2,Production       ,Production Technician I,56991,12.0
+10070,3,4,5.0,0,14,0,Production       ,Production Technician I,55722,39.0
+10155,3,5,3.79,5,8,0,Software Engineering,Software Engineer,101199,10.0
+10306,1,3,1.93,0,5,6,Sales,Area Sales Manager,61568,17.0
+10100,3,5,4.62,0,1,0,Production       ,Production Technician II,58275,18.0
+10310,1,2,1.12,0,9,4,Production       ,Production Technician I,53189,11.0
+10197,3,5,3.01,7,15,0,IT/IS,BI Developer,96820,13.0
+10276,3,4,4.3,0,1,0,Production       ,Production Technician I,51259,19.0
+10304,1,1,2.3,0,17,2,Sales,Area Sales Manager,59231,17.0
+10284,2,4,3.88,0,6,0,Production       ,Production Technician I,61584,12.0
+10207,3,5,3.4,0,15,0,Production       ,Production Technician I,46335,14.0
+10133,3,4,4.11,6,16,0,IT/IS,IT Support,70621,7.0
+10028,4,5,4.3,5,4,0,IT/IS,IT Manager - Support,138888,5.0
+10006,4,5,4.77,0,14,0,Sales,Area Sales Manager,74241,21.0
+10105,3,4,4.52,0,4,0,Production       ,Production Manager,75188,2.0
+10211,3,3,2.9,0,6,0,Production       ,Production Technician I,62514,19.0
+10064,3,3,5.0,0,7,0,Production       ,Production Technician I,60070,20.0
+10247,3,5,4.7,0,8,0,Production       ,Production Technician I,48888,18.0
+10235,3,3,4.2,0,3,0,Production       ,Production Technician I,54285,18.0
+10299,1,1,3.0,0,5,2,Production       ,Production Technician II,56847,22.0
+10280,2,4,5.0,0,16,5,Production       ,Production Technician I,60340,22.0
+10296,2,3,2.3,0,19,5,Production       ,Production Technician I,59124,16.0
+10290,2,5,2.1,4,19,4,Software Engineering,Software Engineer,99280,10.0
+10263,3,5,4.4,0,17,0,Production       ,Production Technician II,71776,16.0
+10136,3,4,4.0,0,7,0,Production       ,Production Technician II,65902,
+10189,3,3,3.13,0,16,0,Production       ,Production Technician I,57748,39.0
+10308,1,5,1.56,0,15,6,Production       ,Production Technician I,64057,11.0
+10309,1,3,1.2,6,2,3,IT/IS,Network Engineer,53366,7.0
+10049,3,5,5.0,0,19,0,Production       ,Production Technician I,58530,12.0
+10093,3,5,4.76,0,20,0,Production       ,Production Technician II,72609,11.0
+10163,3,3,3.66,0,6,0,Production       ,Production Technician II,55965,19.0
+10305,3,5,2.0,0,7,4,Sales,Area Sales Manager,70187,21.0
+10015,4,5,5.0,5,15,0,IT/IS,IT Director,178000,5.0
+10080,3,3,5.0,2,3,0,Admin Offices,Sr. Accountant,99351,9.0
+10258,3,3,4.3,0,7,2,Sales,Area Sales Manager,67251,21.0
+10273,3,4,4.7,5,1,0,IT/IS,IT Support,65707,6.0
+10111,3,3,4.5,0,5,0,Production       ,Production Technician I,52249,14.0
+10257,3,4,4.2,0,12,0,Production       ,Production Technician I,53171,18.0
+10159,3,3,3.73,0,19,0,Production       ,Production Technician I,51337,22.0
+10122,3,4,4.24,0,2,0,Production       ,Production Technician I,51505,16.0
+10142,3,4,3.97,0,7,0,Sales,Area Sales Manager,59370,17.0
+10283,2,4,3.97,0,15,3,Production       ,Production Technician I,54933,39.0
+10018,4,4,3.9,0,3,0,Production       ,Production Technician I,57815,11.0
+10255,3,5,4.5,0,20,0,Sales,Area Sales Manager,61555,21.0
+10246,3,4,4.6,4,10,0,IT/IS,Database Administrator,114800,4.0
+10228,3,5,4.3,7,20,0,IT/IS,IT Support,74679,7.0
+10243,3,5,4.3,0,7,0,Production       ,Production Technician I,53018,19.0
+10031,4,4,4.5,0,1,0,Production       ,Production Technician I,59892,12.0
+10300,1,3,3.0,0,10,3,Production       ,Production Technician II,68898,12.0
+10101,3,4,4.61,5,11,0,IT/IS,IT Support,61242,7.0
+10237,3,3,4.6,0,20,0,Production       ,Production Technician II,66825,14.0
+10051,3,3,5.0,0,2,0,Production       ,Production Technician I,48285,14.0
+10218,3,5,4.4,0,1,0,Production       ,Production Technician II,66149,20.0
+10256,3,5,4.1,0,3,0,Production       ,Production Technician I,49256,20.0
+10098,3,3,4.63,0,2,0,Production       ,Production Manager,62957,2.0
+10059,3,5,5.0,0,17,0,Production       ,Production Technician I,63813,18.0
+10234,3,5,4.2,5,8,0,IT/IS,BI Developer,99020,13.0
+10109,3,5,4.5,0,20,0,Sales,Area Sales Manager,71707,17.0
+10125,3,4,4.2,0,13,0,Production       ,Production Technician I,54828,22.0
+10074,3,3,5.0,0,20,0,Production       ,Production Technician II,64246,18.0
+10097,3,4,4.64,0,8,0,Production       ,Production Technician I,52177,39.0
+10007,4,4,4.76,0,5,0,Production       ,Production Technician I,62065,11.0
+10129,3,4,4.17,0,1,0,Production       ,Production Technician I,46998,19.0
+10075,3,3,5.0,0,15,0,Production       ,Production Technician II,68099,18.0
+10167,3,5,3.6,0,9,0,Sales,Area Sales Manager,70545,17.0
+10195,3,5,3.03,0,16,0,Production       ,Production Technician II,63478,30.0
+10112,3,5,4.48,6,4,0,IT/IS,Database Administrator,97999,4.0
+10272,3,4,4.5,0,19,0,Sales,Director of Sales,180000,2.0
+10182,3,3,3.24,4,6,0,Admin Offices,Administrative Assistant,49920,1.0
+10248,3,4,4.8,0,4,0,Production       ,Production Technician I,55425,19.0
+10201,3,5,3.0,0,4,0,Production       ,Production Technician II,69340,16.0
+10214,3,3,4.5,0,6,0,Production       ,Production Technician II,64995,
+10160,3,3,3.72,0,18,0,Production       ,Production Technician II,68182,11.0
+10289,2,2,2.34,0,4,3,Production       ,Production Manager,83082,2.0
+10139,3,3,3.99,0,14,0,Production       ,Production Technician I,51908,12.0
+10227,3,3,4.1,0,7,0,Production       ,Production Technician I,61242,14.0
+10236,3,5,4.3,0,7,0,Production       ,Production Technician I,45069,20.0
+10009,4,4,4.6,0,11,0,Production       ,Production Technician II,60724,19.0
+10060,3,5,5.0,0,9,0,Production       ,Production Technician I,60436,18.0
+10034,4,4,4.7,0,9,0,Production       ,Production Technician I,46837,22.0
+10156,3,3,3.75,5,2,0,IT/IS,Database Administrator,105700,4.0
+10036,4,3,4.3,0,1,0,Production       ,Production Technician II,63322,12.0
+10138,3,4,4.0,0,4,0,Production       ,Production Technician I,61154,16.0
+10244,3,5,4.5,0,2,0,Sales,Sales Manager,68999,15.0
+10192,3,4,3.07,0,10,0,Production       ,Production Technician I,50482,22.0
+10231,3,5,4.3,0,13,0,Sales,Area Sales Manager,65310,21.0
+10089,3,3,4.83,0,10,0,Executive Office,President & CEO,250000,9.0
+10166,3,5,3.6,0,16,0,Production       ,Production Technician I,54005,39.0
+10170,3,4,3.49,0,6,0,Production       ,Production Technician I,45433,11.0
+10208,3,3,3.1,0,3,0,Production       ,Production Technician I,46654,19.0
+10176,3,3,3.38,0,17,0,Production       ,Production Technician I,63973,12.0
+10165,3,5,3.65,0,20,0,Sales,Area Sales Manager,71339,17.0
+10113,3,5,4.46,6,7,0,IT/IS,Sr. Network Engineer,93206,7.0
+10092,3,4,4.78,0,9,0,Production       ,Production Manager,82758,2.0
+10106,3,3,4.52,0,20,0,Production       ,Production Technician II,66074,14.0
+10052,3,5,5.0,0,13,0,Production       ,Production Technician I,46120,14.0
+10038,3,4,5.0,4,3,0,Admin Offices,Accountant I,64520,1.0
+10249,3,3,4.9,0,20,0,Production       ,Production Technician II,61962,20.0
+10232,3,5,4.1,7,2,0,IT/IS,Senior BI Developer,81584,13.0
+10087,3,3,4.88,0,17,0,Production       ,Production Technician I,63676,20.0
+10134,3,4,4.1,0,20,0,Admin Offices,Shared Services Manager,93046,2.0
+10251,3,3,4.1,0,10,0,Production       ,Production Technician I,64738,16.0
+10103,3,3,4.53,0,16,0,Sales,Area Sales Manager,70468,17.0
+10017,4,3,4.1,0,11,0,Production       ,Production Manager,77915,2.0
+10186,3,4,3.18,0,16,0,Production       ,Production Technician I,52624,22.0
+10137,3,3,4.0,0,7,0,Production       ,Production Technician II,63450,18.0
+10008,4,4,4.64,5,14,0,IT/IS,IT Support,51777,6.0
+10096,3,4,4.65,0,15,0,Production       ,Production Technician II,67237,22.0
+10035,4,4,4.2,0,19,0,Production       ,Production Technician II,73330,16.0
+10057,3,3,5.0,0,6,0,Production       ,Production Technician I,52057,16.0
+10004,4,4,5.0,0,17,0,Production       ,Production Technician I,47434,39.0
+10191,3,4,3.08,0,18,0,Production       ,Production Technician I,52788,11.0
+10219,3,4,4.6,0,14,0,Production       ,Production Technician I,45395,19.0
+10077,3,3,5.0,0,4,0,Production       ,Production Technician II,62385,
+10073,3,4,5.0,0,16,0,Production       ,Production Technician II,68407,11.0
+10279,3,3,4.1,0,11,0,Production       ,Production Technician I,61349,12.0
+10110,3,5,4.5,4,14,0,Software Engineering,Software Engineer,105688,10.0
+10053,3,4,5.0,0,8,0,Production       ,Production Technician I,54132,14.0
+10076,3,5,5.0,0,16,0,Production       ,Production Technician II,55315,19.0
+10145,3,3,3.93,0,20,0,Production       ,Production Technician I,62810,20.0
+10202,3,4,3.4,0,7,0,Sales,Area Sales Manager,63291,21.0
+10128,3,4,4.18,0,17,0,Production       ,Production Technician I,62659,18.0
+10068,3,4,5.0,0,10,0,Production       ,Production Technician I,55688,22.0
+10116,3,3,4.37,0,2,0,Production       ,Production Manager,83667,2.0
+10298,1,2,3.0,0,6,6,Production       ,Production Technician II,55800,12.0
+10213,3,3,3.7,0,14,0,Production       ,Production Technician II,58207,14.0
+10288,2,3,2.39,6,13,4,IT/IS,IT Manager - Infra,157000,5.0
+10025,4,3,4.7,0,1,0,Production       ,Production Technician II,72460,20.0
+10223,3,4,4.1,0,12,0,Production       ,Production Technician II,72106,18.0
+10151,3,3,3.81,6,6,0,IT/IS,Network Engineer,52599,7.0
+10254,3,4,4.4,0,18,0,Production       ,Production Technician I,63430,16.0
+10120,3,5,4.29,0,11,0,Production       ,Production Technician II,74417,22.0
+10216,3,4,4.1,0,13,0,Production       ,Production Technician I,57575,20.0
+10079,3,3,5.0,6,17,0,IT/IS,Senior BI Developer,87921,13.0
+10215,3,3,4.3,0,19,0,Production       ,Production Technician I,50470,39.0
+10185,3,3,3.18,0,10,0,Production       ,Production Technician I,46664,11.0
+10063,3,5,5.0,0,11,0,Production       ,Production Technician I,48495,19.0
+10037,4,3,4.0,0,12,0,Production       ,Production Technician I,52984,12.0
+10042,3,5,5.0,0,2,0,Sales,Area Sales Manager,63695,21.0
+10206,3,5,3.6,0,4,0,Production       ,Production Technician I,62061,14.0
+10104,3,5,4.53,0,5,0,Production       ,Production Technician II,66738,16.0
+10303,1,2,2.33,0,3,6,Production       ,Production Technician I,52674,20.0
+10078,3,3,5.0,0,17,0,Production       ,Production Technician II,71966,39.0
+10121,3,3,4.28,0,1,0,Sales,Area Sales Manager,63051,21.0
+10021,4,3,5.0,0,13,0,Production       ,Production Technician I,47414,18.0
+10281,2,3,4.25,0,6,4,Production       ,Production Technician I,53060,22.0
+10041,3,5,5.0,0,18,0,Sales,Area Sales Manager,68829,17.0
+10148,3,4,3.89,0,7,0,Production       ,Production Technician I,63515,16.0
+10005,4,5,5.0,3,13,0,Software Engineering,Software Engineer,108987,10.0
+10259,3,4,4.7,5,19,0,IT/IS,Data Analyst,93093,4.0
+10286,2,5,3.54,0,15,4,Production       ,Production Technician I,53564,39.0
+10297,2,5,2.4,0,2,5,Production       ,Production Technician II,60270,11.0
+10171,3,4,3.45,0,5,0,Production       ,Production Technician I,45998,11.0
+10032,4,5,4.2,0,12,0,Production       ,Production Technician II,57954,19.0
+10130,3,5,4.16,0,6,0,Production       ,Production Manager,74669,2.0
+10217,3,3,4.3,0,14,0,Production       ,Production Technician II,74226,12.0
+10016,4,5,4.6,7,16,0,IT/IS,Data Analyst,93554,4.0
+10050,3,3,5.0,0,13,0,Production       ,Production Technician I,64724,12.0
+10164,3,3,3.66,0,15,0,Production       ,Production Technician I,47001,14.0
+10124,3,5,4.2,0,9,0,Sales,Area Sales Manager,61844,21.0
+10187,3,4,3.17,0,14,0,Production       ,Production Technician I,46799,20.0
+10225,3,3,4.8,0,14,0,Production       ,Production Technician I,59472,18.0
+10262,3,5,4.5,0,16,0,Production       ,Production Technician I,46430,20.0
+10131,3,4,4.15,0,4,0,Software Engineering,Software Engineer,83363,2.0
+10239,3,4,4.4,6,10,0,IT/IS,BI Developer,95920,13.0
+10152,3,5,3.8,0,19,0,Production       ,Production Technician I,61729,22.0
+10140,3,3,3.98,0,4,0,Sales,Area Sales Manager,61809,17.0
+10058,3,4,5.0,0,11,0,Production       ,Production Technician I,45115,16.0
+10011,4,5,4.36,0,16,0,Production       ,Production Technician I,46738,
+10230,3,4,4.5,0,10,0,Production       ,Production Technician II,64971,14.0
+10224,3,5,4.2,0,13,0,Production       ,Production Technician II,55578,20.0
+10047,3,3,5.0,0,11,0,Production       ,Production Technician I,50428,11.0
+10285,2,3,3.6,0,16,4,Production       ,Production Technician I,61422,19.0
+10020,4,5,3.6,0,4,0,Production       ,Production Technician I,63353,12.0
+10162,3,5,3.69,6,15,0,IT/IS,Data Analyst,89883,4.0
+10149,3,3,3.88,7,12,0,IT/IS,Principal Data Architect,120000,4.0
+10086,3,3,4.94,5,17,0,IT/IS,Data Architect,150290,13.0
+10054,3,4,5.0,0,8,0,Production       ,Production Technician I,60627,14.0
+10065,3,5,5.0,0,4,0,Production       ,Production Technician I,53180,20.0
+10198,3,5,3.6,7,13,0,IT/IS,IT Manager - DB,140920,5.0
+10222,3,4,4.3,6,8,0,IT/IS,IT Manager - DB,148999,5.0
+10126,3,3,4.2,6,2,0,Software Engineering,Software Engineer,86214,10.0
+10295,2,4,2.6,0,4,5,Production       ,Production Technician I,47750,18.0
+10260,3,5,4.6,0,7,0,Production       ,Production Technician I,46428,22.0
+10233,3,3,4.1,0,13,0,Production       ,Production Technician II,57975,18.0
+10229,3,3,4.2,5,2,0,IT/IS,Data Analyst ,88527,4.0
+10169,3,3,3.51,0,2,0,Production       ,Production Technician I,56147,16.0
+10071,3,5,5.0,0,14,0,Production       ,Production Technician I,50923,
+10179,3,3,3.31,6,7,0,IT/IS,Network Engineer,50750,7.0
+10091,3,4,4.81,0,15,0,Production       ,Production Technician I,52087,11.0
+10178,3,3,3.32,7,16,0,IT/IS,Data Analyst,87826,4.0
+10039,3,3,5.0,5,2,0,Admin Offices,Administrative Assistant,51920,1.0
+10095,3,4,4.68,0,20,0,Production       ,Production Technician II,63878,22.0
+10027,4,3,4.3,0,4,0,Production       ,Production Technician II,60656,16.0
+10291,2,4,2.4,0,16,2,Sales,Sales Manager,72992,15.0
+10153,3,4,3.8,4,17,0,Admin Offices,Administrative Assistant,55000,1.0
+10157,3,3,3.73,0,16,0,Production       ,Production Technician I,58939,19.0
+10119,3,3,4.3,5,19,0,IT/IS,IT Support,66593,6.0
+10180,3,4,3.27,5,13,0,IT/IS,Sr. Network Engineer,87565,7.0
+10302,1,2,2.4,1,20,6,Production       ,Production Technician I,64021,12.0
+10090,3,5,4.83,0,15,0,Production       ,Production Manager,65714,2.0
+10030,4,4,4.1,0,16,0,Production       ,Production Technician I,62425,14.0
+10278,3,4,4.1,0,9,0,Production       ,Production Technician I,47961,20.0
+10307,1,2,1.81,0,5,3,Sales,Area Sales Manager,58273,21.0
+10147,3,5,3.9,5,9,0,Admin Offices,Accountant I,63003,1.0
+10266,3,3,4.7,0,4,0,Production       ,Production Technician I,61355,18.0
+10241,3,4,4.1,0,18,0,Sales,Area Sales Manager,60120,17.0
+10158,3,4,3.73,0,12,0,Production       ,Production Manager,63682,2.0
+10117,3,5,4.36,0,10,0,Production       ,Production Technician I,63025,22.0
+10209,3,5,3.4,0,13,0,Production       ,Production Technician I,59238,16.0
+10024,4,5,4.5,5,1,0,Software Engineering,Software Engineer,92989,10.0
+10173,3,3,3.4,6,14,0,IT/IS,BI Developer,90100,13.0
+10221,3,5,4.5,0,11,0,Production       ,Production Technician I,60754,39.0
+10146,3,3,3.93,0,3,0,Production       ,Production Technician II,72202,16.0
+10161,3,3,3.69,0,18,0,Sales,Area Sales Manager,58370,21.0
+10141,3,4,3.98,0,1,0,Production       ,Production Technician I,48413,11.0
+10268,3,4,4.1,0,15,0,Production       ,Production Technician II,67176,39.0
+10123,3,5,4.21,0,4,0,Production       ,Production Technician I,56339,12.0
+10013,4,3,4.1,0,6,0,Sales,Area Sales Manager,64397,21.0
+10287,2,5,2.44,0,18,4,Production       ,Production Technician I,63025,14.0
+10044,3,3,5.0,5,11,0,IT/IS,Network Engineer,75281,7.0
+10102,3,3,4.6,4,9,0,Software Engineering,Software Engineer,100416,10.0
+10270,3,3,4.4,0,5,0,Production       ,Production Technician II,74813,11.0
+10045,3,4,5.0,7,8,0,IT/IS,Network Engineer,76029,7.0
+10205,3,3,2.81,0,16,0,Sales,Area Sales Manager,57859,17.0
+10014,4,5,4.5,0,15,0,Production       ,Production Technician I,58523,20.0
+10144,3,3,3.93,0,19,0,Production       ,Production Manager,88976,2.0
+10253,3,4,4.5,0,11,0,Sales,Area Sales Manager,55875,17.0
+10118,3,3,4.33,7,9,0,IT/IS,Database Administrator,113999,4.0
+10022,4,5,4.3,0,18,0,Production       ,Production Technician I,49773,18.0
+10183,3,3,3.21,0,7,0,Production       ,Production Technician I,62068,22.0
+10190,3,5,3.11,0,4,0,Production       ,Production Technician II,66541,19.0
+10274,3,3,4.5,0,5,0,Production       ,Production Manager,80512,2.0
+10293,2,3,2.5,0,13,6,Production       ,Production Technician I,50274,16.0
+10172,3,4,3.42,7,17,0,IT/IS,Senior BI Developer,84903,13.0
+10127,3,4,4.2,8,7,0,IT/IS,Sr. Network Engineer,107226,7.0
+10072,3,5,5.0,0,11,0,Production       ,Production Technician I,58371,39.0
+10048,3,3,5.0,0,7,0,Production       ,Production Technician I,55140,11.0
+10204,3,5,3.6,0,9,0,Production       ,Production Technician I,58062,19.0
+10264,3,4,4.3,0,16,0,Production       ,Production Technician I,59728,19.0
+10033,4,3,5.0,0,7,0,Production       ,Production Technician II,70507,12.0
+10174,3,4,3.4,0,14,0,Production       ,Production Technician II,60446,14.0
+10135,3,4,4.07,0,13,0,Production       ,Production Technician II,65893,20.0
+10301,1,2,3.2,0,4,5,Production       ,Production Technician I,48513,12.0
+10010,4,5,4.6,6,16,0,IT/IS,CIO,220450,2.0
+10043,3,3,5.0,5,11,0,IT/IS,Data Analyst,89292,4.0
+10271,3,5,4.5,0,2,0,Production       ,Production Technician I,45046,14.0

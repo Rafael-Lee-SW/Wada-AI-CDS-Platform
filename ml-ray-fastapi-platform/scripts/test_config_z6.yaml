@@ -1,0 +1,19 @@
+tests:
+  - id: 1
+    description: "5. Logistic Regression Binary Classification - Condition 2"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/의약품 주성분 데이터(2023년).csv"
+      model_choice: "logistic_regression_binary"
+      feature_columns:
+        - "ITEM_SEQ"
+        - "ENTP_NO"
+        - "INDUTY_CLASS_CODE"
+        - "ITEM_PERMIT_DATE"
+      binary_conditions:
+        - column: "MATERIAL_QTY"
+          operator: ">="
+          value: 50
+          target_column: "HIGH_MATERIAL_FLAG"
+    expected_status: 200

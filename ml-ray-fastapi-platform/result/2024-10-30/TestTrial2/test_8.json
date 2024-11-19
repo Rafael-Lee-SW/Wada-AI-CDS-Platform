@@ -1,0 +1,4352 @@
+{
+    "status": "success",
+    "result": {
+        "kmeans_model": {
+            "model_type": "KMeans",
+            "n_clusters": 4,
+            "cluster_centers_": [
+                [
+                    -0.30231162833524355,
+                    0.2755782143095647,
+                    -0.9811254537802726,
+                    0.3679654436312736,
+                    -0.06041861797534441
+                ],
+                [
+                    -0.18912738694668305,
+                    -0.3335543900165669,
+                    0.11437402164115448,
+                    -1.5013475192086978,
+                    -0.05740513281753236
+                ],
+                [
+                    1.7292102029990002,
+                    -0.31599824846621094,
+                    0.0597302258625283,
+                    0.3847992264684434,
+                    -1.179062925298623
+                ],
+                [
+                    -0.36775162125663907,
+                    0.08432507033195127,
+                    0.8535675700934976,
+                    0.4113421361991376,
+                    0.6263947670942928
+                ]
+            ],
+            "labels_": [
+                0,
+                2,
+                1,
+                3,
+                0,
+                3,
+                1,
+                3,
+                0,
+                3,
+                3,
+                3,
+                2,
+                0,
+                0,
+                3,
+                3,
+                3,
+                2,
+                3,
+                3,
+                0,
+                3,
+                1,
+                0,
+                2,
+                2,
+                1,
+                1,
+                2,
+                1,
+                3,
+                1,
+                0,
+                1,
+                0,
+                2,
+                0,
+                3,
+                2,
+                0,
+                3,
+                2,
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                2,
+                0,
+                1,
+                3,
+                2,
+                0,
+                1,
+                0,
+                0,
+                0,
+                3,
+                2,
+                1,
+                0,
+                1,
+                1,
+                0,
+                1,
+                0,
+                1,
+                3,
+                2,
+                3,
+                0,
+                1,
+                0,
+                0,
+                0,
+                1,
+                3,
+                1,
+                1,
+                3,
+                0,
+                3,
+                1,
+                1,
+                3,
+                3,
+                1,
+                1,
+                2,
+                2,
+                0,
+                0,
+                0,
+                3,
+                3,
+                0,
+                1,
+                3,
+                0,
+                3,
+                2,
+                3,
+                0,
+                0,
+                1,
+                0,
+                3,
+                0,
+                0,
+                0,
+                0,
+                3,
+                2,
+                3,
+                3,
+                3,
+                3,
+                0,
+                0,
+                3,
+                1,
+                1,
+                2,
+                2,
+                1,
+                0,
+                1,
+                0,
+                1,
+                1,
+                3,
+                0,
+                0,
+                3,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                1,
+                3,
+                2,
+                3,
+                1,
+                1,
+                1,
+                3,
+                2,
+                2,
+                3,
+                3,
+                0,
+                3,
+                0,
+                3,
+                2,
+                0,
+                3,
+                2,
+                3,
+                0,
+                3,
+                3,
+                3,
+                0,
+                3,
+                1,
+                3,
+                0,
+                3,
+                0,
+                2,
+                0,
+                3,
+                3,
+                1,
+                3,
+                3,
+                0,
+                1,
+                1,
+                2,
+                0,
+                3,
+                0,
+                3,
+                3,
+                3,
+                3,
+                3,
+                1,
+                3,
+                3,
+                0,
+                0,
+                0,
+                1,
+                3,
+                0,
+                3,
+                0,
+                3,
+                0,
+                2,
+                2,
+                3,
+                1,
+                0,
+                3,
+                0,
+                3,
+                2,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                0,
+                2,
+                3,
+                0,
+                3,
+                3,
+                3,
+                3,
+                0,
+                3,
+                0,
+                2,
+                2,
+                2,
+                0,
+                0,
+                2,
+                2,
+                0,
+                1,
+                0,
+                3,
+                2,
+                0,
+                3,
+                1,
+                3,
+                1,
+                0,
+                3,
+                0,
+                1,
+                1,
+                3,
+                3,
+                1,
+                1,
+                2,
+                3,
+                3,
+                1,
+                0,
+                0,
+                3,
+                1,
+                3,
+                1,
+                0,
+                1,
+                3,
+                0,
+                3,
+                0,
+                3,
+                0,
+                0,
+                1,
+                2,
+                2,
+                0,
+                0,
+                1,
+                3,
+                2,
+                3,
+                2,
+                3,
+                1,
+                1,
+                2,
+                1,
+                1,
+                2,
+                3,
+                0,
+                1,
+                3,
+                0,
+                1,
+                3,
+                0,
+                2,
+                2,
+                0
+            ],
+            "inertia_": 915.4727323142224
+        },
+        "clustered_data": [
+            {
+                "Salary": 62506,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2230280381177547
+            },
+            {
+                "Salary": 104437,
+                "TenureDays": 444.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.96,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.07972801303149
+            },
+            {
+                "Salary": 64955,
+                "TenureDays": 447.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.02,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.197489536406553
+            },
+            {
+                "Salary": 64991,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.84,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7211774359273903
+            },
+            {
+                "Salary": 50825,
+                "TenureDays": 1884.0,
+                "Absences": 2,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 3.4945804669876015
+            },
+            {
+                "Salary": 57568,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.3008844819341296
+            },
+            {
+                "Salary": 95660,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.04,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9673338657729231
+            },
+            {
+                "Salary": 59365,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9732217633925248
+            },
+            {
+                "Salary": 47837,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.46,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.6790518970957539
+            },
+            {
+                "Salary": 50178,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.7835309232816121
+            },
+            {
+                "Salary": 54670,
+                "TenureDays": 2194.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.348835724082459
+            },
+            {
+                "Salary": 47211,
+                "TenureDays": 1631.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0034536392546678
+            },
+            {
+                "Salary": 92328,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.28,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 0.9254761716993856
+            },
+            {
+                "Salary": 58709,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7638848305247699
+            },
+            {
+                "Salary": 52505,
+                "TenureDays": 1655.0,
+                "Absences": 1,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5847094571225495
+            },
+            {
+                "Salary": 57834,
+                "TenureDays": 2356.0,
+                "Absences": 20,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.757684576175802
+            },
+            {
+                "Salary": 70131,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.48807466903909086
+            },
+            {
+                "Salary": 59026,
+                "TenureDays": 1243.0,
+                "Absences": 12,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0154203366696382
+            },
+            {
+                "Salary": 110000,
+                "TenureDays": 432.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.6872706426265844
+            },
+            {
+                "Salary": 53250,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.8004006231794013
+            },
+            {
+                "Salary": 51044,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.3961319318232577
+            },
+            {
+                "Salary": 64919,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8553871521871743
+            },
+            {
+                "Salary": 62910,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.3642430009524131
+            },
+            {
+                "Salary": 66441,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 2.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.0725876323433376
+            },
+            {
+                "Salary": 57815,
+                "TenureDays": 1180.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.8,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7322484079833081
+            },
+            {
+                "Salary": 103613,
+                "TenureDays": 732.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.5,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.114119503451846
+            },
+            {
+                "Salary": 106367,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 3.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.4311501120134358
+            },
+            {
+                "Salary": 74312,
+                "TenureDays": 311.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.39,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.578775675989637
+            },
+            {
+                "Salary": 53492,
+                "TenureDays": 439.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.35,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9174015425387425
+            },
+            {
+                "Salary": 63000,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.1441125828318253
+            },
+            {
+                "Salary": 65288,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 3.19,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.5767564234476514
+            },
+            {
+                "Salary": 64375,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.5,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.241986737157509
+            },
+            {
+                "Salary": 74326,
+                "TenureDays": 1083.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.14,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5121982219109609
+            },
+            {
+                "Salary": 63763,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.51,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.575793718255135
+            },
+            {
+                "Salary": 62162,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.25,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.068700845600824
+            },
+            {
+                "Salary": 77692,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.84,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5243815372270753
+            },
+            {
+                "Salary": 72640,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.9124672240966194
+            },
+            {
+                "Salary": 93396,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.96,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5940611685361477
+            },
+            {
+                "Salary": 52846,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.43,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.4115362868857544
+            },
+            {
+                "Salary": 100031,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.1342861247616893
+            },
+            {
+                "Salary": 71860,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0729741626767704
+            },
+            {
+                "Salary": 61656,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0706459830806008
+            },
+            {
+                "Salary": 110929,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 0.5494548210544669
+            },
+            {
+                "Salary": 54237,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 3.3,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.7353015340160727
+            },
+            {
+                "Salary": 60380,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.8,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8285939258139636
+            },
+            {
+                "Salary": 66808,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.0,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.3974364418302625
+            },
+            {
+                "Salary": 64786,
+                "TenureDays": 1602.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7483384982216483
+            },
+            {
+                "Salary": 64816,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.58,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.276810190676702
+            },
+            {
+                "Salary": 68678,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 6.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2379739816764839
+            },
+            {
+                "Salary": 64066,
+                "TenureDays": 602.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.998680498740603
+            },
+            {
+                "Salary": 59369,
+                "TenureDays": 392.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.3300508555974333
+            },
+            {
+                "Salary": 50373,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7077276566960733
+            },
+            {
+                "Salary": 63108,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.3954899676744391
+            },
+            {
+                "Salary": 59144,
+                "TenureDays": 1901.0,
+                "Absences": 16,
+                "EngagementSurvey": 2.0,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.4940157112936645
+            },
+            {
+                "Salary": 68051,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.13,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.6276649486309156
+            },
+            {
+                "Salary": 170500,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.7,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.6421816007831644
+            },
+            {
+                "Salary": 63381,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.73,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7560945529335744
+            },
+            {
+                "Salary": 83552,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.04,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.156730217114548
+            },
+            {
+                "Salary": 56149,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.12,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.5337190198372175
+            },
+            {
+                "Salary": 92329,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.500048415945382
+            },
+            {
+                "Salary": 65729,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.62,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7502906296456843
+            },
+            {
+                "Salary": 85028,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.1,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8846336510019783
+            },
+            {
+                "Salary": 57583,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.050706513439964
+            },
+            {
+                "Salary": 56294,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.96,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.026300139472866
+            },
+            {
+                "Salary": 56991,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.6214718533652401
+            },
+            {
+                "Salary": 55722,
+                "TenureDays": 1850.0,
+                "Absences": 14,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.8835526302368986
+            },
+            {
+                "Salary": 101199,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 3.79,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.214697534234812
+            },
+            {
+                "Salary": 61568,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 1.93,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.6907961502771143
+            },
+            {
+                "Salary": 58275,
+                "TenureDays": 1675.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.62,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.1053946451426926
+            },
+            {
+                "Salary": 53189,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 1.12,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.4081213782682935
+            },
+            {
+                "Salary": 96820,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.01,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5172582815750912
+            },
+            {
+                "Salary": 51259,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0020063842976414
+            },
+            {
+                "Salary": 59231,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 2.3,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.4101717860149166
+            },
+            {
+                "Salary": 61584,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.88,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8097208312300104
+            },
+            {
+                "Salary": 46335,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.4,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.2094378096214562
+            },
+            {
+                "Salary": 70621,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.11,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.6958093888461896
+            },
+            {
+                "Salary": 138888,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.577827868911955
+            },
+            {
+                "Salary": 74241,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.77,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7738852790549253
+            },
+            {
+                "Salary": 75188,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.52,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.6512809482775337
+            },
+            {
+                "Salary": 62514,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 2.9,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.089211890349234
+            },
+            {
+                "Salary": 60070,
+                "TenureDays": 2255.0,
+                "Absences": 7,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.388598340733417
+            },
+            {
+                "Salary": 48888,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0377055160955793
+            },
+            {
+                "Salary": 54285,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7327809349367126
+            },
+            {
+                "Salary": 56847,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 3.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.4821685095545611
+            },
+            {
+                "Salary": 60340,
+                "TenureDays": 2369.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.675730826371083
+            },
+            {
+                "Salary": 59124,
+                "TenureDays": 1469.0,
+                "Absences": 19,
+                "EngagementSurvey": 2.3,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8354372067803761
+            },
+            {
+                "Salary": 99280,
+                "TenureDays": 765.0,
+                "Absences": 19,
+                "EngagementSurvey": 2.1,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.4258723924338415
+            },
+            {
+                "Salary": 71776,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7302393509459197
+            },
+            {
+                "Salary": 65902,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.0,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7548053620678546
+            },
+            {
+                "Salary": 57748,
+                "TenureDays": 1653.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.13,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.0770661778262385
+            },
+            {
+                "Salary": 64057,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 1.56,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9352210214870655
+            },
+            {
+                "Salary": 53366,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 1.2,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.8639750925124887
+            },
+            {
+                "Salary": 58530,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.359471775141857
+            },
+            {
+                "Salary": 72609,
+                "TenureDays": 770.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.76,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.933655433916082
+            },
+            {
+                "Salary": 55965,
+                "TenureDays": 646.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.66,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.802252539609407
+            },
+            {
+                "Salary": 70187,
+                "TenureDays": 1420.0,
+                "Absences": 7,
+                "EngagementSurvey": 2.0,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.7793705964801805
+            },
+            {
+                "Salary": 178000,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.8327924202125407
+            },
+            {
+                "Salary": 99351,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 9.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.6819668016255762
+            },
+            {
+                "Salary": 67251,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.043391871684699
+            },
+            {
+                "Salary": 65707,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 6.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2861989161769676
+            },
+            {
+                "Salary": 52249,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.4922763053735513
+            },
+            {
+                "Salary": 53171,
+                "TenureDays": 1243.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7151362803477116
+            },
+            {
+                "Salary": 51337,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.73,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.1965055730906018
+            },
+            {
+                "Salary": 51505,
+                "TenureDays": 1835.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.24,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2878255788750002
+            },
+            {
+                "Salary": 59370,
+                "TenureDays": 425.0,
+                "Absences": 7,
+                "EngagementSurvey": 3.97,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.229649986304675
+            },
+            {
+                "Salary": 54933,
+                "TenureDays": 1179.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.97,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.531188710963356
+            },
+            {
+                "Salary": 57815,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.9,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8523260773143891
+            },
+            {
+                "Salary": 61555,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.8497584703438599
+            },
+            {
+                "Salary": 114800,
+                "TenureDays": 27.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.58914247532241
+            },
+            {
+                "Salary": 74679,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.884472987519619
+            },
+            {
+                "Salary": 53018,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.880172676360146
+            },
+            {
+                "Salary": 59892,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7312042323466322
+            },
+            {
+                "Salary": 68898,
+                "TenureDays": 399.0,
+                "Absences": 10,
+                "EngagementSurvey": 3.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.715585242382213
+            },
+            {
+                "Salary": 61242,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.61,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.4789961298366698
+            },
+            {
+                "Salary": 66825,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.1357132773523992
+            },
+            {
+                "Salary": 48285,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0590575489192913
+            },
+            {
+                "Salary": 66149,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0147273933800331
+            },
+            {
+                "Salary": 49256,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0395209142252986
+            },
+            {
+                "Salary": 62957,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.63,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.6335336993798721
+            },
+            {
+                "Salary": 63813,
+                "TenureDays": 1055.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9837485886533001
+            },
+            {
+                "Salary": 99020,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.2672491689862184
+            },
+            {
+                "Salary": 71707,
+                "TenureDays": 968.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.251608025383026
+            },
+            {
+                "Salary": 54828,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.613050442285235
+            },
+            {
+                "Salary": 64246,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.1236347890895972
+            },
+            {
+                "Salary": 52177,
+                "TenureDays": 1436.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.64,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.787872494001796
+            },
+            {
+                "Salary": 62065,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.76,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.6731374392222234
+            },
+            {
+                "Salary": 46998,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.17,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.113206338889381
+            },
+            {
+                "Salary": 68099,
+                "TenureDays": 890.0,
+                "Absences": 15,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.2396265671861815
+            },
+            {
+                "Salary": 70545,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.0630814751417457
+            },
+            {
+                "Salary": 63478,
+                "TenureDays": 236.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.03,
+                "ManagerID": 30.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.999419787244363
+            },
+            {
+                "Salary": 97999,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.48,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.311929164579182
+            },
+            {
+                "Salary": 180000,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 3.0933529479633166
+            },
+            {
+                "Salary": 49920,
+                "TenureDays": 58.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.24,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 3.17119952440389
+            },
+            {
+                "Salary": 55425,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.8,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.886397209383537
+            },
+            {
+                "Salary": 69340,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.2658555657156565
+            },
+            {
+                "Salary": 64995,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.4470183138879811
+            },
+            {
+                "Salary": 68182,
+                "TenureDays": 770.0,
+                "Absences": 18,
+                "EngagementSurvey": 3.72,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8179392604699969
+            },
+            {
+                "Salary": 83082,
+                "TenureDays": 581.0,
+                "Absences": 4,
+                "EngagementSurvey": 2.34,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.5259894996862635
+            },
+            {
+                "Salary": 51908,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.99,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.1721573023747769
+            },
+            {
+                "Salary": 61242,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.6425372438153928
+            },
+            {
+                "Salary": 45069,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.121247193260165
+            },
+            {
+                "Salary": 60724,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7640273667186241
+            },
+            {
+                "Salary": 60436,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2235305753782157
+            },
+            {
+                "Salary": 46837,
+                "TenureDays": 2365.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.7579789334598344
+            },
+            {
+                "Salary": 105700,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.75,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.7469287352376297
+            },
+            {
+                "Salary": 63322,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7326244170993353
+            },
+            {
+                "Salary": 61154,
+                "TenureDays": 1908.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.397404630033686
+            },
+            {
+                "Salary": 68999,
+                "TenureDays": 899.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2338589637057849
+            },
+            {
+                "Salary": 50482,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 3.07,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.199062868244022
+            },
+            {
+                "Salary": 65310,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.514829058356614
+            },
+            {
+                "Salary": 250000,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.83,
+                "ManagerID": 9.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 5.53161973200571
+            },
+            {
+                "Salary": 54005,
+                "TenureDays": 1347.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.677417704961956
+            },
+            {
+                "Salary": 45433,
+                "TenureDays": 836.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.49,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5321215401824724
+            },
+            {
+                "Salary": 46654,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.1,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.687268197886931
+            },
+            {
+                "Salary": 63973,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.38,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.2612923352968652
+            },
+            {
+                "Salary": 71339,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 3.65,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.4081448404714585
+            },
+            {
+                "Salary": 93206,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.46,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.052822405964058
+            },
+            {
+                "Salary": 82758,
+                "TenureDays": 1797.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.78,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.1047368233904655
+            },
+            {
+                "Salary": 66074,
+                "TenureDays": 448.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.52,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.2672494272754258
+            },
+            {
+                "Salary": 46120,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.2061707627974774
+            },
+            {
+                "Salary": 64520,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.8583836807055296
+            },
+            {
+                "Salary": 61962,
+                "TenureDays": 378.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.9,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.3698253830198706
+            },
+            {
+                "Salary": 81584,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0379228544542425
+            },
+            {
+                "Salary": 63676,
+                "TenureDays": 2519.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.88,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.9844965835327546
+            },
+            {
+                "Salary": 93046,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.897583799575152
+            },
+            {
+                "Salary": 64738,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0903918253999552
+            },
+            {
+                "Salary": 70468,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.53,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.5722937709019822
+            },
+            {
+                "Salary": 77915,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.518075324586434
+            },
+            {
+                "Salary": 52624,
+                "TenureDays": 2640.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.18,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.596421835793817
+            },
+            {
+                "Salary": 63450,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8784090146427431
+            },
+            {
+                "Salary": 51777,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.64,
+                "ManagerID": 6.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.7688503147734072
+            },
+            {
+                "Salary": 67237,
+                "TenureDays": 1165.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.65,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.5820883608619146
+            },
+            {
+                "Salary": 73330,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0038166041192047
+            },
+            {
+                "Salary": 52057,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.9619694708555091
+            },
+            {
+                "Salary": 47434,
+                "TenureDays": 1468.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.6440475105187584
+            },
+            {
+                "Salary": 52788,
+                "TenureDays": 1828.0,
+                "Absences": 18,
+                "EngagementSurvey": 3.08,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.18085392483685
+            },
+            {
+                "Salary": 45395,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.6569625825248155
+            },
+            {
+                "Salary": 62385,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8279496161756368
+            },
+            {
+                "Salary": 68407,
+                "TenureDays": 411.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.463756575824603
+            },
+            {
+                "Salary": 61349,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2391587468741974
+            },
+            {
+                "Salary": 105688,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 0.9378286942182481
+            },
+            {
+                "Salary": 54132,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.05172163093928
+            },
+            {
+                "Salary": 55315,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7608145545202876
+            },
+            {
+                "Salary": 62810,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 3.93,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0508950983953411
+            },
+            {
+                "Salary": 63291,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 3.4,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.286835264391443
+            },
+            {
+                "Salary": 62659,
+                "TenureDays": 1684.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.18,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0635650401064336
+            },
+            {
+                "Salary": 55688,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.201721521486478
+            },
+            {
+                "Salary": 83667,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.37,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.834481460798413
+            },
+            {
+                "Salary": 55800,
+                "TenureDays": 1116.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.948221910549909
+            },
+            {
+                "Salary": 58207,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.7,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.184297683930092
+            },
+            {
+                "Salary": 157000,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 2.39,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 3.160613724022866
+            },
+            {
+                "Salary": 72460,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.1540262291694683
+            },
+            {
+                "Salary": 72106,
+                "TenureDays": 1243.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.879900284716098
+            },
+            {
+                "Salary": 52599,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.81,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.276767960978976
+            },
+            {
+                "Salary": 63430,
+                "TenureDays": 1243.0,
+                "Absences": 18,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.6779329093513575
+            },
+            {
+                "Salary": 74417,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.29,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9996950297540632
+            },
+            {
+                "Salary": 57575,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.5879939775974775
+            },
+            {
+                "Salary": 87921,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.5976698249127055
+            },
+            {
+                "Salary": 50470,
+                "TenureDays": 921.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.698672372856731
+            },
+            {
+                "Salary": 46664,
+                "TenureDays": 1150.0,
+                "Absences": 10,
+                "EngagementSurvey": 3.18,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.8847666935805706
+            },
+            {
+                "Salary": 48495,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.120081464580308
+            },
+            {
+                "Salary": 52984,
+                "TenureDays": 1243.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.2631380636959506
+            },
+            {
+                "Salary": 63695,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2675922613752133
+            },
+            {
+                "Salary": 62061,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0597953727811844
+            },
+            {
+                "Salary": 66738,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.53,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.4704209996129168
+            },
+            {
+                "Salary": 52674,
+                "TenureDays": 1492.0,
+                "Absences": 3,
+                "EngagementSurvey": 2.33,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9943944216515723
+            },
+            {
+                "Salary": 71966,
+                "TenureDays": 462.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.2525392641154287
+            },
+            {
+                "Salary": 63051,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.28,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.1062021441745462
+            },
+            {
+                "Salary": 47414,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9751753501199442
+            },
+            {
+                "Salary": 53060,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.25,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.1325533607266691
+            },
+            {
+                "Salary": 68829,
+                "TenureDays": 1243.0,
+                "Absences": 18,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9918473695951391
+            },
+            {
+                "Salary": 63515,
+                "TenureDays": 1070.0,
+                "Absences": 7,
+                "EngagementSurvey": 3.89,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0748869281458826
+            },
+            {
+                "Salary": 108987,
+                "TenureDays": 1400.0,
+                "Absences": 13,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.247182810324526
+            },
+            {
+                "Salary": 93093,
+                "TenureDays": 517.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.1956650331405276
+            },
+            {
+                "Salary": 53564,
+                "TenureDays": 2544.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.54,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 4.015280831430516
+            },
+            {
+                "Salary": 60270,
+                "TenureDays": 1533.0,
+                "Absences": 2,
+                "EngagementSurvey": 2.4,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.987411678449444
+            },
+            {
+                "Salary": 45998,
+                "TenureDays": 1623.0,
+                "Absences": 5,
+                "EngagementSurvey": 3.45,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.534039789365924
+            },
+            {
+                "Salary": 57954,
+                "TenureDays": 630.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.6728983421910488
+            },
+            {
+                "Salary": 74669,
+                "TenureDays": 2032.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.16,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.282650199320423
+            },
+            {
+                "Salary": 74226,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.1479359483315899
+            },
+            {
+                "Salary": 93554,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.2618984778084041
+            },
+            {
+                "Salary": 64724,
+                "TenureDays": 514.0,
+                "Absences": 13,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.217945129120201
+            },
+            {
+                "Salary": 47001,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.66,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.3130955681179386
+            },
+            {
+                "Salary": 61844,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.1281593344399874
+            },
+            {
+                "Salary": 46799,
+                "TenureDays": 2576.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.17,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.486311746784501
+            },
+            {
+                "Salary": 59472,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.8,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.5550275981408083
+            },
+            {
+                "Salary": 46430,
+                "TenureDays": 267.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.467892807578138
+            },
+            {
+                "Salary": 83363,
+                "TenureDays": 1636.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.15,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.8933697634596618
+            },
+            {
+                "Salary": 95920,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.2224038735298914
+            },
+            {
+                "Salary": 61729,
+                "TenureDays": 2385.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.8,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.8092668849579923
+            },
+            {
+                "Salary": 61809,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.98,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7138759501030192
+            },
+            {
+                "Salary": 45115,
+                "TenureDays": 1705.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.5993285791001246
+            },
+            {
+                "Salary": 46738,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.36,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7973937797555832
+            },
+            {
+                "Salary": 64971,
+                "TenureDays": 26.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.1901607649812544
+            },
+            {
+                "Salary": 55578,
+                "TenureDays": 218.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.5717980655671635
+            },
+            {
+                "Salary": 50428,
+                "TenureDays": 1842.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.8478869605601642
+            },
+            {
+                "Salary": 61422,
+                "TenureDays": 1954.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.9059483631938952
+            },
+            {
+                "Salary": 63353,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0944852134907563
+            },
+            {
+                "Salary": 89883,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.69,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.5269217521568332
+            },
+            {
+                "Salary": 120000,
+                "TenureDays": 1405.0,
+                "Absences": 12,
+                "EngagementSurvey": 3.88,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.0456925623654676
+            },
+            {
+                "Salary": 150290,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.94,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.2294701415402103
+            },
+            {
+                "Salary": 60627,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.0113137277025233
+            },
+            {
+                "Salary": 53180,
+                "TenureDays": 2688.0,
+                "Absences": 4,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 3.311004372201748
+            },
+            {
+                "Salary": 140920,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.6153531061398692
+            },
+            {
+                "Salary": 148999,
+                "TenureDays": 1395.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.663627709827606
+            },
+            {
+                "Salary": 86214,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2541700879654396
+            },
+            {
+                "Salary": 47750,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 2.6,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5289681037751737
+            },
+            {
+                "Salary": 46428,
+                "TenureDays": 3493.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 5.173159811015108
+            },
+            {
+                "Salary": 57975,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.6156935469448138
+            },
+            {
+                "Salary": 88527,
+                "TenureDays": 299.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.6232761138125738
+            },
+            {
+                "Salary": 56147,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.51,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.2823404635147209
+            },
+            {
+                "Salary": 50923,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0110939850491847
+            },
+            {
+                "Salary": 50750,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 3.31,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.3694057582557932
+            },
+            {
+                "Salary": 52087,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.81,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.2210381976127846
+            },
+            {
+                "Salary": 87826,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.32,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.899254586291363
+            },
+            {
+                "Salary": 51920,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.9233265411886986
+            },
+            {
+                "Salary": 63878,
+                "TenureDays": 1990.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.68,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.9094388823305186
+            },
+            {
+                "Salary": 60656,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.40852281027571935
+            },
+            {
+                "Salary": 72992,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 2.4,
+                "ManagerID": 15.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.199042058466942
+            },
+            {
+                "Salary": 55000,
+                "TenureDays": 730.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.8,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.443176634525905
+            },
+            {
+                "Salary": 58939,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.73,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9120091716751111
+            },
+            {
+                "Salary": 66593,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 6.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.8533935118535552
+            },
+            {
+                "Salary": 87565,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 3.27,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.4423391605473295
+            },
+            {
+                "Salary": 64021,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 2.4,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.7431386410598724
+            },
+            {
+                "Salary": 65714,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.83,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.136084906578299
+            },
+            {
+                "Salary": 62425,
+                "TenureDays": 777.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.462686410659934
+            },
+            {
+                "Salary": 47961,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.2448584745811162
+            },
+            {
+                "Salary": 58273,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 1.81,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.981680520352579
+            },
+            {
+                "Salary": 63003,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 3.9,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.947216786946213
+            },
+            {
+                "Salary": 61355,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.6908596445883086
+            },
+            {
+                "Salary": 60120,
+                "TenureDays": 1243.0,
+                "Absences": 18,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.7209378000393873
+            },
+            {
+                "Salary": 63682,
+                "TenureDays": 1243.0,
+                "Absences": 12,
+                "EngagementSurvey": 3.73,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8695377929492492
+            },
+            {
+                "Salary": 63025,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.36,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9637382211499257
+            },
+            {
+                "Salary": 59238,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 3.4,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.8280835650440942
+            },
+            {
+                "Salary": 92989,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5184577767612633
+            },
+            {
+                "Salary": 90100,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.4,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.348930805078539
+            },
+            {
+                "Salary": 60754,
+                "TenureDays": 1435.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.5716001236918906
+            },
+            {
+                "Salary": 72202,
+                "TenureDays": 2245.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.93,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.2264425717229277
+            },
+            {
+                "Salary": 58370,
+                "TenureDays": 1243.0,
+                "Absences": 18,
+                "EngagementSurvey": 3.69,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.0780032740726184
+            },
+            {
+                "Salary": 48413,
+                "TenureDays": 1889.0,
+                "Absences": 1,
+                "EngagementSurvey": 3.98,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.606921747589738
+            },
+            {
+                "Salary": 67176,
+                "TenureDays": 1162.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.512190440337819
+            },
+            {
+                "Salary": 56339,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.21,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.5116330076973522
+            },
+            {
+                "Salary": 64397,
+                "TenureDays": 1243.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.029939938732714
+            },
+            {
+                "Salary": 63025,
+                "TenureDays": 1243.0,
+                "Absences": 18,
+                "EngagementSurvey": 2.44,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.398781322844645
+            },
+            {
+                "Salary": 75281,
+                "TenureDays": 403.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.3732099293176354
+            },
+            {
+                "Salary": 100416,
+                "TenureDays": 1882.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.997403236935521
+            },
+            {
+                "Salary": 74813,
+                "TenureDays": 1269.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.4,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.7044551522245044
+            },
+            {
+                "Salary": 76029,
+                "TenureDays": 1243.0,
+                "Absences": 8,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.4680572672975796
+            },
+            {
+                "Salary": 57859,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 2.81,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.038039765403549
+            },
+            {
+                "Salary": 58523,
+                "TenureDays": 1271.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.12282127518001909
+            },
+            {
+                "Salary": 88976,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.93,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.890292855081267
+            },
+            {
+                "Salary": 55875,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.817558318416636
+            },
+            {
+                "Salary": 113999,
+                "TenureDays": 737.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.33,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 0.9549704143051657
+            },
+            {
+                "Salary": 49773,
+                "TenureDays": 1596.0,
+                "Absences": 18,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.9939934756061645
+            },
+            {
+                "Salary": 62068,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 3.21,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.2896789919514107
+            },
+            {
+                "Salary": 66541,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.11,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.3910420742196428
+            },
+            {
+                "Salary": 80512,
+                "TenureDays": 98.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.9116473617964864
+            },
+            {
+                "Salary": 50274,
+                "TenureDays": 1114.0,
+                "Absences": 13,
+                "EngagementSurvey": 2.5,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.8867099356422785
+            },
+            {
+                "Salary": 84903,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.42,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.508390410181366
+            },
+            {
+                "Salary": 107226,
+                "TenureDays": 1243.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 0.7964566991066814
+            },
+            {
+                "Salary": 58371,
+                "TenureDays": 1221.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.649836411292483
+            },
+            {
+                "Salary": 55140,
+                "TenureDays": 1575.0,
+                "Absences": 7,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.1028952508543592
+            },
+            {
+                "Salary": 58062,
+                "TenureDays": 490.0,
+                "Absences": 9,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8452534537248593
+            },
+            {
+                "Salary": 59728,
+                "TenureDays": 1265.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.2326690566768667
+            },
+            {
+                "Salary": 70507,
+                "TenureDays": 1140.0,
+                "Absences": 7,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.1169766426146943
+            },
+            {
+                "Salary": 60446,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.4,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 0.8749116398857966
+            },
+            {
+                "Salary": 65893,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.07,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 0.6564016938102223
+            },
+            {
+                "Salary": 48513,
+                "TenureDays": 2583.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.2,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 3.30057272031652
+            },
+            {
+                "Salary": 220450,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 4.433327995012258
+            },
+            {
+                "Salary": 89292,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.2330786391164357
+            },
+            {
+                "Salary": 45046,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 0.8431002929799692
+            }
+        ],
+        "scaler": {
+            "with_mean": true,
+            "with_std": true,
+            "copy": true,
+            "feature_names_in_": [
+                "Salary",
+                "TenureDays",
+                "Absences",
+                "EngagementSurvey",
+                "ManagerID"
+            ],
+            "n_features_in_": 5,
+            "n_samples_seen_": 311,
+            "mean_": [
+                69020.6848874598,
+                1250.08038585209,
+                10.237942122186496,
+                4.11,
+                14.581993569131832
+            ],
+            "var_": [
+                630821473.6306077,
+                179570.00318441703,
+                34.14274045967267,
+                0.6219948553054663,
+                63.37510985204868
+            ],
+            "scale_": [
+                25116.159611505253,
+                423.75700959915343,
+                5.843178968649914,
+                0.7886665044906284,
+                7.9608485635671205
+            ]
+        },
+        "anomalies": [
+            {
+                "Salary": 104437,
+                "TenureDays": 444.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.96,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.07972801303149
+            },
+            {
+                "Salary": 64955,
+                "TenureDays": 447.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.02,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.197489536406553
+            },
+            {
+                "Salary": 50825,
+                "TenureDays": 1884.0,
+                "Absences": 2,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 3.4945804669876015
+            },
+            {
+                "Salary": 95660,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.04,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9673338657729231
+            },
+            {
+                "Salary": 50178,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.7835309232816121
+            },
+            {
+                "Salary": 54670,
+                "TenureDays": 2194.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.348835724082459
+            },
+            {
+                "Salary": 52505,
+                "TenureDays": 1655.0,
+                "Absences": 1,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5847094571225495
+            },
+            {
+                "Salary": 57834,
+                "TenureDays": 2356.0,
+                "Absences": 20,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.757684576175802
+            },
+            {
+                "Salary": 110000,
+                "TenureDays": 432.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.6872706426265844
+            },
+            {
+                "Salary": 66441,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 2.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.0725876323433376
+            },
+            {
+                "Salary": 103613,
+                "TenureDays": 732.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.5,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.114119503451846
+            },
+            {
+                "Salary": 74312,
+                "TenureDays": 311.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.39,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.578775675989637
+            },
+            {
+                "Salary": 53492,
+                "TenureDays": 439.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.35,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9174015425387425
+            },
+            {
+                "Salary": 63000,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.1441125828318253
+            },
+            {
+                "Salary": 74326,
+                "TenureDays": 1083.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.14,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5121982219109609
+            },
+            {
+                "Salary": 77692,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.84,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5243815372270753
+            },
+            {
+                "Salary": 72640,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.9124672240966194
+            },
+            {
+                "Salary": 93396,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.96,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5940611685361477
+            },
+            {
+                "Salary": 64066,
+                "TenureDays": 602.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.998680498740603
+            },
+            {
+                "Salary": 59369,
+                "TenureDays": 392.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.3300508555974333
+            },
+            {
+                "Salary": 59144,
+                "TenureDays": 1901.0,
+                "Absences": 16,
+                "EngagementSurvey": 2.0,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.4940157112936645
+            },
+            {
+                "Salary": 68051,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 4.13,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.6276649486309156
+            },
+            {
+                "Salary": 170500,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.7,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.6421816007831644
+            },
+            {
+                "Salary": 83552,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.04,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.156730217114548
+            },
+            {
+                "Salary": 92329,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.500048415945382
+            },
+            {
+                "Salary": 85028,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.1,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8846336510019783
+            },
+            {
+                "Salary": 55722,
+                "TenureDays": 1850.0,
+                "Absences": 14,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.8835526302368986
+            },
+            {
+                "Salary": 61568,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 1.93,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.6907961502771143
+            },
+            {
+                "Salary": 53189,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 1.12,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.4081213782682935
+            },
+            {
+                "Salary": 96820,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.01,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5172582815750912
+            },
+            {
+                "Salary": 70621,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.11,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.6958093888461896
+            },
+            {
+                "Salary": 138888,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.577827868911955
+            },
+            {
+                "Salary": 75188,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.52,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.6512809482775337
+            },
+            {
+                "Salary": 60070,
+                "TenureDays": 2255.0,
+                "Absences": 7,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.388598340733417
+            },
+            {
+                "Salary": 60340,
+                "TenureDays": 2369.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.675730826371083
+            },
+            {
+                "Salary": 59124,
+                "TenureDays": 1469.0,
+                "Absences": 19,
+                "EngagementSurvey": 2.3,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8354372067803761
+            },
+            {
+                "Salary": 99280,
+                "TenureDays": 765.0,
+                "Absences": 19,
+                "EngagementSurvey": 2.1,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.4258723924338415
+            },
+            {
+                "Salary": 57748,
+                "TenureDays": 1653.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.13,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.0770661778262385
+            },
+            {
+                "Salary": 64057,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 1.56,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9352210214870655
+            },
+            {
+                "Salary": 53366,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 1.2,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.8639750925124887
+            },
+            {
+                "Salary": 72609,
+                "TenureDays": 770.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.76,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.933655433916082
+            },
+            {
+                "Salary": 55965,
+                "TenureDays": 646.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.66,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.802252539609407
+            },
+            {
+                "Salary": 70187,
+                "TenureDays": 1420.0,
+                "Absences": 7,
+                "EngagementSurvey": 2.0,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.7793705964801805
+            },
+            {
+                "Salary": 178000,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.8327924202125407
+            },
+            {
+                "Salary": 99351,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 9.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.6819668016255762
+            },
+            {
+                "Salary": 59370,
+                "TenureDays": 425.0,
+                "Absences": 7,
+                "EngagementSurvey": 3.97,
+                "ManagerID": 17.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.229649986304675
+            },
+            {
+                "Salary": 54933,
+                "TenureDays": 1179.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.97,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.531188710963356
+            },
+            {
+                "Salary": 114800,
+                "TenureDays": 27.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.58914247532241
+            },
+            {
+                "Salary": 74679,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.884472987519619
+            },
+            {
+                "Salary": 68898,
+                "TenureDays": 399.0,
+                "Absences": 10,
+                "EngagementSurvey": 3.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.715585242382213
+            },
+            {
+                "Salary": 62957,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.63,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.6335336993798721
+            },
+            {
+                "Salary": 52177,
+                "TenureDays": 1436.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.64,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.787872494001796
+            },
+            {
+                "Salary": 63478,
+                "TenureDays": 236.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.03,
+                "ManagerID": 30.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.999419787244363
+            },
+            {
+                "Salary": 180000,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 3.0933529479633166
+            },
+            {
+                "Salary": 49920,
+                "TenureDays": 58.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.24,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 3.17119952440389
+            },
+            {
+                "Salary": 68182,
+                "TenureDays": 770.0,
+                "Absences": 18,
+                "EngagementSurvey": 3.72,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8179392604699969
+            },
+            {
+                "Salary": 83082,
+                "TenureDays": 581.0,
+                "Absences": 4,
+                "EngagementSurvey": 2.34,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.5259894996862635
+            },
+            {
+                "Salary": 46837,
+                "TenureDays": 2365.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.7579789334598344
+            },
+            {
+                "Salary": 105700,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 3.75,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.7469287352376297
+            },
+            {
+                "Salary": 250000,
+                "TenureDays": 1243.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.83,
+                "ManagerID": 9.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 5.53161973200571
+            },
+            {
+                "Salary": 54005,
+                "TenureDays": 1347.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.677417704961956
+            },
+            {
+                "Salary": 45433,
+                "TenureDays": 836.0,
+                "Absences": 6,
+                "EngagementSurvey": 3.49,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5321215401824724
+            },
+            {
+                "Salary": 46654,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.1,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.687268197886931
+            },
+            {
+                "Salary": 82758,
+                "TenureDays": 1797.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.78,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.1047368233904655
+            },
+            {
+                "Salary": 66074,
+                "TenureDays": 448.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.52,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.2672494272754258
+            },
+            {
+                "Salary": 64520,
+                "TenureDays": 1243.0,
+                "Absences": 3,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.8583836807055296
+            },
+            {
+                "Salary": 61962,
+                "TenureDays": 378.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.9,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.3698253830198706
+            },
+            {
+                "Salary": 63676,
+                "TenureDays": 2519.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.88,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.9844965835327546
+            },
+            {
+                "Salary": 93046,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.897583799575152
+            },
+            {
+                "Salary": 77915,
+                "TenureDays": 1243.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.518075324586434
+            },
+            {
+                "Salary": 52624,
+                "TenureDays": 2640.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.18,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.596421835793817
+            },
+            {
+                "Salary": 51777,
+                "TenureDays": 1243.0,
+                "Absences": 14,
+                "EngagementSurvey": 4.64,
+                "ManagerID": 6.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.7688503147734072
+            },
+            {
+                "Salary": 47434,
+                "TenureDays": 1468.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.6440475105187584
+            },
+            {
+                "Salary": 52788,
+                "TenureDays": 1828.0,
+                "Absences": 18,
+                "EngagementSurvey": 3.08,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.18085392483685
+            },
+            {
+                "Salary": 68407,
+                "TenureDays": 411.0,
+                "Absences": 16,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.463756575824603
+            },
+            {
+                "Salary": 83667,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.37,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.834481460798413
+            },
+            {
+                "Salary": 157000,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 2.39,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 3.160613724022866
+            },
+            {
+                "Salary": 87921,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.5976698249127055
+            },
+            {
+                "Salary": 50470,
+                "TenureDays": 921.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.698672372856731
+            },
+            {
+                "Salary": 52674,
+                "TenureDays": 1492.0,
+                "Absences": 3,
+                "EngagementSurvey": 2.33,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.9943944216515723
+            },
+            {
+                "Salary": 71966,
+                "TenureDays": 462.0,
+                "Absences": 17,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.2525392641154287
+            },
+            {
+                "Salary": 93093,
+                "TenureDays": 517.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.7,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.1956650331405276
+            },
+            {
+                "Salary": 53564,
+                "TenureDays": 2544.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.54,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 4.015280831430516
+            },
+            {
+                "Salary": 60270,
+                "TenureDays": 1533.0,
+                "Absences": 2,
+                "EngagementSurvey": 2.4,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.987411678449444
+            },
+            {
+                "Salary": 45998,
+                "TenureDays": 1623.0,
+                "Absences": 5,
+                "EngagementSurvey": 3.45,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.534039789365924
+            },
+            {
+                "Salary": 57954,
+                "TenureDays": 630.0,
+                "Absences": 12,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.6728983421910488
+            },
+            {
+                "Salary": 74669,
+                "TenureDays": 2032.0,
+                "Absences": 6,
+                "EngagementSurvey": 4.16,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.282650199320423
+            },
+            {
+                "Salary": 64724,
+                "TenureDays": 514.0,
+                "Absences": 13,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.217945129120201
+            },
+            {
+                "Salary": 46799,
+                "TenureDays": 2576.0,
+                "Absences": 14,
+                "EngagementSurvey": 3.17,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.486311746784501
+            },
+            {
+                "Salary": 46430,
+                "TenureDays": 267.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.467892807578138
+            },
+            {
+                "Salary": 83363,
+                "TenureDays": 1636.0,
+                "Absences": 4,
+                "EngagementSurvey": 4.15,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.8933697634596618
+            },
+            {
+                "Salary": 61729,
+                "TenureDays": 2385.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.8,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.8092668849579923
+            },
+            {
+                "Salary": 45115,
+                "TenureDays": 1705.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.5993285791001246
+            },
+            {
+                "Salary": 64971,
+                "TenureDays": 26.0,
+                "Absences": 10,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 14.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 3.1901607649812544
+            },
+            {
+                "Salary": 55578,
+                "TenureDays": 218.0,
+                "Absences": 13,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.5717980655671635
+            },
+            {
+                "Salary": 50428,
+                "TenureDays": 1842.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.8478869605601642
+            },
+            {
+                "Salary": 61422,
+                "TenureDays": 1954.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.9059483631938952
+            },
+            {
+                "Salary": 89883,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 3.69,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.5269217521568332
+            },
+            {
+                "Salary": 150290,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 4.94,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.2294701415402103
+            },
+            {
+                "Salary": 53180,
+                "TenureDays": 2688.0,
+                "Absences": 4,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 20.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 3.311004372201748
+            },
+            {
+                "Salary": 140920,
+                "TenureDays": 1243.0,
+                "Absences": 13,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.6153531061398692
+            },
+            {
+                "Salary": 148999,
+                "TenureDays": 1395.0,
+                "Absences": 8,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 5.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.663627709827606
+            },
+            {
+                "Salary": 47750,
+                "TenureDays": 1243.0,
+                "Absences": 4,
+                "EngagementSurvey": 2.6,
+                "ManagerID": 18.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.5289681037751737
+            },
+            {
+                "Salary": 46428,
+                "TenureDays": 3493.0,
+                "Absences": 7,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 5.173159811015108
+            },
+            {
+                "Salary": 88527,
+                "TenureDays": 299.0,
+                "Absences": 2,
+                "EngagementSurvey": 4.2,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.6232761138125738
+            },
+            {
+                "Salary": 87826,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 3.32,
+                "ManagerID": 4.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.899254586291363
+            },
+            {
+                "Salary": 51920,
+                "TenureDays": 1243.0,
+                "Absences": 2,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.9233265411886986
+            },
+            {
+                "Salary": 63878,
+                "TenureDays": 1990.0,
+                "Absences": 20,
+                "EngagementSurvey": 4.68,
+                "ManagerID": 22.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.9094388823305186
+            },
+            {
+                "Salary": 55000,
+                "TenureDays": 730.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.8,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 2.443176634525905
+            },
+            {
+                "Salary": 66593,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 4.3,
+                "ManagerID": 6.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 1.8533935118535552
+            },
+            {
+                "Salary": 64021,
+                "TenureDays": 1243.0,
+                "Absences": 20,
+                "EngagementSurvey": 2.4,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.7431386410598724
+            },
+            {
+                "Salary": 65714,
+                "TenureDays": 1243.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.83,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.136084906578299
+            },
+            {
+                "Salary": 58273,
+                "TenureDays": 1243.0,
+                "Absences": 5,
+                "EngagementSurvey": 1.81,
+                "ManagerID": 21.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.981680520352579
+            },
+            {
+                "Salary": 63003,
+                "TenureDays": 1243.0,
+                "Absences": 9,
+                "EngagementSurvey": 3.9,
+                "ManagerID": 1.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.947216786946213
+            },
+            {
+                "Salary": 63682,
+                "TenureDays": 1243.0,
+                "Absences": 12,
+                "EngagementSurvey": 3.73,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8695377929492492
+            },
+            {
+                "Salary": 92989,
+                "TenureDays": 1243.0,
+                "Absences": 1,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.5184577767612633
+            },
+            {
+                "Salary": 60754,
+                "TenureDays": 1435.0,
+                "Absences": 11,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.5716001236918906
+            },
+            {
+                "Salary": 72202,
+                "TenureDays": 2245.0,
+                "Absences": 3,
+                "EngagementSurvey": 3.93,
+                "ManagerID": 16.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 2.2264425717229277
+            },
+            {
+                "Salary": 48413,
+                "TenureDays": 1889.0,
+                "Absences": 1,
+                "EngagementSurvey": 3.98,
+                "ManagerID": 11.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 1.606921747589738
+            },
+            {
+                "Salary": 67176,
+                "TenureDays": 1162.0,
+                "Absences": 15,
+                "EngagementSurvey": 4.1,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.512190440337819
+            },
+            {
+                "Salary": 75281,
+                "TenureDays": 403.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 7.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.3732099293176354
+            },
+            {
+                "Salary": 100416,
+                "TenureDays": 1882.0,
+                "Absences": 9,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 10.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.997403236935521
+            },
+            {
+                "Salary": 88976,
+                "TenureDays": 1243.0,
+                "Absences": 19,
+                "EngagementSurvey": 3.93,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 1.890292855081267
+            },
+            {
+                "Salary": 80512,
+                "TenureDays": 98.0,
+                "Absences": 5,
+                "EngagementSurvey": 4.5,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 2.9116473617964864
+            },
+            {
+                "Salary": 84903,
+                "TenureDays": 1243.0,
+                "Absences": 17,
+                "EngagementSurvey": 3.42,
+                "ManagerID": 13.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.508390410181366
+            },
+            {
+                "Salary": 58371,
+                "TenureDays": 1221.0,
+                "Absences": 11,
+                "EngagementSurvey": 5.0,
+                "ManagerID": 39.0,
+                "Cluster_Anomaly": 3,
+                "Distance": 2.649836411292483
+            },
+            {
+                "Salary": 58062,
+                "TenureDays": 490.0,
+                "Absences": 9,
+                "EngagementSurvey": 3.6,
+                "ManagerID": 19.0,
+                "Cluster_Anomaly": 1,
+                "Distance": 1.8452534537248593
+            },
+            {
+                "Salary": 48513,
+                "TenureDays": 2583.0,
+                "Absences": 4,
+                "EngagementSurvey": 3.2,
+                "ManagerID": 12.0,
+                "Cluster_Anomaly": 0,
+                "Distance": 3.30057272031652
+            },
+            {
+                "Salary": 220450,
+                "TenureDays": 1243.0,
+                "Absences": 16,
+                "EngagementSurvey": 4.6,
+                "ManagerID": 2.0,
+                "Cluster_Anomaly": 2,
+                "Distance": 4.433327995012258
+            }
+        ]
+    }
+}

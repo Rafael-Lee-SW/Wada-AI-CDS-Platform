@@ -1,0 +1,53 @@
+# test_config_nn.yaml
+
+tests:
+  - id: 1
+    description: "1. Neural Network Regression"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "PerfScoreID"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+      epochs: 100
+      batch_size: 20
+    expected_status: 200
+
+  - id: 2
+    description: "2. Graph Neural Network Analysis"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "graph_neural_network_analysis"
+      id_column: "EmpID"
+      edge_source_column: "EmpID" # Corrected from 'source'
+      edge_target_column: "ManagerID" # Corrected from 'target'
+      additional_features:
+        - "PerfScoreID"
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "ManagerID"
+      feature_generations:
+        - type: "period"
+          new_column: "TenureDays"
+          start_column: "DateofHire"
+          end_column: "DateofTermination"
+    expected_status: 200

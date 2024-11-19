@@ -1,0 +1,39 @@
+name: ml_ray_fastapi_env
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - ray
+      - ray[serve]
+      - aiohttp-cors
+      - rich
+      - Pygments
+      - pytest
+      - watchfiles
+      - opencensus
+      - opencensus-context
+  - fastapi
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - networkx
+  - pydantic
+  - uvicorn
+  - tensorflow
+  - keras
+  - aiohttp
+  - google-api-core
+  - grpcio
+  - protobuf
+  - requests
+  - scipy
+  - tensorboard
+  - pytorch
+  - plotly
+  - pillow
+  - h5py
+  - python-dotenv
