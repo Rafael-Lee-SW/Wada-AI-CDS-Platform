@@ -1,0 +1,68 @@
+tests:
+  - id: 1
+    description: "Random Forest Regression: Employee Performance Prediction"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "PerfScoreID"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "SpecialProjectsCount"
+        - "Absences"
+        - "DaysLateLast30"
+        - "Department"
+        - "Position"
+        - "Salary"
+        - "TenureDays"
+        - "ManagerID"
+      id_column: "EmpID"
+    expected_status: 200
+
+  - id: 2
+    description: "KMeans Clustering: Role-Based Grouping and Risk Analysis"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "Role Criticality Score"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Factory Operating Rate (%)"
+        - "Operational Risk Factor"
+      id_column: "Employee ID"
+      num_clusters: 3
+    expected_status: 200
+
+  - id: 3
+    description: "Random Forest Regression: Predicting Absence Cost Impact"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "random_forest_regression"
+      target_variable: `Absence Cost Impact ($)`
+      feature_columns:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
+    expected_status: 200

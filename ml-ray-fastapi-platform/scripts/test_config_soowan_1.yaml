@@ -4,7 +4,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
       model_choice: "random_forest_regression"
       target_variable: "PerfScoreID"
       feature_columns:
@@ -26,7 +26,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
       model_choice: "random_forest_classification"
       target_variable: "Termd"
       feature_columns:
@@ -48,7 +48,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
       model_choice: "logistic_regression_binary"
       target_variable: "Overpaid"
       feature_columns:
@@ -79,7 +79,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
       model_choice: "logistic_regression_multinomial"
       target_variable: "PerfScoreID"
       feature_columns:
@@ -101,7 +101,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
       model_choice: "kmeans_clustering_segmentation"
       feature_columns:
         - "Position"
@@ -117,7 +117,7 @@ tests:
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
       model_choice: "kmeans_clustering_anomaly_detection"
       feature_columns:
         - "Salary"
@@ -130,55 +130,201 @@ tests:
     expected_status: 200
 
   - id: 7
-    description: "7. Neural Network Regression"
+    description: "Neural Network Regression on Absence Cost Impact"
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
       model_choice: "neural_network_regression"
-      target_variable: "PerfScoreID"
+      target_variable: "Absence Cost Impact ($)"
       feature_columns:
-        - "EmpSatisfaction"
-        - "EngagementSurvey"
-        - "SpecialProjectsCount"
-        - "Absences"
-        - "DaysLateLast30"
-        - "Department"
-        - "Position"
-        - "Salary"
-        - "TenureDays"
-        - "ManagerID"
-      epochs: 100
-      batch_size: 20
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
     expected_status: 200
 
   - id: 8
-    description: "8. Graph Neural Network Analysis"
+    description: "Graph Neural Network Regression on Absence Cost Impact"
     endpoint: "/predict"
     method: "POST"
     payload:
-      file_path: "./dataset/Human_Resources_Data_Set.csv"
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
       model_choice: "graph_neural_network_analysis"
-      node_features_path: "./dataset/node_features.csv"
-      edges_path: "./dataset/edges.csv"
-      id_column: "EmpID"
-      edge_source_column: "source"  # As per the generated edges
-      edge_target_column: "target"  # As per the generated edges
+      id_column: "Employee ID"
       additional_features:
-        - "PerfScoreID"
-        - "EmpSatisfaction"
-        - "EngagementSurvey"
-        - "SpecialProjectsCount"
-        - "Absences"
-        - "DaysLateLast30"
-        - "Department"
-        - "Position"
-        - "Salary"
-        - "ManagerID"
-      feature_generations:
-        - type: "period"
-          new_column: "TenureDays"
-          start_column: "DateofHire"
-          end_column: "DateofTermination"
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      target_column: "Absence Cost Impact ($)"
+      task_type: "regression"
+      relationship_column: "ManagerID"
+      sample_size: 10
+      random_state: 42
     expected_status: 200
 
+  - id: 9
+    description: "Graph Neural Network Classification on Role Criticality Score"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "graph_neural_network_analysis"
+      id_column: "Employee ID"
+      additional_features:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      target_column: "Role Criticality Score"
+      task_type: "classification"
+      relationship_column: "ManagerID" # Adjust if 'ManagerID' exists in your dataset
+      sample_size: 10
+      random_state: 42
+    expected_status: 200
+
+  - id: 10
+    description: "Neural Network Regression with Limited Features"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "Absence Cost Impact ($)"
+      feature_columns:
+        - "Production Volume (units)"
+        - "Overtime Dependency Rate (%)"
+        - "Shift Flexibility Score"
+        - "Absenteeism Frequency"
+      id_column: "Employee ID"
+    expected_status: 200
+
+  - id: 11
+    description: "Neural Network Regression with Missing Values"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "Absence Cost Impact ($)"
+      feature_columns:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
+    expected_status: 200
+
+  - id: 12
+    description: "12. Support Vector Machine Classification"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/304efd3f-416c-46e8-891a-a92d85afab85.csv"
+      model_choice: "support_vector_machine_classification"
+      target_variable: "Termd"
+      feature_columns:
+        - "EmpSatisfaction"
+        - "EngagementSurvey"
+        - "PerfScoreID"
+        - "Salary"
+        - "TenureDays"
+        - "Absences"
+        - "DaysLateLast30"
+      id_column: "EmpID"
+      kernel: "rbf"
+      C: 1.0
+      gamma: "scale"
+    expected_status: 200
+
+  - id: 13
+    description: "13. Support Vector Machine Regression with Hyperparameter Tuning"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "support_vector_machine_regression"
+      target_variable: "Absence Cost Impact ($)"
+      feature_columns:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
+      param_grid:
+        C: [0.1, 1, 10]
+        gamma: ["scale", "auto"]
+        epsilon: [0.1, 0.2]
+        kernel: ["rbf", "linear"]
+    expected_status: 200

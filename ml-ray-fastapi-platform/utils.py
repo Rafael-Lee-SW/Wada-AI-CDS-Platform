@@ -1,8 +1,90 @@
 # utils.py
 
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+import logging
+import chardet
+import requests
+import tempfile
+
+
+# 다양한 인코딩을 도와주는 함수들
+def detect_encoding(file_path, n_lines=1000):
+    """
+    Detects the encoding of a file by reading the first n_lines.
+    """
+    try:
+        response = requests.get(file_path)
+        response.raise_for_status()
+        raw_data = response.content[: n_lines * 100]  # Approximate bytes
+    except Exception as e:
+        logging.error(f"Failed to fetch data from '{file_path}': {e}")
+        raise e
+
+    result = chardet.detect(raw_data)
+    encoding = result["encoding"]
+    confidence = result["confidence"]
+    logging.info(f"Detected encoding: {encoding} with confidence {confidence}")
+    return encoding
+
+
+def download_file(url):
+    """
+    Downloads a file from the given URL and saves it to a temporary file.
+    """
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv")
+        with open(temp_file.name, "wb") as f:
+            f.write(response.content)
+        logging.info(
+            f"File downloaded from '{url}' to temporary file '{temp_file.name}'."
+        )
+        return temp_file.name
+    except Exception as e:
+        logging.error(f"Failed to download file from '{url}': {e}")
+        raise e
+
+
+def read_csv_with_encoding(file_path_or_url):
+    """
+    Reads a CSV file from a local path or URL with appropriate encoding handling.
+    Tries 'euc-kr', 'cp949', 'utf-8', and uses chardet if all fail.
+    """
+    if file_path_or_url.startswith("http://") or file_path_or_url.startswith(
+        "https://"
+    ):
+        # Download the file first
+        file_path = download_file(file_path_or_url)
+    else:
+        file_path = file_path_or_url
+
+    encodings_to_try = ["euc-kr", "cp949", "utf-8"]
+    for enc in encodings_to_try:
+        try:
+            df = pd.read_csv(file_path, encoding=enc)
+            logging.info(f"File '{file_path}' read successfully with {enc} encoding.")
+            return df
+        except UnicodeDecodeError as e:
+            logging.warning(f"{enc} decoding failed: {e}.")
+
+    # If all specified encodings fail, try to detect encoding
+    try:
+        encoding = detect_encoding(file_path)
+        df = pd.read_csv(file_path, encoding=encoding)
+        logging.info(
+            f"File '{file_path}' read successfully with detected encoding {encoding}."
+        )
+        return df
+    except Exception as e:
+        logging.error(
+            f"Failed to decode file '{file_path}' with detected encoding: {e}"
+        )
+        raise e
+
 
 def load_and_preprocess_data(
     data,
@@ -13,7 +95,7 @@ def load_and_preprocess_data(
     fill_missing=True,
 ):
     if isinstance(data, str):
-        df = pd.read_csv(data)
+        df = read_csv_with_encoding(data)
     else:
         df = data.copy()
 
@@ -59,17 +141,40 @@ def load_and_preprocess_data(
         X = pd.get_dummies(X, drop_first=True)
         if y is not None and y.dtype == "object":
             le = LabelEncoder()
-            y = le.fit_transform(y)
+            y_encoded = le.fit_transform(y)  # y_encoded is a NumPy array
+            y = pd.Series(
+                y_encoded, index=original_indices, name=target_variable
+            )  # Convert back to Series
+    else:
+        if y is not None:
+            y = pd.Series(y, index=original_indices, name=target_variable)
 
     # Restore original indices
     X.index = original_indices
+
     if y is not None:
         y.index = original_indices
+        
+    logging.info(f"데이터 로드 완료: {X.shape}")
+    logging.info(f"타겟 변수의 고유 클래스: {np.unique(y)}")
 
     return X, y
 
 
-def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False):
+def split_data(
+    X,
+    y,
+    ids=None,
+    test_size=0.2,
+    random_state=42,
+    return_ids=False,
+    task_type="classification",
+):
+    if task_type == "classification":
+        stratify_param = y
+    else:
+        stratify_param = None
+
     if ids is not None:
         # Convert ids to a Series if it's not already
         if not isinstance(ids, pd.Series):
@@ -79,7 +184,12 @@ def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False)
         ids = ids.loc[X.index]
 
         X_train, X_test, y_train, y_test, id_train, id_test = train_test_split(
-            X, y, ids, test_size=test_size, random_state=random_state, stratify=y
+            X,
+            y,
+            ids,
+            test_size=test_size,
+            random_state=random_state,
+            stratify=stratify_param,
         )
         if return_ids:
             return X_train, X_test, y_train, y_test, id_train, id_test
@@ -87,7 +197,11 @@ def split_data(X, y, ids=None, test_size=0.2, random_state=42, return_ids=False)
             return X_train, X_test, y_train, y_test
     else:
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=random_state, stratify=y
+            X,
+            y,
+            test_size=test_size,
+            random_state=random_state,
+            stratify=stratify_param,
         )
         return X_train, X_test, y_train, y_test
 

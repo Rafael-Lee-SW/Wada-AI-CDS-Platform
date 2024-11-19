@@ -1,0 +1,46 @@
+tests:
+  - id: 1
+    description: "KMeans Clustering: Role-Based Grouping and Risk Analysis"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "Role Criticality Score"
+        - "Production Volume \u0028units\u0029"
+        - "Production Efficiency \u0028\u0025\u0029"
+        - "Factory Operating Rate \u0028\u0025\u0029"
+        - "Operational Risk Factor"
+      id_column: "Employee ID"
+      num_clusters: 3
+    expected_status: 200
+
+  - id: 2
+    description: "Random Forest Regression: Predicting Absence Cost Impact"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "random_forest_regression"
+      target_variable: "Absence Cost Impact \u0028\u0024\u0029"
+      feature_columns:
+        - "Factory Operating Rate \u0028\u0025\u0029"
+        - "Production Volume \u0028units\u0029"
+        - "Production Efficiency \u0028\u0025\u0029"
+        - "Production Downtime Rate \u0028\u0025\u0029"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume \u0028units\u0029"
+        - "Absence Impact on Efficiency \u0028\u0025\u0029"
+        - "Overtime Dependency Rate \u0028\u0025\u0029"
+        - "Cross-Training Index"
+        - "Error Rate Increase \u0028\u0025\u0029"
+        - "Process Bottleneck Potential \u0028\u0025\u0029"
+        - "Team Coordination Score"
+        - "Job Role Coverage \u0028\u0025\u0029"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
+    expected_status: 200

@@ -1,0 +1,17 @@
+tests:
+  - id: 1
+    description: "1. Random Forest Classification"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/46afccda-8995-4bf7-96a7-aa07b08a913f.csv"
+      model_choice: "random_forest_classification"
+      target_variable: "EmploymentStatus"
+      feature_columns:
+        - "Salary"
+        - "TenureDays"
+        - "PerformanceScore"
+        - "EngagementSurvey"
+        - "EmpSatisfaction"
+      id_column: "EmpID"
+    expected_status: 200

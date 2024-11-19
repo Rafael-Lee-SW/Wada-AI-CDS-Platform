@@ -17,7 +17,7 @@ COPY . .
 ENV PYTHONPATH=/tmp
 
 # Expose the port
-EXPOSE 8000 8080
+EXPOSE 8000 8282 8265
 
 # Command to run the application
 CMD ["python", "app/main.py"]
