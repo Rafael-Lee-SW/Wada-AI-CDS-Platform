@@ -1,9 +1,7 @@
 // src/app/chat/components/analyzeReport/KMeansVisualization.js
 
 import React, { useState, useEffect } from "react";
-//plotly.js 호출
 import dynamic from "next/dynamic";
-// Material-UI로 Interactive Chart Components
 import {
   Slider,
   Typography,
@@ -14,42 +12,33 @@ import {
   IconButton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-// PCA(주성분 분석)을 수행하기 위한 라이브러리 호출
 import { PCA } from "ml-pca";
-// 볼록 껍질(convex hull)을 계산하기 위한 라이브러리를 호출(클러스터 영역 정의)
 import convexHull from "convex-hull";
-import * as d3 from "d3"; // 색상 스케일 정의를 위해
+import * as d3 from "d3"; 
 import useAnalyzingKmeansStyles from "/styles/analyzingKmeansStyle.js"; // 스타일 코드
-import PropTypes from "prop-types"; // 프롭된 값의 타입 검증
+import PropTypes from "prop-types"; 
 //아이콘
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
-// 이 컴포넌트는 KMeans(case5-6) 클러스터링 결과를 시각화하며, 산점도, 볼록 껍질, 이상치 및 데이터 테이블을 포함합니다.
 function KMeansVisualization({ result, explanation }) {
   const classes = useAnalyzingKmeansStyles();
-
-  // featureColumn들을 우선적으로 정의한다.
   const featureColumns = Array.isArray(result.feature_columns_used)
     ? result.feature_columns_used
     : [];
 
-  // State 변수들
-  // 클러스터 설명을 위한 정의
   const [clusters, setClusters] = useState({});
   const [clusterColorMap, setClusterColorMap] = useState({});
-  // 아래는 렌더링을 위한 Cluster 정의
-  const [clusterData, setClusterData] = useState([]); // 클러스터
-  const [clusterSizes, setClusterSizes] = useState({}); // 클러스터 사이즈
-  const [clusterCentersPca, setClusterCentersPca] = useState([]); // 클러스터 중심점
-  const [anomalies, setAnomalies] = useState([]); // 이상치 저장 배열
-  const [numAnomalies, setNumAnomalies] = useState(2); // 이상치 갯수 조절 슬라이더
-  const [isAnomalyDetection, setIsAnomalyDetection] = useState(false); // Case 6의 여부(이상치 탐지)
-  const [error, setError] = useState(null); //에러 유무
-  const [showInset, setShowInset] = useState(true); // 작은 그래프
+  const [clusterData, setClusterData] = useState([]); 
+  const [clusterSizes, setClusterSizes] = useState({}); 
+  const [clusterCentersPca, setClusterCentersPca] = useState([]); 
+  const [anomalies, setAnomalies] = useState([]); 
+  const [numAnomalies, setNumAnomalies] = useState(2); 
+  const [isAnomalyDetection, setIsAnomalyDetection] = useState(false); 
+  const [error, setError] = useState(null); 
+  const [showInset, setShowInset] = useState(true); 
 
-  // // "explanation" prop에서 분석 목적, 데이터 설명 및 모델 설명을 추출합니다.
   const { analysis_purpose, data_description, models_used } =
     explanation.overview || {};
 
@@ -59,19 +48,15 @@ function KMeansVisualization({ result, explanation }) {
   const clusterDescriptions = explanation.cluster?.cluster_description || [];
   const clusterTitles = explanation.cluster?.cluster_title || [];
 
-  // 그래프의 축 값, 각 클러스터에 대한 설명
   const {
     "x-axis_title": xAxisTitle,
     "x-axis_description": xAxisDescription,
     "y-axis_title": yAxisTitle,
     "y-axis_description": yAxisDescription,
-    cluster_title: clusterGroupTitle, // For legend title
-    cluster_description: clusterGroupDescription, // Description of cluster groups
+    cluster_title: clusterGroupTitle, 
+    cluster_description: clusterGroupDescription, 
   } = explanation;
 
-  // --- 변수 정의 끝 ---
-
-  // 클러스터에 대한 일관된 색상 생성하는 도우미 함수
   const generateClusterColorMap = (clusters, colors) => {
     const map = {};
     clusters.forEach((cluster, i) => {
@@ -80,15 +65,12 @@ function KMeansVisualization({ result, explanation }) {
     return map;
   };
 
-  // result이나 numAnomalies가 변경될 때마다 데이터를 처리합니다.
   useEffect(() => {
     if (result) {
       processData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result, numAnomalies]);
 
-  // 클러스터링 결과를 처리하고, PCA를 수행하며, 필요에 따라 이상치를 식별하는 함수입니다.
   const processData = () => {
     try {
       const clusterLabel = result.cluster_label || "Cluster_Anomaly";
@@ -98,11 +80,8 @@ function KMeansVisualization({ result, explanation }) {
       const clusterCenters = result.cluster_centers || [];
       const modelName = result.model.toLowerCase();
 
-      // 모델 이름에 'anomalydetection'이 포함되어 있으면 Case6
       setIsAnomalyDetection(modelName.includes("anomalydetection"));
-      console.log(isAnomalyDetection);
 
-      // 결과 prop에서 클러스터 레이블과 샘플 데이터를 추출합니다.
       const dfSample = [];
       const sampleKeys = Object.keys(clusteredDataSample).filter(
         (key) => key !== clusterLabel
@@ -119,26 +98,21 @@ function KMeansVisualization({ result, explanation }) {
       }
 
       if (!dfSample.length) {
-        // 데이터 처리 후 사용 가능한 데이터가 없으면 오류 메시지를 설정합니다.
         setError("No data available for visualization.");
         return;
       }
 
-      // 주성분 분석(PCA)을 위해 데이터를 준비합니다.
       const X = dfSample.map((row) => featureColumns.map((col) => row[col]));
 
-      // 데이터의 차원이 올바른지 확인하고, 그렇지 않으면 오류를 설정합니다.
       if (X.length === 0 || X[0].length === 0) {
         setError("Data is empty or improperly formatted.");
         return;
       }
 
-      // 제공된 스케일러 평균과 스케일을 사용하여 데이터를 수동으로 스케일링하여 정규화
       const X_scaled = X.map((row) =>
         row.map((value, i) => (value - scalerMean[i]) / scalerScale[i])
       );
 
-      // 스케일링된 데이터에 유효하지 않은 값이 있는지 확인하고 발견되면 오류를 설정합니다.
       const hasInvalidValues = X_scaled.some((row) =>
         row.some((value) => isNaN(value) || value === undefined)
       );
@@ -147,51 +121,42 @@ function KMeansVisualization({ result, explanation }) {
         return;
       }
 
-      // 데이터의 차원을 2개 구성 요소로 줄이기 위해 PCA를 수행합니다.
       const pca = new PCA(X_scaled);
       const X_pca_matrix = pca.predict(X_scaled, { nComponents: 2 });
-      const X_pca = X_pca_matrix.to2DArray(); // Convert Matrix to 2D array
+      const X_pca = X_pca_matrix.to2DArray(); 
 
-      // 클러스터 중심점을 PCA를 사용하여 변환합니다 (이미 스케일링된 상태).
       const clusterCentersScaled = clusterCenters;
       const centers_pca_matrix = pca.predict(clusterCentersScaled, {
         nComponents: 2,
       });
       const centers_pca = centers_pca_matrix.to2DArray();
 
-      // 각 데이터 샘플에 PCA 구성 요소(PC1, PC2)를 추가합니다.
       const dfSampleWithPca = dfSample.map((row, index) => ({
         ...row,
         PC1: X_pca[index][0],
         PC2: X_pca[index][1],
       }));
 
-      // 각 클러스터의 점의 수(분포)를 계산합니다.
       const sizes = {};
       dfSampleWithPca.forEach((row) => {
         const cluster = row[clusterLabel];
         sizes[cluster] = (sizes[cluster] || 0) + 1;
       });
 
-      // 클러스터 리스트 생성
       const clustersList = [
         ...new Set(dfSampleWithPca.map((d) => d[clusterLabel])),
       ];
-      setClusters(clustersList); // 클러스터 리스트 상태 업데이트
+      setClusters(clustersList); 
 
-      // 색상 스케일 정의 (Colorblind-friendly palette 사용)
       const colors = d3.schemeSet2;
 
-      // 클러스터 색상 매핑 생성
       const newClusterColorMap = generateClusterColorMap(clustersList, colors);
-      setClusterColorMap(newClusterColorMap); // 클러스터 색상 매핑 상태 업데이트
+      setClusterColorMap(newClusterColorMap); 
 
-      // 처리된 데이터, 클러스터 크기 및 클러스터 중심점을 상태에 설정합니다.
       setClusterData(dfSampleWithPca);
       setClusterSizes(sizes);
       setClusterCentersPca(centers_pca);
 
-      // Case6에서 각 클러스터에서 이상치를 식별합니다.
       if (isAnomalyDetection) {
         const anomaliesData = computeAnomalies(
           dfSampleWithPca,
@@ -202,21 +167,16 @@ function KMeansVisualization({ result, explanation }) {
         setAnomalies(anomaliesData);
       }
 
-      // 이전에 발생한 오류 메시지를 초기화합니다.
-      setError(null); // Clear any previous errors
+      setError(null); 
     } catch (e) {
-      console.error("Error processing data:", e);
       setError("Failed to process data for visualization.");
     }
   };
 
-  // 클러스터 중심에서 가장 먼 포인트를 선택하여 이상치를 계산하는 함수입니다.
   const computeAnomalies = (data, centers_pca, clusterLabel, numAnomalies) => {
-    // 이상치를 담을 배열 정의
     const anomalies = [];
     const clusters = {};
 
-    // 각 클러스터별로 이상치를 식별하여 anomalies 배열에 추가합니다.
     data.forEach((row) => {
       const cluster = row[clusterLabel];
       if (!clusters[cluster]) clusters[cluster] = [];
@@ -233,7 +193,6 @@ function KMeansVisualization({ result, explanation }) {
           Math.pow(row.PC1 - center[0], 2) + Math.pow(row.PC2 - center[1], 2)
         ),
       }));
-      // Sort points by distance descending and take top N
       points.sort((a, b) => b.distance - a.distance);
       const topAnomalies = points.slice(0, numAnomalies);
       anomalies.push(...topAnomalies);
@@ -242,12 +201,10 @@ function KMeansVisualization({ result, explanation }) {
     return anomalies;
   };
 
-  // 슬라이더 값이 변경될 때 클러스터당 이상치 수를 업데이트하는 핸들러
   const handleNumAnomaliesChange = (event, value) => {
     setNumAnomalies(value);
   };
 
-  // 각 클러스터의 직원 수를 보여주는 막대 차트를 렌더링하는 함수
   const renderClusterDistribution = () => {
     const clusterLabels = Object.keys(clusterSizes).map((cluster) => {
       const index = parseInt(cluster, 10);
@@ -314,21 +271,18 @@ function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // 클러스터 원 내부 막대 차트를 포함한 클러스터의 산점도를 렌더링
   const renderClusterScatterPlot = () => {
     if (!clusterData.length) return null;
 
     const clusterLabel = result.cluster_label || "Cluster_Anomaly";
     const clusters = [...new Set(clusterData.map((d) => d[clusterLabel]))];
 
-    const colors = d3.schemeSet2; // Colorblind-friendly palette
+    const colors = d3.schemeSet2; 
 
-    // Generate cluster color mapping
     const clusterColorMap = generateClusterColorMap(clusters, colors);
 
     const data = [];
 
-    // **1. 클러스터 원을 먼저 그린다.(Convux hall)**
     clusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -339,7 +293,6 @@ function KMeansVisualization({ result, explanation }) {
         const hullIndices = convexHull(points);
         const hullPoints = hullIndices.map((indexPair) => points[indexPair[0]]);
 
-        // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
         const centroid = [
           clusterCentersPca[clusterIndex][0],
@@ -364,12 +317,11 @@ function KMeansVisualization({ result, explanation }) {
           name: `${clusterTitles[i] || `Cluster ${cluster}`} Area`,
           hoverinfo: "text",
           text: clusterTitles[i] || `Cluster ${cluster}`,
-          hoveron: "fills", // Enable hover on fills
+          hoveron: "fills",
         });
       }
     });
 
-    // **2. 산점도를 그린다.**
     clusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -397,11 +349,10 @@ function KMeansVisualization({ result, explanation }) {
         hoverlabel: {
           bgcolor: "#FFFFFF",
           bordercolor: "#CCCCCC",
-        }, // Enhance hover label appearance
+        }, 
       });
     });
 
-    // **3. 클러스터 중심을 추가한다.**
     data.push({
       x: clusterCentersPca.map((c) => c[0]),
       y: clusterCentersPca.map((c) => c[1]),
@@ -412,7 +363,6 @@ function KMeansVisualization({ result, explanation }) {
       hoverinfo: "none",
     });
 
-    // **4. Add Inset Cluster Distribution Bar Chart (Conditionally)**
     if (showInset) {
       const clusterLabels = clusters.map((cluster) => {
         const index = parseInt(cluster, 10);
@@ -436,9 +386,8 @@ function KMeansVisualization({ result, explanation }) {
     return (
       <div
         className={classes.plotContainer}
-        style={{ position: "relative" }} // Ensure container is relative for absolute positioning
+        style={{ position: "relative" }} 
       >
-        {/* **Toggle Button for Inset Plot** */}
         <IconButton
           onClick={() => setShowInset(!showInset)}
           style={{
@@ -473,7 +422,6 @@ function KMeansVisualization({ result, explanation }) {
               gridcolor: "#e5e5e5",
               linecolor: "#D1D1D6",
             },
-            // 클러스터의 각 인원을 나타내는 내부 Bar 그래프
             xaxis2: {
               domain: [0.7, 0.95],
               anchor: "y2",
@@ -488,7 +436,6 @@ function KMeansVisualization({ result, explanation }) {
               zeroline: false,
               showticklabels: false,
             },
-            // 그래프의 요소들에 대해서 설명해주는 부분
             legend: {
               title: { text: clusterGroupTitle || "설명" },
               orientation: "h",
@@ -509,7 +456,6 @@ function KMeansVisualization({ result, explanation }) {
           }}
           config={{ responsive: true }}
         />
-        {/* 축에 대한 설명 */}
         {xAxisDescription && (
           <Typography
             variant="body2"
@@ -528,7 +474,6 @@ function KMeansVisualization({ result, explanation }) {
             {yAxisDescription}
           </Typography>
         )}
-        {/* 각 그룹에 대한 설명 */}
         {clusterGroupDescription && (
           <Typography
             variant="body2"
@@ -542,11 +487,9 @@ function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // 모든 점들에 대한 엑셀 형식의 시각화 렌더링 함수
   const renderClusteredDataTable = () => {
     if (!clusterData.length) return null;
 
-    // Dynamically generate columns based on data keys
     const columns = Object.keys(clusterData[0]).map((key) => ({
       field: key,
       headerName: key,
@@ -570,20 +513,17 @@ function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // 이상치 탐색 그래프를 렌더링하는 함수
   const renderAnomalyScatterPlot = () => {
     if (!clusterData.length || !isAnomalyDetection) return null;
 
     const clusterLabel = result.cluster_label || "Cluster_Anomaly";
     const clusters = [...new Set(clusterData.map((d) => d[clusterLabel]))];
-    const colors = d3.schemeSet2; // Colorblind-friendly palette
+    const colors = d3.schemeSet2; 
 
-    // Bar 차트와 이상치 그래프의 색상을 일치시키기 위한 함수
     const ClusterColorMap = generateClusterColorMap(clusters, colors);
 
     const data = [];
 
-    // **1. 클러스터 원을 먼저 그린다.(Convux hall)**
     clusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -594,7 +534,6 @@ function KMeansVisualization({ result, explanation }) {
         const hullIndices = convexHull(points);
         const hullPoints = hullIndices.map((indexPair) => points[indexPair[0]]);
 
-        // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
         const centroid = [
           clusterCentersPca[clusterIndex][0],
@@ -619,12 +558,11 @@ function KMeansVisualization({ result, explanation }) {
           name: `${clusterTitles[i] || `Cluster ${cluster}`} Area`,
           hoverinfo: "text",
           text: clusterTitles[i] || `Cluster ${cluster}`,
-          hoveron: "fills", // Enable hover on fills
+          hoveron: "fills", 
         });
       }
     });
 
-    // **2. 산점도를 추가한다.**
     clusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -652,11 +590,10 @@ function KMeansVisualization({ result, explanation }) {
         hoverlabel: {
           bgcolor: "#FFFFFF",
           bordercolor: "#CCCCCC",
-        }, // Enhance hover label appearance
+        },
       });
     });
 
-    // **3. 이상치를 추가한다.**
     data.push({
       x: anomalies.map((a) => a.PC1),
       y: anomalies.map((a) => a.PC2),
@@ -676,7 +613,6 @@ function KMeansVisualization({ result, explanation }) {
       }),
     });
 
-    // **4. 각 클러스터 중심으로부터 이상치까지의 선을 추가한다.**
     anomalies.forEach((anomaly) => {
       const cluster = anomaly[clusterLabel];
       const clusterIndex = parseInt(cluster, 10);
@@ -692,7 +628,6 @@ function KMeansVisualization({ result, explanation }) {
       }
     });
 
-    // **5. 각 클러스터의 중심점을 추가한다.**
     data.push({
       x: clusterCentersPca.map((c) => c[0]),
       y: clusterCentersPca.map((c) => c[1]),
@@ -703,7 +638,6 @@ function KMeansVisualization({ result, explanation }) {
       hoverinfo: "none",
     });
 
-    // **6. 각 클러스터의 인원을 표시화는 bar Chart를 추가한다.**
     if (showInset) {
       const clusterLabels = clusters.map((cluster) => {
         const index = parseInt(cluster, 10);
@@ -727,9 +661,8 @@ function KMeansVisualization({ result, explanation }) {
     return (
       <div
         className={classes.plotContainer}
-        style={{ position: "relative" }} // Ensure container is relative for absolute positioning
+        style={{ position: "relative" }} 
       >
-        {/* 작은 Bar 차트를 켜고 클 수 있는 버튼 */}
         <IconButton
           onClick={() => setShowInset(!showInset)}
           style={{
@@ -765,22 +698,20 @@ function KMeansVisualization({ result, explanation }) {
               gridcolor: "#e5e5e5",
               linecolor: "#D1D1D6",
             },
-            // Define inset axes
             xaxis2: {
-              domain: [0.7, 0.95], // Adjusted position and size for better visibility
+              domain: [0.7, 0.95],
               anchor: "y2",
               showgrid: false,
               zeroline: false,
               showticklabels: false,
             },
             yaxis2: {
-              domain: [0.7, 0.95], // Adjusted position and size for better visibility
+              domain: [0.7, 0.95], 
               anchor: "x2",
               showgrid: false,
               zeroline: false,
               showticklabels: false,
             },
-            // 그래프 요소들에 대한 설명
             legend: {
               title: { text: clusterGroupTitle || "설명" },
               orientation: "h",
@@ -801,7 +732,6 @@ function KMeansVisualization({ result, explanation }) {
           }}
           config={{ responsive: true }}
         />
-        {/* 축 설명 */}
         {xAxisDescription && (
           <Typography
             variant="body2"
@@ -820,7 +750,6 @@ function KMeansVisualization({ result, explanation }) {
             {yAxisDescription}
           </Typography>
         )}
-        {/* 각 그룹에 대한 설명 */}
         {clusterGroupDescription && (
           <Typography
             variant="body2"
@@ -834,7 +763,6 @@ function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // Final return
   return (
     <Container maxWidth="lg" className={classes.container}>
       {error && (
@@ -844,7 +772,6 @@ function KMeansVisualization({ result, explanation }) {
       )}
       {!error && (
         <>
-          {/* Report Title */}
           <Box my={4}>
             <Typography
               variant="h3"
@@ -855,8 +782,6 @@ function KMeansVisualization({ result, explanation }) {
               {explanation.report_title || "AI 모델 분석 보고서"}
             </Typography>
           </Box>
-
-          {/* Anomaly Detection (if applicable) */}
           <Box my={4}>
             {isAnomalyDetection ? (
               <>
@@ -913,20 +838,20 @@ function KMeansVisualization({ result, explanation }) {
             </Typography>
             {clusterDescriptions.length > 0 ? (
               clusterDescriptions.map((desc, index) => {
-                const clusterId = clusters[index]; // 현재 클러스터 ID 가져오기
-                const color = clusterColorMap[clusterId] || "#000000"; // 색상 매핑에서 색상 가져오기, 기본값은 검정색
+                const clusterId = clusters[index]; 
+                const color = clusterColorMap[clusterId] || "#000000"; 
                 return (
                   <Card
                     key={index}
                     variant="outlined"
                     className={classes.card}
-                    style={{ borderColor: color }} // 카드 테두리 색상 설정
+                    style={{ borderColor: color }} 
                   >
                     <CardContent>
                       <Typography
                         variant="h6"
                         className={classes.cardTitle}
-                        style={{ color: color }} // 제목 텍스트 색상 설정
+                        style={{ color: color }} 
                       >
                         {clusterTitles[index] || `Cluster ${index + 1}`}
                       </Typography>
@@ -975,8 +900,6 @@ function KMeansVisualization({ result, explanation }) {
               {models_used?.model_description}
             </Typography>
           </Box>
-
-          {/* Key Findings */}
           <Box my={4}>
             <Typography
               variant="h5"
@@ -1002,7 +925,6 @@ function KMeansVisualization({ result, explanation }) {
               </Card>
             ))}
           </Box>
-          {/* Visualizations */}
           {visualizationsInfo.map((viz, index) => (
             <Box my={4} key={index}>
               {/* 그래프 제목 */}
@@ -1089,8 +1011,6 @@ function KMeansVisualization({ result, explanation }) {
                 </>
               )}
           </Box>
-
-          {/* Clustered Data Table */}
           <Box my={4}>
             <Typography
               variant="h5"
@@ -1107,7 +1027,6 @@ function KMeansVisualization({ result, explanation }) {
   );
 }
 
-// KMeansVisualization 컴포넌트의 prop 타입을 정의하여 타입 검사를 수행합니다.
 KMeansVisualization.propTypes = {
   result: PropTypes.shape({
     feature_columns_used: PropTypes.arrayOf(PropTypes.string),

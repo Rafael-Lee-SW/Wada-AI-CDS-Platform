@@ -139,7 +139,6 @@ export default function SelectML({ chatRoomId, models, purpose, overview, reques
                                                 }
                                             };
 
-                                            // `model_advantages` 항목일 경우 숫자)로 나눠서 줄바꿈 처리
                                             const renderValue = (key, value) => {
                                                 if (key === 'model_advantages') {
                                                     return value.split(/(?=\d\))/).map((item, index) => (

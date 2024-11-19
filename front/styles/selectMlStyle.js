@@ -65,7 +65,7 @@ const styles = {
         whiteSpace: 'pre-wrap',
         wordBreak: 'keep-all',
         overflowWrap: 'break-word',
-        maxWidth: '70%', // 최대 너비를 부모 요소에 맞추기
+        maxWidth: '70%', 
         lineHeight: '1.6',
         textAlign: 'center',
         fontSize: '18px',

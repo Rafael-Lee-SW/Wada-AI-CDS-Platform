@@ -3,14 +3,13 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
-
-// Import custom UI components from your template
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  Typography
 } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
@@ -22,19 +21,14 @@ import {
   TableRow,
 } from "../ui/table";
 
-// Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Custom Styles (Assuming you have a similar styles file)
 import useSVMStyles from "/styles/analyzingSvmStyle.js";
 
 function SVMVisualization({ result, explanation }) {
   const classes = useSVMStyles();
-
-  // Destructure data from result and explanation
   const { graph1, graph2, graph3, graph4, model } = result || {};
 
-  // Destructure explanation with deeper nesting
   const {
     overview = {},
     model_performance = {},
@@ -49,7 +43,6 @@ function SVMVisualization({ result, explanation }) {
     data_table_description = "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다.",
   } = explanation || {};
 
-  // Extract SupportVectorMachine_case from nested structure
   const svmCase = model_specific_details?.details?.svm_case || {};
 
   const {
@@ -58,7 +51,6 @@ function SVMVisualization({ result, explanation }) {
     Classification_Report = {},
   } = svmCase;
 
-  // Extract axis titles and descriptions from nested Decision_Boundary_Graph
   const xAxisTitle =
     Decision_Boundary_Graph?.["x-axis_title"] || "주성분 1";
   const xAxisDescription =
@@ -70,9 +62,6 @@ function SVMVisualization({ result, explanation }) {
     Decision_Boundary_Graph?.["y-axis_description"] ||
     "PC2는 데이터의 두 번째 주성분으로, 첫번째 주성분간의 추가적인 변동성을 설명합니다.";
 
-  // --- Visualization Functions ---
-
-  // Render ROC Curve
   const renderRocCurve = () => {
     if (!graph1 || !graph1.fpr || !graph1.tpr) {
       return (
@@ -115,7 +104,6 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-  // Render Decision Boundary
   const renderDecisionBoundary = () => {
     if (
       !decisionBoundaryData.X_vis ||
@@ -132,17 +120,15 @@ function SVMVisualization({ result, explanation }) {
 
     const { X_vis, y_vis, xx, yy, Z } = decisionBoundaryData;
 
-    // Find decision boundary points (z ~ 0)
     const decisionBoundaryPoints = X_vis.filter((_, index) => {
       const zValue = Z[Math.floor(index / Z[0].length)][index % Z[0].length];
-      return Math.abs(zValue) < 0.05; // Adjust threshold as needed for better representation
+      return Math.abs(zValue) < 0.05; 
     });
 
     return (
       <div>
         <Plot
           data={[
-            // Contour plot for the decision boundary
             {
               x: xx[0],
               y: yy.map((row) => row[0]),
@@ -165,7 +151,6 @@ function SVMVisualization({ result, explanation }) {
                 ticktext: ["Class 2", "Decision Boundary", "Class 1"],
               },
             },
-            // Data points with class colors
             {
               x: X_vis.map((d) => d[0]),
               y: X_vis.map((d) => d[1]),
@@ -185,7 +170,6 @@ function SVMVisualization({ result, explanation }) {
                 },
               },
             },
-            // Decision boundary points (white markers)
             {
               x: decisionBoundaryPoints.map((point) => point[0]),
               y: decisionBoundaryPoints.map((point) => point[1]),
@@ -243,7 +227,6 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-  // Render Confusion Matrix
   const renderConfusionMatrix = () => {
     if (!confusionMatrixData.confusion_matrix || !confusionMatrixData.labels) {
       return (
@@ -282,7 +265,6 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-  // Render Classification Report
   const renderClassificationReport = () => {
     if (!Classification_Report.classification_report) return null;
 
@@ -350,7 +332,6 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-  // Render Data Table for All Spots
   const renderDataTable = () => {
     if (!result.graph4 || !result.graph4.all_data) return null;
 
@@ -385,15 +366,12 @@ function SVMVisualization({ result, explanation }) {
     );
   };
 
-  // --- Final Return ---
   return (
     <div className="container mx-auto p-4 space-y-8">
-      {/* Report Title */}
       <h1 className="text-4xl font-bold text-center mb-8">
         {svmReportTitle || "Support Vector Machine Analysis Report"}
       </h1>
 
-      {/* Overview */}
       <Card>
         <CardHeader>
           <CardTitle>{overview_section_title || "개요"}</CardTitle>
@@ -425,7 +403,6 @@ function SVMVisualization({ result, explanation }) {
         </CardContent>
       </Card>
 
-      {/* Tabs */}
       <Tabs defaultValue="roc_curve" className="w-full">
         <TabsList className="grid w-full grid-cols-3 space-x-4">
           {isClassification && (
@@ -468,10 +445,8 @@ function SVMVisualization({ result, explanation }) {
           )}
         </TabsList>
 
-        {/* Classification Tabs */}
         {isClassification && (
           <>
-            {/* ROC Curve Tab */}
             <TabsContent value="roc_curve">
               <Card>
                 <CardHeader>
@@ -489,7 +464,6 @@ function SVMVisualization({ result, explanation }) {
               </Card>
             </TabsContent>
 
-            {/* Decision Boundary Tab */}
             <TabsContent value="decision_boundary">
               <Card>
                 <CardHeader>
@@ -507,7 +481,6 @@ function SVMVisualization({ result, explanation }) {
               </Card>
             </TabsContent>
 
-            {/* Confusion Matrix Tab */}
             <TabsContent value="confusion_matrix">
               <Card>
                 <CardHeader>
@@ -527,10 +500,8 @@ function SVMVisualization({ result, explanation }) {
           </>
         )}
 
-        {/* Regression Tabs */}
         {isRegression && (
           <>
-            {/* Regression Plot Tab */}
             <TabsContent value="regression_plot">
               <Card>
                 <CardHeader>
@@ -540,7 +511,6 @@ function SVMVisualization({ result, explanation }) {
               </Card>
             </TabsContent>
 
-            {/* Regression Metrics Tab */}
             <TabsContent value="regression_metrics">
               <Card>
                 <CardHeader>
@@ -553,7 +523,6 @@ function SVMVisualization({ result, explanation }) {
         )}
       </Tabs>
 
-      {/* Classification Report */}
       {isClassification && (
         <Card>
           <CardHeader>
@@ -563,9 +532,7 @@ function SVMVisualization({ result, explanation }) {
         </Card>
       )}
 
-      {/* Key Findings and Recommendations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Key Findings */}
         <Card>
           <CardHeader>
             <CardTitle style={{ color: "#8770b4" }}>주목할만한 부분</CardTitle>
@@ -581,7 +548,6 @@ function SVMVisualization({ result, explanation }) {
           </CardContent>
         </Card>
 
-        {/* Recommendations */}
         <Card>
           <CardHeader>
             <CardTitle>추천</CardTitle>
@@ -622,7 +588,6 @@ function SVMVisualization({ result, explanation }) {
   );
 }
 
-// Define PropTypes for type checking
 SVMVisualization.propTypes = {
   result: PropTypes.shape({
     model: PropTypes.string.isRequired,
@@ -688,7 +653,7 @@ SVMVisualization.propTypes = {
       key_features: PropTypes.arrayOf(
         PropTypes.shape({
           feature_name: PropTypes.string.isRequired,
-          importance_score: PropTypes.number, // can be null
+          importance_score: PropTypes.number, 
           business_impact: PropTypes.string.isRequired,
         })
       ),
@@ -735,7 +700,7 @@ SVMVisualization.propTypes = {
     key_findings_section_title: PropTypes.string,
     recommendations_section_title: PropTypes.string,
     data_table_title: PropTypes.string,
-    data_table_description: PropTypes.string, // Added for data table description
+    data_table_description: PropTypes.string, 
   }).isRequired,
 };
 

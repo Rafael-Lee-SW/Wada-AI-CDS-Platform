@@ -50,9 +50,6 @@ const styles = {
         alignItems: 'center',
         gap: '20px',
     },
-    file: {
-      //  padding: '10px'
-    },
     fileName: {
         fontSize: '14px'
     },

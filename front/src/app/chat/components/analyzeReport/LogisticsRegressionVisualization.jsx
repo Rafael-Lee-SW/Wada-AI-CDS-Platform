@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-// UI Components from your template
-import { Slider } from "../ui/silder"; // Corrected import from "silder" to "slider"
+import { Slider } from "../ui/silder"; 
 import {
   Card,
   CardContent,
@@ -28,10 +27,8 @@ import { Button } from "../ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { Typography } from "@mui/material";
 
-// Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Custom Styles
 import useLogisticRegressionStyles from "/styles/analyzingLogisticStyle.js";
 
 export default function LogisticRegressionVisualization({
@@ -39,8 +36,6 @@ export default function LogisticRegressionVisualization({
   explanation,
 }) {
   const classes = useLogisticRegressionStyles();
-
-  // State variables
   const [decisionBoundaryData, setDecisionBoundaryData] = useState(null);
   const [classificationReportData, setClassificationReportData] =
     useState(null);
@@ -50,7 +45,6 @@ export default function LogisticRegressionVisualization({
   const [error, setError] = useState(null);
   const [showInset, setShowInset] = useState(true);
 
-  // Extract explanations
   const {
     overview,
     model_performance,
@@ -66,7 +60,6 @@ export default function LogisticRegressionVisualization({
     data_table_description = "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다.",
   } = explanation || {};
 
-  // Extract LogisticRegression_case details from nested structure
   const logisticCase =
     model_specific_details?.details?.logistic_regression_case || {};
 
@@ -76,7 +69,6 @@ export default function LogisticRegressionVisualization({
     boundary_lines: logisticBoundaryLines = {},
   } = logisticCase;
 
-  // Extract axis titles and descriptions from nested LogisticRegression_case
   const xAxisTitle = logisticCase?.x_axis_title || explanation["x-axis_title"] || "PC1";
   const xAxisDescription =
     logisticCase?.x_axis_description ||
@@ -88,13 +80,9 @@ export default function LogisticRegressionVisualization({
     explanation["y-axis_description"] ||
     "PC2는 데이터의 두 번째 주성분으로, 첫번째 주성분간의 추가적인 변동성을 설명합니다.";
 
-  // State to control active tab
   const [activeTab, setActiveTab] = useState("decision_boundary");
-
-  // Color mapping for classes
   const [colorMapping, setColorMapping] = useState({});
 
-  // Process the result prop to extract necessary data
   useEffect(() => {
     try {
       if (!result) {
@@ -104,7 +92,6 @@ export default function LogisticRegressionVisualization({
 
       const { graph1, graph3 } = result;
 
-      // --- Decision Boundary Plot ---
       if (graph1 && graph1.graph_type === "decision_boundary") {
         const { X_pca, y, coefficients, intercept, classes, original_data } =
           graph1;
@@ -130,7 +117,6 @@ export default function LogisticRegressionVisualization({
           );
           setDecisionBoundaryData(figure);
 
-          // Prepare data table if original data is available
           if (original_data && Array.isArray(original_data)) {
             setDataTable(
               original_data.map((dataPoint, index) => ({
@@ -140,7 +126,6 @@ export default function LogisticRegressionVisualization({
               }))
             );
           } else {
-            // If original data is not available, create a basic table
             setDataTable(
               X_pca.map((point, index) => ({
                 id: index,
@@ -155,7 +140,6 @@ export default function LogisticRegressionVisualization({
         setError("결정 경계 시각화를 위한 데이터가 없습니다.");
       }
 
-      // --- Classification Report ---
       if (graph3 && graph3.classification_report) {
         const report = graph3.classification_report;
         const { reportRows, overallAccuracy } =
@@ -166,7 +150,6 @@ export default function LogisticRegressionVisualization({
         setError("분류 보고서를 위한 데이터가 없습니다.");
       }
 
-      // --- Boundary Lines Titles ---
       if (
         logisticBoundaryLines.boundary_line_title &&
         logisticBoundaryLines.boundary_line_title.length > 0
@@ -174,16 +157,12 @@ export default function LogisticRegressionVisualization({
         setBoundaryLinesTitles(logisticBoundaryLines.boundary_line_title);
       }
 
-      // Clear any previous errors if data is processed successfully
       setError(null);
     } catch (e) {
-      console.error("시각화 데이터 처리 중 오류 발생:", e);
       setError("시각화 데이터 처리에 실패했습니다.");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
 
-  // Helper function to create Decision Boundary Plot
   const createDecisionBoundaryPlot = (
     X_pca,
     y,
@@ -192,8 +171,6 @@ export default function LogisticRegressionVisualization({
     classes,
     boundaryLines
   ) => {
-    // Handle y being either class indices (numbers) or class titles (strings)
-    // Map y indices to class titles
     const mappedY = y.map((cls) => {
       const isBinary =
         result.model === "LogisticRegressionBinary";
@@ -209,7 +186,6 @@ export default function LogisticRegressionVisualization({
       }
     });
 
-    // Define color palette
     const palette = d3.schemeCategory10;
     const uniqueClasses = [...new Set(mappedY)];
     const mapping = {};
@@ -253,11 +229,10 @@ export default function LogisticRegressionVisualization({
         margin: { t: 50, l: 50, r: 50, b: 100 },
         font: { family: "Arial, sans-serif", color: "#1D1D1F" },
         hovermode: "closest",
-        annotations: [], // To hold boundary line titles
+        annotations: [], 
       },
     };
 
-    // Add scatter plot for each class
     uniqueClasses.forEach((cls) => {
       const indices = mappedY.reduce((acc, val, idx) => {
         if (val === cls) acc.push(idx);
@@ -286,17 +261,15 @@ export default function LogisticRegressionVisualization({
       });
     });
 
-    // Compute and plot decision boundaries
     const xMin = d3.min(X_pca, (d) => d[0]) - 1;
     const xMax = d3.max(X_pca, (d) => d[0]) + 1;
     const xVals = d3.range(xMin, xMax, (xMax - xMin) / 200);
 
     const annotations = [];
-    let boundaryIndex = 0; // Initialize boundary line index
+    let boundaryIndex = 0; 
 
     if (classes.length === 2) {
-      // Binary classification
-      const w = coefficients[0]; // Assuming binary classification uses first set of coefficients
+      const w = coefficients[0]; 
       const b = intercept[0];
       if (w[1] !== 0) {
         const yVals = xVals.map((x) => (-b - w[0] * x) / w[1]);
@@ -306,9 +279,8 @@ export default function LogisticRegressionVisualization({
           mode: "lines",
           line: { color: "black", width: 2 },
           name: "결정 경계",
-          showlegend: true, // Ensure legend is shown
+          showlegend: true,
         });
-        // Add annotation for the boundary line
         annotations.push({
           x: (xMin + xMax) / 2,
           y: (-b - w[0] * ((xMin + xMax) / 2)) / w[1],
@@ -320,7 +292,6 @@ export default function LogisticRegressionVisualization({
         });
       }
     } else {
-      // Multiclass classification
       for (let i = 0; i < classes.length; i++) {
         for (let j = i + 1; j < classes.length; j++) {
           const w_diff = [
@@ -340,21 +311,18 @@ export default function LogisticRegressionVisualization({
               name: `경계선 ${getClassName(classes[i])} vs ${getClassName(
                 classes[j]
               )}`,
-              showlegend: true, // Ensure legend is shown
+              showlegend: true, 
             });
 
-            // Calculate midpoint for annotation
             const midX = (xMin + xMax) / 2;
             const midY = (-b_diff - w_diff[0] * midX) / w_diff[1];
 
-            // Retrieve the corresponding boundary line title
             const boundaryTitle =
               boundaryLinesTitles[boundaryIndex] ||
               `경계선 ${getClassName(classes[i])} vs ${getClassName(
                 classes[j]
               )}`;
 
-            // Add annotation for the boundary line
             annotations.push({
               x: midX,
               y: midY,
@@ -365,7 +333,7 @@ export default function LogisticRegressionVisualization({
               font: { color: "gray", size: 12 },
             });
 
-            boundaryIndex++; // Increment boundary line index
+            boundaryIndex++; 
           }
         }
       }
@@ -376,15 +344,12 @@ export default function LogisticRegressionVisualization({
     return fig;
   };
 
-  // Helper function to get class name based on class label
   const getClassName = (cls) => {
-    // Use class index to get the title
     return (
       logisticClasses.classTitle?.[cls] || `Class ${cls}`
     );
   };
 
-  // Helper function to transform Classification Report into DataFrame-like structure
   const transformClassificationReport = (report) => {
     const rows = [];
     let overallAccuracy = null;
@@ -405,7 +370,6 @@ export default function LogisticRegressionVisualization({
             Support: report[key].support,
           });
         } else {
-          // Handle unexpected format
           rows.push({
             Class: key,
             Precision: "N/A",
@@ -427,7 +391,6 @@ export default function LogisticRegressionVisualization({
             Support: report[key].support,
           });
         } else {
-          // Handle unexpected format
           rows.push({
             Class: key,
             Precision: "N/A",
@@ -442,7 +405,6 @@ export default function LogisticRegressionVisualization({
     return { reportRows: rows, overallAccuracy };
   };
 
-  // Render Classification Report as a table
   const renderClassificationReport = () => {
     if (!classificationReportData) return null;
 
@@ -477,11 +439,9 @@ export default function LogisticRegressionVisualization({
     );
   };
 
-  // Render Data Table for All Spots
   const renderDataTable = () => {
     if (!dataTable.length) return null;
 
-    // Dynamically generate columns based on data keys, excluding 'id' if necessary
     const excludeColumns = ["id"];
     const dataKeys = Object.keys(dataTable[0]).filter(
       (key) => !excludeColumns.includes(key)
@@ -533,12 +493,10 @@ export default function LogisticRegressionVisualization({
     );
   };
 
-  // Handle tab change
   const handleTabChange = (value) => {
     setActiveTab(value);
   };
 
-  // Render the component
   return (
     <div className="container mx-auto p-4 space-y-8">
       {error && (
@@ -548,12 +506,9 @@ export default function LogisticRegressionVisualization({
       )}
       {!error && (
         <>
-          {/* Report Title */}
           <h1 className="text-4xl font-bold text-center mb-8">
             {logisticReportTitle || "AI 모델 분석 보고서"}
           </h1>
-
-          {/* Overview Section */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -586,8 +541,6 @@ export default function LogisticRegressionVisualization({
               </Typography>
             </CardContent>
           </Card>
-
-          {/* Tabs Section */}
           <Tabs
             value={activeTab}
             onValueChange={(value) => setActiveTab(value)}
@@ -625,7 +578,6 @@ export default function LogisticRegressionVisualization({
                 {visualizations[4]?.title || "전체 예측 데이터"}
               </TabsTrigger>
             </TabsList>
-            {/* Decision Boundary Tab Content */}
             <TabsContent value="decision_boundary">
               <Card>
                 <CardHeader>
@@ -646,7 +598,6 @@ export default function LogisticRegressionVisualization({
                         config={{ responsive: true }}
                       />
                     )}
-                    {/* Axis Descriptions */}
                     {xAxisDescription && (
                       <Typography
                         variant="body2"
@@ -666,9 +617,7 @@ export default function LogisticRegressionVisualization({
                       </Typography>
                     )}
                   </div>
-                  {/* Class Descriptions and Boundary Lines Descriptions */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    {/* Class Descriptions */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <h3 className="text-lg font-semibold mb-2">
                         클래스 설명
@@ -695,7 +644,6 @@ export default function LogisticRegressionVisualization({
                           </Card>
                         ))}
                     </div>
-                    {/* Boundary Lines Descriptions */}
                     <div>
                       <h3 className="text-lg font-semibold mb-2" style={{ paddingBottom: '10px' }}>
                         결정 경계 설명
@@ -721,8 +669,6 @@ export default function LogisticRegressionVisualization({
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Classification Report Tab Content */}
             <TabsContent value="classification_report">
               <Card>
                 <CardHeader>
@@ -735,7 +681,6 @@ export default function LogisticRegressionVisualization({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  {/* Display Overall Accuracy */}
                   {accuracy !== null && (
                     <div className="mb-4">
                       <Typography variant="h6">
@@ -743,13 +688,10 @@ export default function LogisticRegressionVisualization({
                       </Typography>
                     </div>
                   )}
-                  {/* Render Classification Report Table */}
                   {renderClassificationReport()}
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Confusion Matrix Tab Content */}
             <TabsContent value="confusion_matrix">
               <Card>
                 <CardHeader>
@@ -800,8 +742,6 @@ export default function LogisticRegressionVisualization({
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Classification Probabilities Tab Content */}
             <TabsContent value="classification_probabilities">
               <Card>
                 <CardHeader>
@@ -817,8 +757,6 @@ export default function LogisticRegressionVisualization({
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Predictions Overview Tab Content */}
             <TabsContent value="predictions_overview">
               <Card>
                 <CardHeader>
@@ -836,8 +774,6 @@ export default function LogisticRegressionVisualization({
               </Card>
             </TabsContent>
           </Tabs>
-
-          {/* Feature Importance */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -851,7 +787,7 @@ export default function LogisticRegressionVisualization({
                     <span
                       className="inline-block w-4 h-4 mr-2 rounded-full"
                       style={{
-                        backgroundColor: "#6b7280", // Neutral color for feature name
+                        backgroundColor: "#6b7280", 
                       }}
                     ></span>
                     <CardTitle className="text-sm">
@@ -888,8 +824,6 @@ export default function LogisticRegressionVisualization({
               ))}
             </CardContent>
           </Card>
-
-          {/* Key Findings */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -918,8 +852,6 @@ export default function LogisticRegressionVisualization({
               </ul>
             </CardContent>
           </Card>
-
-          {/* Recommendations */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -958,8 +890,6 @@ export default function LogisticRegressionVisualization({
                 )}
             </CardContent>
           </Card>
-
-          {/* Model Performance Section */}
           {model_performance.metrics &&
             model_performance.metrics.length > 0 && (
               <Card>
@@ -969,7 +899,6 @@ export default function LogisticRegressionVisualization({
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {/* Render Metrics */}
                   {model_performance.metrics.map((metric, index) => (
                     <div key={index} className="mb-2">
                       <Typography variant="body1">
@@ -981,8 +910,6 @@ export default function LogisticRegressionVisualization({
                       </Typography>
                     </div>
                   ))}
-
-                  {/* Render Prediction Analysis */}
                   {model_performance.prediction_analysis && (
                     <>
                       <Typography variant="h6" className="mt-4" style={{ paddingTop: '10px', paddingBottom: '10px', color: '#8770b4', fontWeight: 'bold' }}>
@@ -1015,7 +942,6 @@ export default function LogisticRegressionVisualization({
   );
 }
 
-// Define PropTypes for type checking
 LogisticRegressionVisualization.propTypes = {
   result: PropTypes.shape({
     graph1: PropTypes.shape({
@@ -1026,8 +952,8 @@ LogisticRegressionVisualization.propTypes = {
       ), // Handle both strings and numbers
       coefficients: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
       intercept: PropTypes.arrayOf(PropTypes.number),
-      classes: PropTypes.arrayOf(PropTypes.string), // Assuming class titles are strings
-      original_data: PropTypes.arrayOf(PropTypes.object), // Added for data table
+      classes: PropTypes.arrayOf(PropTypes.string), 
+      original_data: PropTypes.arrayOf(PropTypes.object), 
     }),
     graph3: PropTypes.shape({
       graph_type: PropTypes.string,
@@ -1134,6 +1060,6 @@ LogisticRegressionVisualization.propTypes = {
     key_findings_section_title: PropTypes.string,
     recommendations_section_title: PropTypes.string,
     data_table_title: PropTypes.string,
-    data_table_description: PropTypes.string, // Added for data table description
+    data_table_description: PropTypes.string, 
   }).isRequired,
 };

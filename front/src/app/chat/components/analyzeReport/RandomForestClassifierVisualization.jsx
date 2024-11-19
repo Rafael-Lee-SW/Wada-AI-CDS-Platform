@@ -3,9 +3,7 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
-
-// 직접 정의한 UI 컴포넌트(Card, Tabs, Table 등)
-import { Slider } from "../ui/silder"; // 슬라이더 컴포넌트 경로 수정 필요
+import { Slider } from "../ui/silder"; 
 import {
   Card,
   CardContent,
@@ -24,10 +22,8 @@ import {
 } from "../ui/table";
 import { Typography } from "@mui/material";
 
-// Plotly를 동적으로 가져와 SSR 문제를 방지
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// 커스텀 스타일
 import useAnalyzingKmeansStyles from "/styles/analyzingKmeansStyle.js";
 
 export default function RandomForestClassifierVisualization({
@@ -35,16 +31,11 @@ export default function RandomForestClassifierVisualization({
   explanation,
 }) {
   const classes = useAnalyzingKmeansStyles();
-
-  // 슬라이더 상태 관리
   const [threshold, setThreshold] = useState(0.5);
-
-  // 슬라이더 변경 핸들러
   const handleThresholdChange = (value) => {
     setThreshold(value[0]);
   };
 
-  // 설명 객체에서 기본값으로 구조 분해
   const {
     overview = {},
     key_findings = [],
@@ -61,7 +52,6 @@ export default function RandomForestClassifierVisualization({
     recommendations_section_title = "권장 사항",
   } = explanation;
 
-  // Extract RandomForest_case details
   const rfCase =
     model_specific_details?.details?.random_forest_case || {};
 
@@ -73,17 +63,11 @@ export default function RandomForestClassifierVisualization({
     y_axis_description: rfYAxisDescription = defaultYAxisDescription,
   } = rfCase;
 
-  // 특성 중요도 막대 차트를 렌더링하는 함수
   const renderFeatureImportances = () => {
     const featureImportances = result.graph1?.feature_importances;
     const featureNames = result.graph1?.feature_names;
 
     if (!Array.isArray(featureImportances) || !Array.isArray(featureNames)) {
-      console.error(
-        "유효하지 않은 특성 중요도 데이터:",
-        featureImportances,
-        featureNames
-      );
       return null;
     }
 
@@ -92,10 +76,7 @@ export default function RandomForestClassifierVisualization({
       Importance: featureImportances[index],
     }));
 
-    // 내림차순 정렬로 더 나은 시각화 제공
     df_importances.sort((a, b) => b.Importance - a.Importance);
-
-    // 상위 6개 특성만 표시
     df_importances = df_importances.slice(0, 6);
 
     return (
@@ -132,12 +113,10 @@ export default function RandomForestClassifierVisualization({
     );
   };
 
-  // 분류 메트릭 테이블을 렌더링하는 함수
   const renderClassificationMetrics = () => {
     const classification_report = result.graph3?.classification_report;
 
     if (!classification_report) {
-      console.error("graph3에 classification_report가 없습니다.");
       return null;
     }
 
@@ -185,7 +164,6 @@ export default function RandomForestClassifierVisualization({
     );
   };
 
-  // 혼동 행렬 히트맵을 렌더링하는 함수
   const renderConfusionMatrix = () => {
     const confusion_matrix = result.graph4?.confusion_matrix;
     const labels = result.graph4?.labels;
@@ -194,11 +172,6 @@ export default function RandomForestClassifierVisualization({
       !Array.isArray(confusion_matrix) ||
       !Array.isArray(labels)
     ) {
-      console.error(
-        "유효하지 않거나 누락된 혼동 행렬 데이터:",
-        confusion_matrix,
-        labels
-      );
       return null;
     }
 
@@ -237,7 +210,6 @@ export default function RandomForestClassifierVisualization({
     );
   };
 
-  // 분류 확률 산점도를 렌더링하는 함수
   const renderClassificationProbabilities = () => {
     const graph2 = result.graph2;
 
@@ -248,16 +220,12 @@ export default function RandomForestClassifierVisualization({
       !Array.isArray(graph2.y_test) ||
       !Array.isArray(graph2.y_pred)
     ) {
-      console.error("유효하지 않거나 누락된 graph2 데이터:", graph2);
       return null;
     }
 
     const { y_proba, identifier, y_test, y_pred } = graph2;
-
-    // 클래스 '1'의 확률 계산
     const probabilities = y_proba.map((prob) => prob[1]);
 
-    // 데이터 프레임 생성
     const df_prob = identifier.map((id, index) => ({
       Identifier: id,
       Probability_Class_1: probabilities[index],
@@ -265,7 +233,6 @@ export default function RandomForestClassifierVisualization({
       Predicted: y_pred[index],
     }));
 
-    // 확률 기준으로 정렬
     df_prob.sort((a, b) => b.Probability_Class_1 - a.Probability_Class_1);
 
     return (
@@ -321,7 +288,6 @@ export default function RandomForestClassifierVisualization({
           }}
           config={{ responsive: true }}
         />
-        {/* 임계값 슬라이더 */}
         <div className="mt-4">
           <label
             htmlFor="threshold-slider"
@@ -343,7 +309,6 @@ export default function RandomForestClassifierVisualization({
     );
   };
 
-  // 예측 개요 테이블을 렌더링하는 함수
   const renderPredictionsTable = () => {
     const graph2 = result.graph2;
 
@@ -353,10 +318,6 @@ export default function RandomForestClassifierVisualization({
       !Array.isArray(graph2.y_pred) ||
       !Array.isArray(graph2.identifier)
     ) {
-      console.error(
-        "예측 테이블을 위한 유효하지 않거나 누락된 graph2 데이터:",
-        graph2
-      );
       return null;
     }
 
@@ -398,15 +359,11 @@ export default function RandomForestClassifierVisualization({
     );
   };
 
-  // 최종 반환되는 JSX
   return (
     <div className="container mx-auto p-4 space-y-8">
-      {/* 보고서 제목 */}
       <h1 className="text-4xl font-bold text-center mb-8">
         {rfReportTitle}
       </h1>
-
-      {/* 개요 섹션 */}
       <Card>
         <CardHeader>
           <CardTitle>
@@ -439,8 +396,6 @@ export default function RandomForestClassifierVisualization({
           </Typography>
         </CardContent>
       </Card>
-
-      {/* 탭 섹션 */}
       <Tabs defaultValue="feature_importance" className="w-full">
         <TabsList className="grid w-full grid-cols-5 space-x-4">
           <TabsTrigger
@@ -474,7 +429,6 @@ export default function RandomForestClassifierVisualization({
             {visualizations[4]?.title || "전체 예측 데이터"}
           </TabsTrigger>
         </TabsList>
-        {/* 특성 중요도 탭 내용 */}
         <TabsContent value="feature_importance">
           <Card>
             <CardHeader>
@@ -489,8 +443,6 @@ export default function RandomForestClassifierVisualization({
             <CardContent className={classes.plotContainer}>{renderFeatureImportances()}</CardContent>
           </Card>
         </TabsContent>
-
-        {/* 모델 성능표 탭 내용 */}
         <TabsContent value="classification_metrics">
           <Card>
             <CardHeader>
@@ -505,8 +457,6 @@ export default function RandomForestClassifierVisualization({
             <CardContent>{renderClassificationMetrics()}</CardContent>
           </Card>
         </TabsContent>
-
-        {/* 혼동 행렬 탭 내용 */}
         <TabsContent value="confusion_matrix">
           <Card>
             <CardHeader>
@@ -519,8 +469,6 @@ export default function RandomForestClassifierVisualization({
             <CardContent className={classes.plotContainer}>{renderConfusionMatrix()}</CardContent>
           </Card>
         </TabsContent>
-
-        {/* 분류 확률 탭 내용 */}
         <TabsContent value="classification_probabilities">
           <Card>
             <CardHeader>
@@ -535,8 +483,6 @@ export default function RandomForestClassifierVisualization({
             <CardContent className={classes.plotContainer}>{renderClassificationProbabilities()}</CardContent>
           </Card>
         </TabsContent>
-
-        {/* 전체 예측 데이터 탭 내용 */}
         <TabsContent value="predictions_overview">
           <Card>
             <CardHeader>
@@ -550,10 +496,7 @@ export default function RandomForestClassifierVisualization({
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* 주요 발견 사항 및 권장 사항 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 주요 발견 사항 */}
         <Card>
           <CardHeader>
             <CardTitle style={{ color: '#8770b4' }}>
@@ -570,8 +513,6 @@ export default function RandomForestClassifierVisualization({
             </ul>
           </CardContent>
         </Card>
-
-        {/* 권장 사항 */}
         <Card>
           <CardHeader>
             <CardTitle>
@@ -617,7 +558,6 @@ export default function RandomForestClassifierVisualization({
         </Card>
       </div>
 
-      {/* 모델 성능 섹션 */}
       {result && explanation && explanation.model_performance && (
         <Card>
           <CardHeader>
@@ -627,7 +567,6 @@ export default function RandomForestClassifierVisualization({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* 중요 지표 렌더링 */}
             <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}>
               ◾ 중요 지표
             </Typography>
@@ -642,7 +581,6 @@ export default function RandomForestClassifierVisualization({
               </div>
             ))}
 
-            {/* 예측 모델 분석 렌더링 */}
             {explanation.model_performance.prediction_analysis && (
               <>
                 <Typography
@@ -680,7 +618,6 @@ export default function RandomForestClassifierVisualization({
   );
 }
 
-// PropTypes 정의 (유효성 검사)
 RandomForestClassifierVisualization.propTypes = {
   result: PropTypes.shape({
     model: PropTypes.string.isRequired,

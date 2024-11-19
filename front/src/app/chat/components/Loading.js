@@ -30,7 +30,7 @@ const ProgressBar = ({ currentStep }) => {
         const timer = setTimeout(() => {
             setIsTimeout(true);
             setMessage('거의 다 됐어요! 조금만 더 기다려주세요.');
-        }, 7000); // 7초
+        }, 7000); 
 
         return () => clearTimeout(timer);
     }, []);
@@ -50,7 +50,7 @@ const ProgressBar = ({ currentStep }) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length); // 슬라이드 전환
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length); 
         }, 8000); 
 
         return () => clearInterval(interval); 
@@ -78,7 +78,6 @@ const ProgressBar = ({ currentStep }) => {
                     ))}
                 </StepsWrapper>
                 {message && <Message>{message}</Message>}
-                {/* 슬라이드 추가 */}
                 <SlideContainer>
                     <SlideWrapper
                         style={{
