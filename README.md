@@ -394,23 +394,27 @@
 
 # 💻 서비스 화면
 
-### Kiosk
+### 모델 분석
 
-| ![Kiosk 1](./READMEfile/kiosk1.png)| ![Kiosk 2](./READMEfile/kiosk2.png)|
-|------------------------------------|------------------------------------|
-| **키 입력(로그인)**                  |  **메인 화면**                      |
-| ![Kiosk 3](./READMEfile/kiosk3.png)| ![Kiosk 4](./READMEfile/kiosk4.png)|
-| **장바구니**                        | **결제**                            |
-| ![Kiosk 5](./READMEfile/kiosk5.png)|                                    |
-| **결제 완료**                       |                                    |
+| ![Kiosk 1](./READMEfile/1.PNG)| ![Kiosk 2](./READMEfile/2.PNG)|
+|------------------------------------          |------------------------------------|
+| **매인화면**                                  |  **분석 파일 선택**            |
+| ![Kiosk 3](./READMEfile/3.PNG)               | ![Kiosk 4](./READMEfile/4.PNG)|
+| **분석 요구사항 입력**                        | **모델 추천 분석**              |
+| ![Kiosk 5](./READMEfile/5.PNG)               |   ![Kiosk 6](./READMEfile/6.PNG)|
+| **모델 추천 분석 설명**                       |     **유저 모델 선택**      |
+| ![Kiosk 7](./READMEfile/7.PNG)               |   ![Kiosk 9](./READMEfile/9.PNG)|
+| **모델 분석**                       |     **결과 확인**      |
 
-### Page
-| ![Page 1](./READMEfile/page1.png)  | ![Page 2](./READMEfile/page2.png)  |
+### 모델 분석 결과
+| ![Page 1](./READMEfile/result1.PNG)  | ![Page 2](./READMEfile/result2.PNG)  |
 |:----------------------------------:|:----------------------------------:|
-| **방범 영상**                       |   **방범 영상 재생**                 |
-| ![Page 3](./READMEfile/page3.png)  | ![Page 4](./READMEfile/page4.png)  |
-| **매장 기기 관리**                   |  **매장 재고 분석**                 |
-| ![Page 5](./READMEfile/page5.png)  | ![Page 6](./READMEfile/page6.png)  |
+| **분석 결과**                       |   **분석 결과**                 |
+| ![Page 3](./READMEfile/result3.PNG)  | ![Page 4](./READMEfile/result4.PNG)  |
+|  **분석 결과**                    |  **분석 결과**                   |
+| ![Page 5](./READMEfile/result5.PNG)  | ![Page 6](./READMEfile/result6.PNG)  |
+|  **분석 결과**                         |  **분석 결과**                   |
+
 | **수요 예측**                       | **수요 예측 시각화**                 |
 
 
