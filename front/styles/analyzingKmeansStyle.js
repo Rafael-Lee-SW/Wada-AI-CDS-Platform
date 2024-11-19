@@ -66,16 +66,16 @@ const useAnalyzingKmeansStyles = makeStyles({
     overflow: "hidden",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
     backgroundColor: "#ffffff",
-    display: "flex", // Flexbox 사용
-    flexDirection: "column", // 수직 정렬
-    justifyContent: "center", // 가로 중앙 정렬
-    alignItems: "center", // 세로 중앙 정렬
-    padding: "20px", // 그래프와 컨테이너 간의 여백 추가
+    display: "flex", 
+    flexDirection: "column", 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: "20px", 
   },
   axisDescriptions: {
     marginTop: "10px",
     textAlign: "center",
-    maxWidth: "600px", // 설명 텍스트의 최대 너비 설정
+    maxWidth: "600px", 
   },
   axisDescription: {
     color: "#4A5568",
@@ -92,41 +92,34 @@ const useAnalyzingKmeansStyles = makeStyles({
     backgroundColor: "#ffffff",
     borderRadius: "12px",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-    // 열 헤더 스타일
     "& .MuiDataGrid-columnHeaders": {
-      backgroundColor: "#1a202c", // 어두운 회색 또는 다른 대비 색상
-      color: "black", // 흰색 텍스트
+      backgroundColor: "#1a202c", 
+      color: "black", 
       fontWeight: 700,
       borderBottom: "2px solid #4a5568",
       fontSize: "1rem",
     },
-    // 셀 텍스트 스타일
     "& .MuiDataGrid-cell": {
-      color: "#2D3748", // 다크 그레이 텍스트
+      color: "#2D3748", 
       fontSize: "0.9rem",
     },
-    // 행 호버 스타일
     "& .MuiDataGrid-row:hover": {
-      backgroundColor: "#f0f4f8", // 밝은 회색 호버
+      backgroundColor: "#f0f4f8", 
     },
-    // 푸터 스타일
     "& .MuiDataGrid-footerContainer": {
       backgroundColor: "#ffffff",
       borderTop: "2px solid #e2e8f0",
     },
-    // 선택된 행 스타일
     "& .MuiDataGrid-row.Mui-selected": {
-      backgroundColor: "#bee3f8", // 선택된 행의 배경색
+      backgroundColor: "#bee3f8", 
       color: "#2D3748",
       "&:hover": {
         backgroundColor: "#90cdf4",
       },
     },
-    // 체크박스 스타일
     "& .MuiCheckbox-root": {
       color: "#0D47A1",
     },
-    // 페이지 네비게이션 버튼 스타일
     "& .MuiPaginationItem-root": {
       color: "#0D47A1",
     },
@@ -147,7 +140,6 @@ const useAnalyzingKmeansStyles = makeStyles({
   },
   clusterTitle: {
     fontWeight: 600,
-    // color will be set dynamically
   },
   clusterDescription: {
     color: "#4A5568",

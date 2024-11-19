@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-// Dynamically import all visualization components with loading fallback
 const KMeansVisualization = dynamic(
   () => import("../chat/components/analyzeReport/KMeansVisualization.jsx"),
   { ssr: false, loading: () => <p>Loading K-Means Visualization...</p> }
@@ -51,7 +50,6 @@ const NeuralNetworkVisualization = dynamic(
   { ssr: false, loading: () => <p>Loading Neural Network Visualization...</p> }
 );
 
-// Define a list of all available visualizations with their corresponding components and data paths
 const visualizationsList = [
   {
     name: "K-Means-anomaly",
@@ -111,14 +109,13 @@ const visualizationsList = [
 
 export default function Test() {
   const [selectedVisualization, setSelectedVisualization] = useState(
-    visualizationsList[4] // Default to Support Vector Machine
+    visualizationsList[4] 
   );
   const [jsonResult, setJsonResult] = useState(null);
   const [jsonExplanation, setJsonExplanation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch data whenever the selected visualization changes
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -142,23 +139,10 @@ export default function Test() {
         const resultData = await resultResponse.json();
         const explanationData = await explanationResponse.json();
 
-        console.log(
-          `Fetched result data for ${selectedVisualization.name}:`,
-          resultData
-        );
-        console.log(
-          `Fetched explanation data for ${selectedVisualization.name}:`,
-          explanationData
-        );
-
         setJsonResult(resultData);
         setJsonExplanation(explanationData);
 
-        console.log(resultData)
-        console.log(explanationData)
-
       } catch (err) {
-        console.error("Failed to fetch JSON data:", err);
         setError("Failed to load analysis results.");
       } finally {
         setIsLoading(false);
@@ -168,13 +152,11 @@ export default function Test() {
     fetchData();
   }, [selectedVisualization]);
 
-  // URL of the CSV file to download
   const csvDownloadUrl =
     "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/fe692d91-b65e-4239-81a4-8bc70afe1a67.csv";
 
   return (
     <div className="container mx-auto p-4 space-y-8">
-      {/* Visualization Selection Buttons */}
       <div className="flex flex-wrap justify-center gap-4">
         {visualizationsList.map((viz) => (
           <button
@@ -190,7 +172,6 @@ export default function Test() {
         ))}
       </div>
 
-      {/* Download CSV Button */}
       <div className="flex justify-center">
         <a
           href={csvDownloadUrl}
@@ -201,11 +182,9 @@ export default function Test() {
         </a>
       </div>
 
-      {/* Loading and Error States */}
       {isLoading && <p>Loading visualization...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Render the selected visualization component when data is available */}
       {jsonResult && jsonExplanation && (
         <selectedVisualization.component
           result={(jsonResult.result)}

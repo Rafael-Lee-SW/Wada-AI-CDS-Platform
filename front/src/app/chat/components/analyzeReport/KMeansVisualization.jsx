@@ -7,7 +7,6 @@ import * as d3 from "d3";
 import convexHull from "convex-hull";
 import { PCA } from "ml-pca";
 
-// UI Components from your template
 import { Slider } from "../ui/silder";
 import {
   Card,
@@ -19,31 +18,23 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
 import { Eye, EyeOff } from "lucide-react";
-
-// Material-UI Components
 import { DataGrid } from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
-
-// Custom Styles
 import useAnalyzingKmeansStyles from "/styles/analyzingKmeansStyle.js";
 import { purple } from "@mui/material/colors";
 
-// Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 export default function KMeansVisualization({ result, explanation }) {
   const classes = useAnalyzingKmeansStyles();
 
-  // Extract feature columns
   const featureColumns = Array.isArray(result.feature_columns_used)
     ? result.feature_columns_used
     : [];
 
-  // Determine model type directly from props
   const modelType = (result.model || "").toLowerCase();
   const isAnomalyDetection = modelType.includes("anomalydetection");
 
-  // State variables
   const [clusters, setClusters] = useState([]);
   const [clusterColorMap, setClusterColorMap] = useState({});
   const [clusterData, setClusterData] = useState([]);
@@ -53,15 +44,11 @@ export default function KMeansVisualization({ result, explanation }) {
   const [numAnomalies, setNumAnomalies] = useState(2);
   const [error, setError] = useState(null);
   const [showInset, setShowInset] = useState(true);
-
-  // Extract explanations
   const { overview, key_findings, recommendations, visualizations } = explanation;
   const keyFindings = key_findings || [];
   const recommendationActions = recommendations || {};
   const visualizationsInfo = visualizations || [];
   const clusterInfo = explanation.model_specific_details?.details?.kmeans_clustering_case?.cluster || {};
-
-  // Extract kmeans_clustering_case details
   const kmeansCase = explanation.model_specific_details?.details?.kmeans_clustering_case || {};
 
   const {
@@ -78,17 +65,14 @@ export default function KMeansVisualization({ result, explanation }) {
     } = {},
   } = kmeansCase;
 
-  // State to control active tab
   const [activeTab, setActiveTab] = useState(
     isAnomalyDetection ? "anomalies" : "clusters_graph"
   );
 
-  // Update activeTab if isAnomalyDetection changes
   useEffect(() => {
     setActiveTab(isAnomalyDetection ? "anomalies" : "clusters_graph");
   }, [isAnomalyDetection]);
 
-  // Generate a consistent color map for clusters
   const generateClusterColorMap = (clusters, colors) => {
     const map = {};
     clusters.forEach((cluster, i) => {
@@ -97,15 +81,12 @@ export default function KMeansVisualization({ result, explanation }) {
     return map;
   };
 
-  // Process data when result or numAnomalies change
   useEffect(() => {
     if (result) {
       processData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result, numAnomalies]);
 
-  // Function to process clustering results, perform PCA, and identify anomalies
   const processData = () => {
     try {
       const clusterLabel = result.cluster_label || "Cluster_Anomaly";
@@ -114,7 +95,6 @@ export default function KMeansVisualization({ result, explanation }) {
       const scalerScale = result.scaler_scale || [];
       const clusterCenters = result.cluster_centers || [];
 
-      // Extract clustered samples
       const dfSample = [];
       const sampleKeys = Object.keys(clusteredDataSample).filter(
         (key) => key !== clusterLabel
@@ -130,15 +110,11 @@ export default function KMeansVisualization({ result, explanation }) {
         dfSample.push(row);
       }
 
-      // 로그: dfSample 확인
-      console.log("dfSample:", dfSample);
-
       if (!dfSample.length) {
         setError("시각화를 위한 데이터가 없습니다.");
         return;
       }
 
-      // Prepare data for PCA
       const X = dfSample.map((row) =>
         featureColumns.map((col) => row[col])
       );
@@ -148,18 +124,10 @@ export default function KMeansVisualization({ result, explanation }) {
         return;
       }
 
-      // 로그: PCA를 위한 X 데이터 확인
-      console.log("X (for PCA):", X);
-
-      // Scale the data
       const X_scaled = X.map((row) =>
         row.map((value, i) => (value - scalerMean[i]) / scalerScale[i])
       );
 
-      // 로그: 스케일링된 데이터 확인
-      console.log("X_scaled:", X_scaled);
-
-      // Check for invalid values
       const hasInvalidValues = X_scaled.some((row) =>
         row.some((value) => isNaN(value) || value === undefined)
       );
@@ -168,50 +136,40 @@ export default function KMeansVisualization({ result, explanation }) {
         return;
       }
 
-      // Perform PCA
       const pca = new PCA(X_scaled);
       const X_pca_matrix = pca.predict(X_scaled, { nComponents: 2 });
       const X_pca = X_pca_matrix.to2DArray();
 
-      // Transform cluster centers
       const centers_pca_matrix = pca.predict(clusterCenters, {
         nComponents: 2,
       });
       const centers_pca = centers_pca_matrix.to2DArray();
 
-      // Add PCA components to each sample
       const dfSampleWithPca = dfSample.map((row, index) => ({
         ...row,
         PC1: X_pca[index][0],
         PC2: X_pca[index][1],
       }));
 
-      // Calculate cluster sizes
       const sizes = {};
       dfSampleWithPca.forEach((row) => {
         const cluster = row[clusterLabel];
         sizes[cluster] = (sizes[cluster] || 0) + 1;
       });
 
-      // Generate cluster list
       const clustersList = [
         ...new Set(dfSampleWithPca.map((d) => d[clusterLabel])),
       ];
       setClusters(clustersList);
 
-      // Define color scale
       const colors = d3.schemeSet2;
-
-      // Generate cluster color mapping
       const newClusterColorMap = generateClusterColorMap(clustersList, colors);
       setClusterColorMap(newClusterColorMap);
 
-      // Update state with processed data
       setClusterData(dfSampleWithPca);
       setClusterSizes(sizes);
       setClusterCentersPca(centers_pca);
 
-      // Identify anomalies if enabled
       if (isAnomalyDetection) {
         const anomaliesData = computeAnomalies(
           dfSampleWithPca,
@@ -221,18 +179,15 @@ export default function KMeansVisualization({ result, explanation }) {
         );
         setAnomalies(anomaliesData);
       } else {
-        setAnomalies([]); // Clear anomalies if not anomaly detection
+        setAnomalies([]); 
       }
 
-      // Clear previous errors
       setError(null);
     } catch (e) {
-      console.error("Error processing data:", e);
       setError("데이터 시각화 처리가 실패했습니다.");
     }
   };
 
-  // Function to compute anomalies based on distance from cluster centers
   const computeAnomalies = (data, centers_pca, clusterLabel, numAnomalies) => {
     const anomalies = [];
     const clusters = {};
@@ -255,7 +210,6 @@ export default function KMeansVisualization({ result, explanation }) {
         ),
       }));
 
-      // Sort points by distance descending and take top N
       points.sort((a, b) => b.distance - a.distance);
       const topAnomalies = points.slice(0, numAnomalies);
       anomalies.push(...topAnomalies);
@@ -264,12 +218,10 @@ export default function KMeansVisualization({ result, explanation }) {
     return anomalies;
   };
 
-  // Handle slider change for number of anomalies
   const handleNumAnomaliesChange = (value) => {
     setNumAnomalies(value[0]);
   };
 
-  // Render cluster distribution bar chart
   const renderClusterDistribution = () => {
     const clusterLabels = clusters.map((cluster, index) => {
       return clusterTitles[index] || `클러스터 ${cluster}`;
@@ -304,9 +256,9 @@ export default function KMeansVisualization({ result, explanation }) {
             },
             plot_bgcolor: "#f9f9f9",
             paper_bgcolor: "#f9f9f9",
-            autosize: true, // 자동 크기 조정
+            autosize: true, 
             height: 400,
-            margin: { t: 50, l: 50, r: 50, b: 80 }, // 하단 마진 증가
+            margin: { t: 50, l: 50, r: 50, b: 80 }, 
             font: {
               family:
                 '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -315,7 +267,6 @@ export default function KMeansVisualization({ result, explanation }) {
           }}
           config={{ responsive: true }}
         />
-        {/* 축 설명을 그래프 하단에 배치 */}
         <div className={classes.axisDescriptions}>
           {xAxisTitle && xAxisDescription && (
             <Typography
@@ -340,7 +291,6 @@ export default function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // 클러스터 정보 렌더링 함수 추가
   const renderClusterInformation = () => {
     if (!clusters.length) return null;
 
@@ -353,7 +303,6 @@ export default function KMeansVisualization({ result, explanation }) {
           <div className="space-y-4">
             {clusters.map((cluster, index) => (
               <div key={cluster} className={classes.clusterInfo}>
-                {/* 클러스터 색상 표시기 추가 */}
                 <div
                   className="inline-block w-4 h-4 mr-2 rounded-full"
                   style={{ backgroundColor: clusterColorMap[cluster] }}
@@ -379,7 +328,6 @@ export default function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // Render cluster scatter plot with conditional cluster centers
   const renderClusterScatterPlot = () => {
     if (!clusterData.length) return null;
 
@@ -388,9 +336,7 @@ export default function KMeansVisualization({ result, explanation }) {
       ...new Set(clusterData.map((d) => d[clusterLabel])),
     ];
 
-    const colors = d3.schemeSet2; // Colorblind-friendly palette
-
-    // Generate cluster color mapping
+    const colors = d3.schemeSet2; 
     const currentClusterColorMap = generateClusterColorMap(
       uniqueClusters,
       colors
@@ -398,7 +344,6 @@ export default function KMeansVisualization({ result, explanation }) {
 
     const data = [];
 
-    // 1. Draw convex hulls for clusters
     uniqueClusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -411,7 +356,6 @@ export default function KMeansVisualization({ result, explanation }) {
           (indexPair) => points[indexPair[0]]
         );
 
-        // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
         const centroid = clusterCentersPca[clusterIndex];
         if (!centroid) return;
@@ -440,7 +384,6 @@ export default function KMeansVisualization({ result, explanation }) {
       }
     });
 
-    // 2. Scatter plot for clusters
     uniqueClusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -472,7 +415,6 @@ export default function KMeansVisualization({ result, explanation }) {
       });
     });
 
-    // 3. Add anomalies if it's an anomaly-detection model
     if (isAnomalyDetection && anomalies.length > 0) {
       data.push({
         x: anomalies.map((a) => a.PC1),
@@ -494,7 +436,6 @@ export default function KMeansVisualization({ result, explanation }) {
         }),
       });
 
-      // 4. Draw lines from anomalies to cluster centers
       anomalies.forEach((anomaly) => {
         const cluster = anomaly[clusterLabel];
         const clusterIndex = parseInt(cluster, 10);
@@ -511,7 +452,6 @@ export default function KMeansVisualization({ result, explanation }) {
       });
     }
 
-    // 5. Add cluster centers only if it's not an anomaly-detection model
     if (!isAnomalyDetection) {
       data.push({
         x: clusterCentersPca.map((c) => c[0]),
@@ -524,7 +464,6 @@ export default function KMeansVisualization({ result, explanation }) {
       });
     }
 
-    // 6. Add Inset Cluster Distribution Bar Chart (Conditionally)
     if (showInset) {
       const clusterLabels = uniqueClusters.map((cluster) => {
         return clusterTitles[parseInt(cluster, 10)] || `클러스터 ${cluster}`;
@@ -552,7 +491,6 @@ export default function KMeansVisualization({ result, explanation }) {
 
     return (
       <div className={classes.plotContainer} style={{ position: "relative" }}>
-        {/* Toggle Button for Inset Plot */}
         <Button
           variant="outline"
           size="icon"
@@ -587,7 +525,6 @@ export default function KMeansVisualization({ result, explanation }) {
               gridcolor: "#e5e5e5",
               linecolor: "#D1D1D6",
             },
-            // Inset axes
             xaxis2: {
               domain: [0.7, 0.95],
               anchor: "y2",
@@ -624,7 +561,6 @@ export default function KMeansVisualization({ result, explanation }) {
           }}
           config={{ responsive: true }}
         />
-        {/* Axis Descriptions */}
         {xAxisTitle && xAxisDescription && (
           <Typography
             variant="body2"
@@ -643,7 +579,6 @@ export default function KMeansVisualization({ result, explanation }) {
             <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
           </Typography>
         )}
-        {/* Cluster Group Description */}
         {clusterGroupDescription && (
           <Typography
             variant="body2"
@@ -657,11 +592,10 @@ export default function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // Dynamically generate columns based on data keys, excluding specific columns if needed
   const renderClusteredDataTable = () => {
     if (!clusterData.length) return null;
 
-    const excludeColumns = ["Cluster_Anomaly"]; // 필요에 따라 제외할 열 설정
+    const excludeColumns = ["Cluster_Anomaly"]; 
     const dataKeys = Object.keys(clusterData[0]).filter(
       (key) => !excludeColumns.includes(key)
     );
@@ -673,7 +607,6 @@ export default function KMeansVisualization({ result, explanation }) {
       minWidth: 150,
     }));
 
-    // Optionally include excluded columns separately
     excludeColumns.forEach((key) => {
       columns.push({
         field: key,
@@ -685,10 +618,6 @@ export default function KMeansVisualization({ result, explanation }) {
     });
 
     const rows = clusterData.map((row, index) => ({ id: index, ...row }));
-
-    // 로그: columns과 rows 확인
-    console.log("DataGrid Columns:", columns);
-    console.log("DataGrid Rows:", rows);
 
     return (
       <div style={{ height: 500, width: "100%" }}>
@@ -705,7 +634,6 @@ export default function KMeansVisualization({ result, explanation }) {
     );
   };
 
-  // Render anomaly scatter plot
   const renderAnomalyScatterPlot = () => {
     if (!clusterData.length || !isAnomalyDetection) return null;
 
@@ -714,9 +642,8 @@ export default function KMeansVisualization({ result, explanation }) {
       ...new Set(clusterData.map((d) => d[clusterLabel])),
     ];
 
-    const colors = d3.schemeSet2; // Colorblind-friendly palette
+    const colors = d3.schemeSet2;
 
-    // Generate cluster color mapping
     const currentClusterColorMap = generateClusterColorMap(
       uniqueClusters,
       colors
@@ -724,7 +651,6 @@ export default function KMeansVisualization({ result, explanation }) {
 
     const data = [];
 
-    // 1. Draw convex hulls for clusters
     uniqueClusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -735,7 +661,6 @@ export default function KMeansVisualization({ result, explanation }) {
         const hullIndices = convexHull(points);
         const hullPoints = hullIndices.map((indexPair) => points[indexPair[0]]);
 
-        // Expand the convex hull
         const clusterIndex = parseInt(cluster, 10);
         const centroid = clusterCentersPca[clusterIndex];
         if (!centroid) return;
@@ -764,7 +689,6 @@ export default function KMeansVisualization({ result, explanation }) {
       }
     });
 
-    // 2. Scatter plot for clusters
     uniqueClusters.forEach((cluster, i) => {
       const clusterPoints = clusterData.filter(
         (d) => d[clusterLabel] === cluster
@@ -796,7 +720,6 @@ export default function KMeansVisualization({ result, explanation }) {
       });
     });
 
-    // 3. Add anomalies
     data.push({
       x: anomalies.map((a) => a.PC1),
       y: anomalies.map((a) => a.PC2),
@@ -816,7 +739,6 @@ export default function KMeansVisualization({ result, explanation }) {
       }),
     });
 
-    // 4. Draw lines from anomalies to cluster centers
     anomalies.forEach((anomaly) => {
       const cluster = anomaly[clusterLabel];
       const clusterIndex = parseInt(cluster, 10);
@@ -832,7 +754,6 @@ export default function KMeansVisualization({ result, explanation }) {
       }
     });
 
-    // 5. Add cluster centers only if it's not an anomaly-detection model
     if (!isAnomalyDetection) {
       data.push({
         x: clusterCentersPca.map((c) => c[0]),
@@ -845,7 +766,6 @@ export default function KMeansVisualization({ result, explanation }) {
       });
     }
 
-    // 6. Add Inset Cluster Distribution Bar Chart (Conditionally)
     if (showInset) {
       const clusterLabels = uniqueClusters.map((cluster) => {
         return clusterTitles[parseInt(cluster, 10)] || `클러스터 ${cluster}`;
@@ -873,7 +793,6 @@ export default function KMeansVisualization({ result, explanation }) {
 
     return (
       <div className={classes.plotContainer} style={{ position: "relative" }}>
-        {/* Toggle Button for Inset Plot */}
         <Button
           variant="outline"
           size="icon"
@@ -908,7 +827,6 @@ export default function KMeansVisualization({ result, explanation }) {
               gridcolor: "#e5e5e5",
               linecolor: "#D1D1D6",
             },
-            // Inset axes
             xaxis2: {
               domain: [0.7, 0.95],
               anchor: "y2",
@@ -945,7 +863,6 @@ export default function KMeansVisualization({ result, explanation }) {
           }}
           config={{ responsive: true }}
         />
-        {/* Axis Descriptions */}
         {xAxisTitle && xAxisDescription && (
           <Typography
             variant="body2"
@@ -964,7 +881,6 @@ export default function KMeansVisualization({ result, explanation }) {
             <strong>{`${yAxisTitle} (y)`}</strong>: {yAxisDescription}
           </Typography>
         )}
-        {/* Cluster Group Description */}
         {clusterGroupDescription && (
           <Typography
             variant="body2"
@@ -990,7 +906,6 @@ export default function KMeansVisualization({ result, explanation }) {
           <p className="text-4xl font-bold text-center mb-8">
             {reportTitle}
           </p>
-          {/* Overview Section */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -1021,8 +936,6 @@ export default function KMeansVisualization({ result, explanation }) {
               </Typography>
             </CardContent>
           </Card>
-
-          {/* Tabs Section */}
           <Tabs
             value={activeTab}
             onValueChange={(value) => setActiveTab(value)}
@@ -1057,7 +970,6 @@ export default function KMeansVisualization({ result, explanation }) {
                 모든 데이터 확인하기
               </TabsTrigger>
             </TabsList>
-            {/* Anomalies Tab Content */}
             {isAnomalyDetection && (
               <TabsContent value="anomalies">
                 <Card>
@@ -1094,8 +1006,6 @@ export default function KMeansVisualization({ result, explanation }) {
                 </Card>
               </TabsContent>
             )}
-
-            {/* Clusters Graph Tab Content */}
             {!isAnomalyDetection && (
               <TabsContent value="clusters_graph">
                 <Card>
@@ -1115,7 +1025,6 @@ export default function KMeansVisualization({ result, explanation }) {
               </TabsContent>
             )}
 
-            {/* Clusters Distribution Tab Content */}
             <TabsContent value="clusters_distribution">
               <Card>
                 <CardHeader>
@@ -1132,8 +1041,6 @@ export default function KMeansVisualization({ result, explanation }) {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Data Table Tab Content */}
             <TabsContent value="data">
               <Card>
                 <CardHeader>
@@ -1148,11 +1055,7 @@ export default function KMeansVisualization({ result, explanation }) {
               </Card>
             </TabsContent>
           </Tabs>
-
-          {/* Cluster Information Card */}
           {renderClusterInformation()}
-
-          {/* Key Findings and Recommendations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1194,8 +1097,6 @@ export default function KMeansVisualization({ result, explanation }) {
               </CardContent>
             </Card>
           </div>
-
-          {/* Model Performance Section */}
           {explanation.model_performance?.metrics &&
             explanation.model_performance.metrics.length > 0 && (
               <Card>
@@ -1205,7 +1106,6 @@ export default function KMeansVisualization({ result, explanation }) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {/* Render Metrics */}
                   <Typography variant="h6" style={{ paddingBottom: '10px' }}>
                     ◾ 주요 메트릭
                   </Typography>
@@ -1219,8 +1119,6 @@ export default function KMeansVisualization({ result, explanation }) {
                       </Typography>
                     </div>
                   ))}
-
-                  {/* Render Prediction Analysis */}
                   {explanation.model_performance.prediction_analysis && (
                     <>
                       <Typography
@@ -1256,14 +1154,10 @@ export default function KMeansVisualization({ result, explanation }) {
             )}
         </>
       )}
-
-      {/* Model Performance Section for Segmentation Models */}
-      {/* Optional: If you want to separate Model Performance from the main content, adjust placement accordingly */}
     </div>
   );
 }
 
-// PropTypes for type checking
 KMeansVisualization.propTypes = {
   result: PropTypes.shape({
     feature_columns_used: PropTypes.arrayOf(PropTypes.string),

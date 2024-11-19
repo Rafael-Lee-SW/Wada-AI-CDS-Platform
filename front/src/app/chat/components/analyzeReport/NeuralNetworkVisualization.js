@@ -31,15 +31,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
     Neural_Network,
   } = explanation || {};
 
-  // Console logging for debugging
-  console.log("Result Data:", result);
-  console.log("Explanation Data:", explanation);
-
-  // --- Visualization functions ---
-
-  // Render the loss curve plot
   const renderLossCurve = () => {
-    // Check if graph1 and its properties are available
     if (!graph1 || !graph1.loss || !graph1.val_loss || !graph1.epochs) {
       return (
         <Typography variant="body2" color="error">
@@ -48,12 +40,10 @@ function NeuralNetworkVisualization({ result, explanation }) {
       );
     }
 
-    // Convert to numbers if they are strings
     const lossData = graph1.loss.map((value) => Number(value));
     const valLossData = graph1.val_loss.map((value) => Number(value));
     const epochsData = graph1.epochs.map((value) => Number(value));
 
-    // Check for NaN values
     if (
       lossData.some(isNaN) ||
       valLossData.some(isNaN) ||

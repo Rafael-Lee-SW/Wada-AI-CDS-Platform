@@ -8,7 +8,7 @@ import Loading from "./Loading";
 import FileUploader from "./FileUploader";
 import RequirementUploader from "./RequirementUploader";
 import NewChat from "./NewChat";
-import { convertEucKrToUtf8, convertUtf8ToArrayBuffer } from '../../../lib/encoding'; // Adjust the path as needed
+import { convertEucKrToUtf8, convertUtf8ToArrayBuffer } from '../../../lib/encoding';
 import Loading2 from "./Loading2";
 import { restyle } from "plotly.js";
 
@@ -45,16 +45,13 @@ export default function Home({ sessionId }) {
     const getChatList = async () => {
         try {
             if (!sessionId) return;
-
-            console.log("대화기록불러오기에 사용되는 sessionId: ", sessionId);
             const response = await fetchChatList(sessionId);
             const chats = response.data;
-            console.log("불러온 채팅: ", chats);
 
             setChatList(chats);
 
         } catch (error) {
-            console.error("대화 기록 불러오기 실패:", error);
+            handleChangeHome();
         }
     };
 
@@ -79,7 +76,7 @@ export default function Home({ sessionId }) {
             handleChangePage('selectML');
 
         } catch (error) {
-            console.log("선택되지 않은 모델 불러오기 오류: ", error);
+            handleChangeHome();
         }
     }
 
@@ -92,17 +89,15 @@ export default function Home({ sessionId }) {
                 "chatRoomId": chatRoomId,
                 "text": requirement
             }
-            console.log("보고서 기반 데이터: ", data);
             const response = await createConversation(data, sessionId);
             const result = response.data;
 
-            console.log("추가 대화 답변: ", result.answer);
             setPage('chatContent');
             setRefreshKey(prevKey => prevKey + 1);
             setScrollToBottom(true);
 
         } catch (error) {
-            console.log("보고서 기반 대화 에러: ", error);
+            handleChangeHome();
         }
     }
 
@@ -124,7 +119,6 @@ export default function Home({ sessionId }) {
             setPage('chatContent');
 
         } catch (error) {
-            console.error("대화 내용 불러오기 실패:", error);
             setIsLoading(false);
             setPage('newChat');
         }
@@ -158,16 +152,10 @@ export default function Home({ sessionId }) {
             return;
         }
 
-        console.log("파일, 요청사항 업로드 확인");
-        console.log("chatRoomId: ", chatRoomId);
-        console.log("files: ", files);
-        console.log("requirement: ", requirement);
-
         const formData = new FormData();
 
         formData.append("chatRoomId", chatRoomId);
 
-        // Process each file: Convert EUC-KR to UTF-8
         for (const file of submittedFile) {
             const arrayBuffer = await file.arrayBuffer();
             const utf8String = convertEucKrToUtf8(arrayBuffer);
@@ -179,13 +167,6 @@ export default function Home({ sessionId }) {
         }
         formData.append("requirement", submittedRequirement);
 
-
-
-        console.log("FormData 내용:");
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-
         setCurrentStep(1);
         setIsLoading(true);
         setPage('loading');
@@ -194,10 +175,6 @@ export default function Home({ sessionId }) {
             const response = await fetchModel(formData, sessionId);
             const result = response.data;
 
-            console.log("최초 모델 추천 결과: ", result);
-            console.log("최초 모델 추천 requestId: ", result.requestId);
-
-            // 추천 모델들, 목적, 요약 저장
             setModels(result.model_recommendations);
             setPurpose(result.purpose_understanding);
             setOverview(result.data_overview);
@@ -209,7 +186,7 @@ export default function Home({ sessionId }) {
             }
 
         } catch (error) {
-            console.error("에러 발생:", error);
+            handleChangeHome();
 
         } finally {
             setIsLoading(false);
@@ -223,7 +200,6 @@ export default function Home({ sessionId }) {
             return;
         }
 
-        console.log("추가요청사항: ", requirement);
         setCurrentStep(1);
         setIsLoading(true);
         setPage('loading');
@@ -234,13 +210,9 @@ export default function Home({ sessionId }) {
                 "requestId": requestId,
                 "newRequirement": requirement
             }
-            console.log("추가요청사항으로 보내는 데이터: ", data);
 
             const response = await fetchNewModel(data, sessionId);
             const result = response.data;
-            console.log("추가요청 결과: ", result);
-            console.log("추가요청 requestId: ", result.requestId);
-            console.log("추가요청 reply: ", result.other_reply);
 
             setModels(result.model_recommendations);
             setPurpose(result.purpose_understanding);
@@ -254,7 +226,7 @@ export default function Home({ sessionId }) {
             }
 
         } catch (error) {
-            console.error("에러 발생:", error);
+            handleChangeHome();
 
         } finally {
             setIsLoading(false);
@@ -265,14 +237,8 @@ export default function Home({ sessionId }) {
     const handleModelSelect = async (chatRoomId, requestId, index) => {
 
         if (!chatRoomId) {
-            console.error("chatRoomId is empty. Cannot proceed with model selection.");
             return;
         }
-
-        console.log("모델 선택 후 보내는 데이터")
-        console.log("chatRoomId: ", chatRoomId);
-        console.log("requestId: ", requestId, "requestId Type: ", typeof requestId);
-        console.log("index: ", index, "index Type: ", typeof index);
 
         setCurrentStep(3);
         setIsLoading(true);
@@ -285,7 +251,6 @@ export default function Home({ sessionId }) {
                 "selectedModel": index
             }
 
-            console.log("data 전체: ", data);
             const response = await createAnalyze(data, sessionId);
             const result = response.data;
 
@@ -295,12 +260,9 @@ export default function Home({ sessionId }) {
             handleChangePage('chatContent')
 
             setResult(result);
-            console.log("최종 데이터: ", result);
 
         } catch (error) {
-            // 테스트용 
-            setPage('chatContent');
-            console.error("모델 선택 중 에러 발생:", error);
+            handleChangeHome();
 
         } finally {
             setIsLoading('false');

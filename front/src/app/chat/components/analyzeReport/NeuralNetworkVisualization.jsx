@@ -4,13 +4,13 @@ import React from "react";
 import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
 
-// Import custom UI components from your template
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  Typography
 } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
@@ -22,19 +22,14 @@ import {
   TableRow,
 } from "../ui/table";
 
-// Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Custom Styles (Assuming you have a similar styles file)
 import useNeuralNetworkStyles from "/styles/analyzingNNStyle.js";
 
 function NeuralNetworkVisualization({ result, explanation }) {
   const classes = useNeuralNetworkStyles();
 
-  // Destructure data from result and explanation
   const { graph1, graph2, graph3, model, architecture } = result || {};
-
-  // Destructure explanation with deeper nesting
   const {
     overview = {},
     model_performance = {},
@@ -49,7 +44,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
     data_table_description = "모든 데이터 포인트의 상세 정보를 확인할 수 있습니다.",
   } = explanation || {};
 
-  // Extract Neural_Network_case from nested structure
   const neuralNetworkCase =
     model_specific_details?.details?.neural_network_case || {};
 
@@ -58,7 +52,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
     Predictions_vs_Actual: predictionsVsActual = {},
   } = neuralNetworkCase;
 
-  // Extract axis titles and descriptions from nested Neural_Network_case
   const xAxisTitle =
     neuralNetworkCase?.["x-axis_title"] ||
     predictionsVsActual?.["x-axis_title"] ||
@@ -76,11 +69,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
     predictionsVsActual?.["y-axis_description"] ||
     "예측 값은 모델이 실제 값에 기반하여 예측한 결과입니다.";
 
-  // --- Visualization functions ---
-
-  // Render the loss curve plot
   const renderLossCurve = () => {
-    // Check if graph1 and its properties are available
     if (!graph1 || !graph1.loss || !graph1.val_loss || !graph1.epochs) {
       return (
         <p className="text-red-500">
@@ -89,12 +78,10 @@ function NeuralNetworkVisualization({ result, explanation }) {
       );
     }
 
-    // Convert to numbers if they are strings
     const lossData = graph1.loss.map((value) => Number(value));
     const valLossData = graph1.val_loss.map((value) => Number(value));
     const epochsData = graph1.epochs.map((value) => Number(value));
 
-    // Check for NaN values
     if (
       lossData.some(isNaN) ||
       valLossData.some(isNaN) ||
@@ -155,13 +142,11 @@ function NeuralNetworkVisualization({ result, explanation }) {
     );
   };
 
-  // Render the predictions vs actual scatter plot
   const renderPredictionScatter = () => {
     if (!graph2) return null;
 
     const { y_test, y_pred, identifiers } = graph2;
 
-    // Check if y_test and y_pred are present
     if (!y_test || !y_pred) {
       return (
         <p className="text-red-500">
@@ -170,11 +155,9 @@ function NeuralNetworkVisualization({ result, explanation }) {
       );
     }
 
-    // Convert to numbers if they are strings
     const yTestData = y_test.map((value) => Number(value));
     const yPredData = y_pred.map((value) => Number(value));
 
-    // Check for NaN values
     if (yTestData.some(isNaN) || yPredData.some(isNaN)) {
       return (
         <p className="text-red-500">
@@ -241,7 +224,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
     );
   };
 
-  // Render the metrics table
   const renderMetricsTable = () => {
     if (!model_performance?.metrics) return null;
 
@@ -282,7 +264,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
     );
   };
 
-  // Render the data table for all spots
   const renderDataTable = () => {
     if (!graph2 || !graph2.identifiers || !graph2.y_test || !graph2.y_pred)
       return null;
@@ -320,7 +301,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
     );
   };
 
-  // --- Final return ---
   return (
     <div className="container mx-auto p-4 space-y-8">
       {/* Report Title */}
@@ -328,7 +308,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
         {neuralReportTitle || "Neural Network Regressor Analysis Report"}
       </h1>
 
-      {/* Overview */}
       <Card>
         <CardHeader>
           <CardTitle>{overview_section_title || "개요"}</CardTitle>
@@ -359,8 +338,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
           </Typography>
         </CardContent>
       </Card>
-
-      {/* Tabs */}
       <Tabs defaultValue="loss_curve" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="loss_curve">
@@ -374,8 +351,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
             {visualizations?.[2]?.title || "Performance Metrics"}
           </TabsTrigger>
         </TabsList>
-
-        {/* Loss Curve Tab */}
         <TabsContent value="loss_curve">
           <Card>
             <CardHeader>
@@ -390,8 +365,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
             <CardContent>{renderLossCurve()}</CardContent>
           </Card>
         </TabsContent>
-
-        {/* Predictions vs Actual Tab */}
         <TabsContent value="predictions">
           <Card>
             <CardHeader>
@@ -407,8 +380,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
             <CardContent>{renderPredictionScatter()}</CardContent>
           </Card>
         </TabsContent>
-
-        {/* Performance Metrics Tab */}
         <TabsContent value="metrics">
           <Card>
             <CardHeader>
@@ -424,10 +395,7 @@ function NeuralNetworkVisualization({ result, explanation }) {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Key Findings and Recommendations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Key Findings */}
         <Card>
           <CardHeader>
             <CardTitle>
@@ -444,8 +412,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
             </ul>
           </CardContent>
         </Card>
-
-        {/* Recommendations */}
         <Card>
           <CardHeader>
             <CardTitle>
@@ -488,7 +454,6 @@ function NeuralNetworkVisualization({ result, explanation }) {
   );
 }
 
-// Define prop types for type checking
 NeuralNetworkVisualization.propTypes = {
   result: PropTypes.shape({
     graph1: PropTypes.shape({
@@ -598,7 +563,7 @@ NeuralNetworkVisualization.propTypes = {
     key_findings_section_title: PropTypes.string,
     recommendations_section_title: PropTypes.string,
     data_table_title: PropTypes.string,
-    data_table_description: PropTypes.string, // Added for data table description
+    data_table_description: PropTypes.string, 
   }).isRequired,
 };
 

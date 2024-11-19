@@ -5,13 +5,13 @@ import { makeStyles } from '@mui/styles';
 const useAnalyzingLogisticStyles = makeStyles({
   container: {
     padding: '40px 20px',
-    background: '#f5f7fa', // Light gray background for better contrast
+    background: '#f5f7fa', 
     minHeight: '100vh',
   },
   reportTitle: {
-    fontFamily: 'Poppins, sans-serif', // Modern sans-serif font
+    fontFamily: 'Poppins, sans-serif', 
     fontWeight: 700,
-    color: '#1a202c', // Darker slate color
+    color: '#1a202c', 
     marginBottom: '50px',
     textAlign: 'center',
   },
@@ -20,13 +20,13 @@ const useAnalyzingLogisticStyles = makeStyles({
     fontWeight: 600,
     color: '#2d3748',
     marginBottom: '25px',
-    borderBottom: '3px solid #2b6cb0', // Accent underline in blue
+    borderBottom: '3px solid #2b6cb0', 
     display: 'inline-block',
     paddingBottom: '5px',
   },
   bodyText: {
     fontFamily: 'Roboto, sans-serif',
-    color: '#4a5568', // Grayish color for better readability
+    color: '#4a5568',
     marginBottom: '25px',
     lineHeight: 1.8,
     fontSize: '1rem',
@@ -34,8 +34,8 @@ const useAnalyzingLogisticStyles = makeStyles({
   card: {
     marginBottom: '25px',
     borderRadius: '12px',
-    background: '#ffffff', // White background for clarity
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)', // Subtle shadow for depth
+    background: '#ffffff', 
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)', 
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     '&:hover': {
       transform: 'translateY(-5px)',
@@ -48,12 +48,12 @@ const useAnalyzingLogisticStyles = makeStyles({
   cardTitle: {
     fontFamily: 'Poppins, sans-serif',
     fontWeight: 600,
-    color: '#2b6cb0', // Strong blue color
+    color: '#2b6cb0',
     marginBottom: '10px',
   },
   cardSubtitle: {
     fontFamily: 'Roboto, sans-serif',
-    color: '#718096', // Lighter gray for subtitles
+    color: '#718096', 
     marginBottom: '10px',
     fontStyle: 'italic',
   },
@@ -69,11 +69,11 @@ const useAnalyzingLogisticStyles = makeStyles({
     overflow: "hidden",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
     backgroundColor: "#ffffff",
-    display: "flex", // Flexbox 사용
-    flexDirection: "column", // 수직 정렬
-    justifyContent: "center", // 가로 중앙 정렬
-    alignItems: "center", // 세로 중앙 정렬
-    padding: "20px", // 그래프와 컨테이너 간의 여백 추가
+    display: "flex", 
+    flexDirection: "column", 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: "20px", 
   },
   dataGrid: {
     backgroundColor: '#ffffff',
@@ -89,7 +89,7 @@ const useAnalyzingLogisticStyles = makeStyles({
       color: '#2d3748',
     },
     '& .MuiDataGrid-row:hover': {
-      backgroundColor: '#ebf8ff', // Light blue hover
+      backgroundColor: '#ebf8ff', 
     },
     '& .MuiDataGrid-root': {
       fontFamily: 'Roboto, sans-serif',

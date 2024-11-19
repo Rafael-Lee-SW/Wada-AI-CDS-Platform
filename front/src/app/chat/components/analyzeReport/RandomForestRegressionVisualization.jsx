@@ -4,7 +4,6 @@ import React from "react";
 import dynamic from "next/dynamic";
 import PropTypes from "prop-types";
 
-// 직접 정의한 UI 컴포넌트(Card, tabs, table etc...)
 import {
   Card,
   CardContent,
@@ -23,10 +22,8 @@ import {
 } from "../ui/table";
 import { Typography } from "@mui/material";
 
-// Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Custom Styles
 import useAnalyzingKmeansStyles from "/styles/analyzingKmeansStyle.js";
 
 export default function RandomForestRegressorVisualization({
@@ -35,7 +32,6 @@ export default function RandomForestRegressorVisualization({
 }) {
   const classes = useAnalyzingKmeansStyles();
 
-  // Destructure explanation with default values
   const {
     overview = {},
     key_findings = [],
@@ -49,7 +45,6 @@ export default function RandomForestRegressorVisualization({
     "y-axis_description": yAxisDescription = "",
   } = explanation;
 
-  // Extract RandomForest_case details
   const rfCase =
     model_specific_details?.details?.random_forest_case || {};
 
@@ -61,17 +56,11 @@ export default function RandomForestRegressorVisualization({
     y_axis_description: rfYAxisDescription = yAxisDescription,
   } = rfCase;
 
-  // Render Feature Importances Bar Chart
   const renderFeatureImportances = () => {
     const featureImportances = result.graph1?.feature_importances;
     const featureNames = result.graph1?.feature_names;
 
     if (!Array.isArray(featureImportances) || !Array.isArray(featureNames)) {
-      console.error(
-        "Invalid feature importances data:",
-        featureImportances,
-        featureNames
-      );
       return null;
     }
 
@@ -80,10 +69,7 @@ export default function RandomForestRegressorVisualization({
       Importance: featureImportances[index],
     }));
 
-    // Sort descending for better visualization
     df_importances.sort((a, b) => b.Importance - a.Importance);
-
-    // Show top 6 features
     df_importances = df_importances.slice(0, 6);
 
     return (
@@ -120,13 +106,11 @@ export default function RandomForestRegressorVisualization({
     );
   };
 
-  // Render Regression Metrics Table
   const renderRegressionMetrics = () => {
     const mse = result.mse;
     const r2 = result.r2;
 
     if (typeof mse !== "number" || typeof r2 !== "number") {
-      console.error("유효하지 않은 회귀 메트릭 데이터:", mse, r2);
       return null;
     }
 
@@ -163,7 +147,6 @@ export default function RandomForestRegressorVisualization({
     );
   };
 
-  // Render Actual vs. Predicted Scatter Plot
   const renderActualVsPredictedScatter = () => {
     const { y_test, y_pred, identifier } = result.graph2;
 
@@ -172,7 +155,6 @@ export default function RandomForestRegressorVisualization({
       !Array.isArray(y_pred) ||
       !Array.isArray(identifier)
     ) {
-      console.error("유효하지 않거나 누락된 graph2 데이터:", result.graph2);
       return null;
     }
 
@@ -234,7 +216,6 @@ export default function RandomForestRegressorVisualization({
     );
   };
 
-  // Render Residuals Scatter Plot
   const renderResidualsPlot = () => {
     const { y_test, y_pred, identifier } = result.graph2;
 
@@ -243,7 +224,6 @@ export default function RandomForestRegressorVisualization({
       !Array.isArray(y_pred) ||
       !Array.isArray(identifier)
     ) {
-      console.error("유효하지 않거나 누락된 graph2 데이터:", result.graph2);
       return null;
     }
 
@@ -296,7 +276,6 @@ export default function RandomForestRegressorVisualization({
     );
   };
 
-  // Render Predictions Overview Table
   const renderPredictionsTable = () => {
     const { y_test, y_pred, identifier } = result.graph2;
 
@@ -305,7 +284,6 @@ export default function RandomForestRegressorVisualization({
       !Array.isArray(y_pred) ||
       !Array.isArray(identifier)
     ) {
-      console.error("유효하지 않거나 누락된 graph2 데이터:", result.graph2);
       return null;
     }
 
@@ -352,7 +330,6 @@ export default function RandomForestRegressorVisualization({
     );
   };
 
-  // Final Return
   return (
     <div className="container mx-auto p-4 space-y-8">
       {result && explanation && (
@@ -361,7 +338,6 @@ export default function RandomForestRegressorVisualization({
             {rfReportTitle}
           </h1>
 
-          {/* Overview Section */}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -395,7 +371,6 @@ export default function RandomForestRegressorVisualization({
             </CardContent>
           </Card>
 
-          {/* Tabs Section */}
           <Tabs defaultValue="feature_importance" className="w-full">
             <TabsList className="grid w-full grid-cols-5 space-x-4">
               <TabsTrigger
@@ -429,7 +404,6 @@ export default function RandomForestRegressorVisualization({
                 {visualizations[4]?.title || "전체 예측 데이터"}
               </TabsTrigger>
             </TabsList>
-            {/* Feature Importances Tab Content */}
             <TabsContent value="feature_importance">
               <Card>
                 <CardHeader>
@@ -446,8 +420,6 @@ export default function RandomForestRegressorVisualization({
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Regression Metrics Tab Content */}
             <TabsContent value="regression_metrics">
               <Card>
                 <CardHeader>
@@ -462,8 +434,6 @@ export default function RandomForestRegressorVisualization({
                 <CardContent>{renderRegressionMetrics()}</CardContent>
               </Card>
             </TabsContent>
-
-            {/* Actual vs Predicted Tab Content */}
             <TabsContent value="actual_vs_predicted">
               <Card>
                 <CardHeader>
@@ -478,8 +448,6 @@ export default function RandomForestRegressorVisualization({
                 <CardContent>{renderActualVsPredictedScatter()}</CardContent>
               </Card>
             </TabsContent>
-
-            {/* Residuals Tab Content */}
             <TabsContent value="residuals">
               <Card>
                 <CardHeader>
@@ -493,8 +461,6 @@ export default function RandomForestRegressorVisualization({
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Predictions Overview Tab Content */}
             <TabsContent value="predictions_overview">
               <Card>
                 <CardHeader>
@@ -508,9 +474,7 @@ export default function RandomForestRegressorVisualization({
             </TabsContent>
           </Tabs>
 
-          {/* Key Findings and Recommendations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Key Findings */}
             <Card>
               <CardHeader>
                 <CardTitle style={{ color: '#8770b4' }}>
@@ -528,7 +492,6 @@ export default function RandomForestRegressorVisualization({
               </CardContent>
             </Card>
 
-            {/* Recommendations */}
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -577,7 +540,6 @@ export default function RandomForestRegressorVisualization({
         </>
       )}
 
-      {/* Model Performance Section */}
       {result && explanation && explanation.model_performance && (
         <Card>
           <CardHeader>
@@ -587,7 +549,6 @@ export default function RandomForestRegressorVisualization({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Render Metrics */}
             <Typography variant="h6" style={{ color: '#8770b4', fontWeight: 'bold', paddingBottom: '10px' }}>
               ◾ 중요 지표
             </Typography>
@@ -602,7 +563,6 @@ export default function RandomForestRegressorVisualization({
               </div>
             ))}
 
-            {/* Render Prediction Analysis */}
             {explanation.model_performance.prediction_analysis && (
               <>
                 <Typography
@@ -640,7 +600,6 @@ export default function RandomForestRegressorVisualization({
   );
 }
 
-// Define prop types for type checking
 RandomForestRegressorVisualization.propTypes = {
   result: PropTypes.shape({
     model: PropTypes.string.isRequired,

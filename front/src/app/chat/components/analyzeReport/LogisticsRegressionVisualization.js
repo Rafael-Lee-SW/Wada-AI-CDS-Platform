@@ -29,7 +29,6 @@ function LogisticRegressionVisualization({ result, explanation }) {
   const [boundaryLinesTitles, setBoundaryLinesTitles] = useState([]);
   const [error, setError] = useState(null);
 
-  // Extract relevant sections from explanation prop
   const {
     overview,
     model_performance,
@@ -40,8 +39,6 @@ function LogisticRegressionVisualization({ result, explanation }) {
     LogisticRegression_Case,
   } = explanation || {};
 
-  // Extract report titles and descriptions
-  // console.log(LogisticRegression_Case.report_title)
   const reportTitle = 
   LogisticRegression_Case?.report_title || "AI 모델 분석 보고서";
   const classesInfo = LogisticRegression_Case?.classes || {};
