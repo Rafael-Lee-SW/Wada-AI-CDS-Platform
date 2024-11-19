@@ -338,9 +338,9 @@ public class PromptGenerator {
              selectedModelDetail);
     }
 
-        // UserPrompt 생성 메서드
-        public static String createUserPromptForResult(Map<String, Object> fastApiResult) {
-            return """
+    // UserPrompt 생성 메서드
+    public static String createUserPromptForResult(Map<String, Object> fastApiResult) {
+        return """
        # Role and Context
        You are an expert data analyst who specializes in explaining complex ML/DL analysis results to non-technical stakeholders. Your task is to create a comprehensive analysis report in Korean based on the provided machine learning analysis results.
 
@@ -493,7 +493,8 @@ public class PromptGenerator {
 
         Remember: The goal is to make the customer feel informed, empowered, and confident in understanding the analysis results and their implications for their business.
        """.formatted(covertToJsonFromMap(fastApiResult));
-        }
+    }
+
 
     public static String covertToJsonFromMap(Map<String, Object> map) {
         ObjectMapper objectMapper = new ObjectMapper();

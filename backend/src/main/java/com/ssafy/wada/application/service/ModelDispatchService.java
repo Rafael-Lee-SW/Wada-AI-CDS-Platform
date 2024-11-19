@@ -47,6 +47,7 @@ public class ModelDispatchService {
     public ModelDispatchResponse dispatchModel(String chatRoomId, int requestId, int selectedModelIndex) {
 
         // Step1 MongoQuery 객체 가져오기
+        log.info("Step 1: MongoDB에서 chatRoomData 가져오기");
         Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("requestId").is(requestId));
         Document chatRoomDataDoc = mongoTemplate.findOne(query, Document.class, "MongoDB");
 
@@ -54,16 +55,19 @@ public class ModelDispatchService {
             throw new IllegalArgumentException("No data found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
         }
 
+        // Step2 Document 데이터를 Map<String, Object>로 변환합니다.
         Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
+        log.info("Step2 Document 데이터 Map 변환 chatRoomData: {}", chatRoomData);
 
         // Step3 Mongo객체에서 fileUrls List 추출후 0번 인덱스
         List<String> fileUrlList = (List<String>) chatRoomData.get("fileUrls");
         String fileUrl = null;
         if (fileUrlList != null && !fileUrlList.isEmpty()) {
             fileUrl = fileUrlList.get(0); // 첫 번째 URL을 추출
+            log.info("Step3 Document 데이터에서 File Url 꺼내기 fileUrl: {}",fileUrl);
         } else {
             throw new IllegalArgumentException("fileUrl not found for chatRoomId: " + chatRoomId + " and requestId: " + requestId);
-        }
+        } log.info("step3 Document 데이터에서 fileUrl 인덱스 0번 추출: {}", fileUrl);
 
         Map<String, Object> recommendedModelFromLLM = (Map<String, Object>) chatRoomData.get("RecommendedModelFromLLM");
         Map<String, Object> updatedRecommendedModelFromLLM = convertToSelectedService.ConvertRecommendedModelFromLLM(recommendedModelFromLLM, selectedModelIndex);
@@ -71,8 +75,11 @@ public class ModelDispatchService {
         // step4 선택된 모델 추출 선택된 모델 isSelected없애기
         List<Map<String, Object>> recommendedModels = getRecommendedModels(chatRoomData, chatRoomId, requestId);
         Map<String, Object> selectedModel = selectModelByIndex(recommendedModels, selectedModelIndex);
+        log.info("Step 4  IsSelected true로 변경, 인덱스로 selectedModel 추출 , 빈값 null로 삽입 ");
+
 
         // 모델 상세 정보를 FastAPI로 전달
+        log.info("Step 5 FastAPI 전달");
         Map<String, Object> analysisResult = fastApiService.sendToFastApi(fileUrl, selectedModel);
         Map<String, Object> fastApiResult = (Map<String, Object>) analysisResult.get("result");
 
@@ -119,6 +126,7 @@ public class ModelDispatchService {
             .set("ResultFromModel", fastApiResult)
             .set("ResultDescriptionFromLLM", gptResultResponse);
         mongoTemplate.upsert(query, update, "MongoDB");
+        log.info("Saved analysis data with chatRoomId: {} in MongoDB", chatRoomId);
     }
 
     private Map<String, Object> selectModelByIndex(List<Map<String, Object>> recommendedModels, int selectedModelIndex) {
@@ -139,6 +147,7 @@ public class ModelDispatchService {
         // 선택한 모델의 isSelected를 true로 설정
         recommendedModels.get(selectedModelIndex).put("isSelected", true);
 
+        log.info("Selected model implementation_request: {}", selectedModel);
         return selectedModel;
     }
     private void ensureKey(Map<String, Object> model, String key) {
@@ -157,6 +166,7 @@ public class ModelDispatchService {
             log.warn("No data found for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
             return "데이터를 찾을 수 없습니다.";
         }
+        log.info("Step 1: Found MongoDB document for requestId: {}, chatRoomId: {}", requestId, chatRoomId);
 
         // Step 2: Document를 Map으로 변환
         Map<String, Object> chatRoomData = objectMapper.convertValue(chatRoomDataDoc, Map.class);
@@ -206,6 +216,7 @@ public class ModelDispatchService {
 
         mongoTemplate.upsert(query, update, "MongoDB");
 
+        log.info("Step 9: ConversationRecord updated or inserted with new entry for chatRoomId: {}, requestId: {}", chatRoomId, requestId);
 
         return changeGptStringToApiString(gptResponse);
     }
