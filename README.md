@@ -184,7 +184,7 @@
         <b> Prompt Engineer <br/> ML/DL Deployment & QA </b><br/>LLM Prompt 생성 및 모델 검증,<br/> 모델 서버 배포 <br/>비즈니스 로직 구현<br/>
         </td>
         <td>
-        <b>Backend</b><br/><b>Model Recommand </b><br/> Backend 환경 구축 <br/>모델 추천 서비스 구현<br/> <br/>
+        <b>Backend</b><br/><b>Model Recommand </b><br/> Backend 환경 구축 <br/>모델 추천 서비스 구현<br/>모니터링 구축 <br/>
         </td>
         <td>
         <b>AI Leader</b><br/><b>Frontend </b><br/>CI/CD 및 배포환경 구축<br/> 방범 영상 페이지 및 알람 기능 구현<br/>
