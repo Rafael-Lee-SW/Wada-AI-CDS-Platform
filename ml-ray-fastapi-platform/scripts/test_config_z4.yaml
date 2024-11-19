@@ -1,0 +1,40 @@
+tests:
+  - id: 1
+    description: "1. K-Means Clustering for Pattern Discovery"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/의약품 주성분 데이터(2023년).csv"
+      model_choice: "kmeans_clustering_segmentation"
+      feature_columns:
+        - "INGR_CODE"
+        - "ENTP_NAME"
+    expected_status: 200
+
+  - id: 2
+    description: "2. K-Means Clustering for Anomaly Detection"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/의약품 주성분 데이터(2023년).csv"
+      model_choice: "kmeans_clustering_anomaly_detection"
+      feature_columns:
+        - "INGR_CODE"
+        - "ENTP_NAME"
+      threshold: 0.1
+    expected_status: 200
+
+  - id: 3
+    description: "3. Random Forest Classification for Classifying Industry Codes"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/의약품 주성분 데이터(2023년).csv"
+      model_choice: "random_forest_classification"
+      feature_columns:
+        - "INGR_CODE"
+        - "ITEM_PERMIT_DATE"
+        - "ENTP_NAME"
+      target_variable: "INDUTY_CLASS_CODE"
+      id_column: "ITEM_SEQ"
+    expected_status: 200

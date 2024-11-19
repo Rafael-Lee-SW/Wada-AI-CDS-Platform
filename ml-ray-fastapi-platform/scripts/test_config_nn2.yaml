@@ -1,0 +1,143 @@
+tests:
+  - id: 1
+    description: "Neural Network Regression on Absence Cost Impact"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "Absence Cost Impact ($)"
+      feature_columns:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
+    expected_status: 200
+
+  - id: 2
+    description: "Graph Neural Network Regression on Absence Cost Impact"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "graph_neural_network_analysis"
+      id_column: "Employee ID"
+      additional_features:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      target_column: "Absence Cost Impact ($)"
+      task_type: "regression"
+      relationship_column: "ManagerID"  # Adjust if 'ManagerID' exists in your dataset
+      sample_size: 10
+      random_state: 42
+    expected_status: 200
+
+  - id: 3
+    description: "Graph Neural Network Classification on Role Criticality Score"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "graph_neural_network_analysis"
+      id_column: "Employee ID"
+      additional_features:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      target_column: "Role Criticality Score"
+      task_type: "classification"
+      relationship_column: "ManagerID"  # Adjust if 'ManagerID' exists in your dataset
+      sample_size: 10
+      random_state: 42
+    expected_status: 200
+
+  - id: 4
+    description: "Neural Network Regression with Limited Features"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/Simulated_Factory_Impact_Data.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "Absence Cost Impact ($)"
+      feature_columns:
+        - "Production Volume (units)"
+        - "Overtime Dependency Rate (%)"
+        - "Shift Flexibility Score"
+        - "Absenteeism Frequency"
+      id_column: "Employee ID"
+    expected_status: 200
+
+  - id: 5
+    description: "Neural Network Regression with Missing Values"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "https://s3.ap-northeast-2.amazonaws.com/wadada-bucket/your-dataset-with-missing-values.csv"
+      model_choice: "neural_network_regression"
+      target_variable: "Absence Cost Impact ($)"
+      feature_columns:
+        - "Factory Operating Rate (%)"
+        - "Production Volume (units)"
+        - "Production Efficiency (%)"
+        - "Production Downtime Rate (%)"
+        - "Role Criticality Score"
+        - "Absence Impact on Volume (units)"
+        - "Absence Impact on Efficiency (%)"
+        - "Overtime Dependency Rate (%)"
+        - "Maintenance Requirement Increase"
+        - "Cross-Training Index"
+        - "Error Rate Increase (%)"
+        - "Process Bottleneck Potential (%)"
+        - "Team Coordination Score"
+        - "Job Role Coverage (%)"
+        - "Absenteeism Frequency"
+        - "Shift Flexibility Score"
+        - "Operational Risk Factor"
+        - "Skill Redundancy Level"
+      id_column: "Employee ID"
+    expected_status: 200

@@ -1,0 +1,18 @@
+tests:
+  - id: 1
+    description: "4. Support Vector Machine Classification for Classifying Industry Codes"
+    endpoint: "/predict"
+    method: "POST"
+    payload:
+      file_path: "./dataset/의약품 주성분 데이터(2023년).csv"
+      model_choice: "support_vector_machine_classification"
+      target_variable: "INDUTY_CLASS_CODE"
+      feature_columns:
+        - "ITEM_SEQ"
+        - "ENTP_NO"
+        - "ENTP_NAME"
+        - "ITEM_NAME"
+        - "INGR_CODE"
+        - "INGR_KOR_NAME"
+      id_column: "ITEM_SEQ"
+    expected_status: 200
