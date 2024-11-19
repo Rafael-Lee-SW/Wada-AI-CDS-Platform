@@ -181,7 +181,7 @@
     </tr>
     <tr align="center">
         <td>
-        <b>Backend <br/> ModelPrompt </b><br/><br/>LLM Prompt 생성 및 모델 검증,<br/> 모델 서버 배포 <br/>비즈니스 로직 구현<br/>
+        <b> Prompt Engineer <br/> ML/DL Deployment & QA </b><br/>LLM Prompt 생성 및 모델 검증,<br/> 모델 서버 배포 <br/>비즈니스 로직 구현<br/>
         </td>
         <td>
         <b>Backend</b><br/><b>Model Recommand </b><br/> Backend 환경 구축 <br/>모델 추천 서비스 구현<br/> <br/>
