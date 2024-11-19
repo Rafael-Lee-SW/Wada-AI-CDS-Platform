@@ -1,0 +1,102 @@
+{
+  "status": "success",
+  "result": {
+    "overview": {
+      "analysis_purpose": "회사의 직원 중 30%를 감원하기 위해 데이터를 분석하고, 이를 통해 누구를 대상으로 감원 결정을 내리는 것이 최적일지 판단하기 위한 분석입니다.",
+      "data_description": "분석된 데이터는 직원의 근무 만족도, 결근 횟수, 최근 30일간 지각 일수, 부서 정보 등 여러 가지 특성을 포함하고 있으며, 이 정보를 바탕으로 직원의 성과와 비용에 영향을 미치는 요인을 파악하고자 합니다.",
+      "models_used": {
+        "model_name": "RandomForestRegressor",
+        "model_description": "랜덤 포레스트 모델은 여러 개의 결정 트리(의사결정 트리)를 사용하여 예측 정확도를 높이는 머신 러닝 모델입니다. 각각의 트리는 독립적으로 예측을 수행하고, 이를 결합하여 최종 예측 결과를 산출합니다."
+      }
+    },
+    "model_performance": {
+      "metrics": [
+        {
+          "metric_name": "MSE (평균 제곱 오차)",
+          "metric_value": "0.137",
+          "interpretation": "MSE 값이 낮을수록 모델의 예측과 실제 값이 유사함을 나타냅니다. 여기서는 약간 높은 오차가 있어 예측 모델의 정확도가 높지 않음을 알 수 있습니다."
+        },
+        {
+          "metric_name": "R² (결정 계수)",
+          "metric_value": "0.039",
+          "interpretation": "R² 값이 1에 가까울수록 모델이 데이터를 잘 설명함을 의미하지만, 현재 값은 0.04로 모델이 데이터의 변동성을 충분히 설명하지 못하고 있음을 나타냅니다."
+        }
+      ],
+      "prediction_analysis": {
+        "overall_accuracy": "모델의 예측 정확도는 낮은 편이며, 이는 주어진 데이터 특성만으로는 직원 성과나 비용에 대한 충분한 예측이 어렵다는 것을 보여줍니다.",
+        "notable_patterns": [
+          "예측된 값이 실제 값보다 전반적으로 더 높게 나타남",
+          "고급 직위보다 낮은 직위에서 예측 정확도가 상대적으로 높음"
+        ]
+      }
+    },
+    "feature_importance": {
+      "key_features": [
+        {
+          "feature_name": "DaysLateLast30",
+          "importance_score": "0.625",
+          "business_impact": "최근 30일간의 지각 일수는 직원의 성과와 비용에 중요한 영향을 미치며, 이는 지각 빈도가 높은 직원이 회사에 부정적 영향을 미칠 수 있음을 의미합니다."
+        },
+        {
+          "feature_name": "Salary",
+          "importance_score": "0.092",
+          "business_impact": "급여는 직원 유지 및 성과와 관련이 깊으며, 높은 급여를 받으면서도 성과가 낮은 직원에 대한 감원을 고려할 수 있습니다."
+        },
+        {
+          "feature_name": "EngagementSurvey",
+          "importance_score": "0.063",
+          "business_impact": "직원 몰입도는 생산성과 연관이 있어, 몰입도가 낮은 직원이 비용 효율성 측면에서 비효율적일 가능성이 있습니다."
+        }
+      ],
+      "relationships": [
+        {
+          "description": "지각 일수와 급여 간에는 상관관계가 없지만, 몰입도는 급여 수준에 영향을 미칠 수 있음.",
+          "business_insight": "급여가 높지만 몰입도가 낮은 직원의 성과를 점검하여 조정이 필요할 수 있음."
+        }
+      ]
+    },
+    "visualizations": [
+      {
+        "title": "특성 중요도",
+        "type": "bar",
+        "description": "직원 성과에 영향을 미치는 각 특성의 중요도를 보여줍니다.",
+        "insights": "지각 일수와 급여가 직원 성과 및 비용에 큰 영향을 미치며, 이를 기반으로 감원 대상을 선정하는 데 참고할 수 있습니다."
+      },
+      {
+        "title": "예측 값과 실제 값 비교",
+        "type": "scatter",
+        "description": "모델이 예측한 값과 실제 값 간의 분포를 비교합니다.",
+        "insights": "대부분의 예측 값이 실제 값보다 높게 나타나며, 이는 모델이 전반적으로 실제 비용을 과대평가하고 있음을 시사합니다."
+      }
+    ],
+    "key_findings": [
+      {
+        "finding": "지각 일수가 많은 직원이 높은 비용을 발생시키는 경향이 있음",
+        "impact": "지각 일수가 높은 직원의 감원이 회사의 비용 절감에 기여할 수 있음",
+        "recommendation": "지각 일수와 성과를 바탕으로 감원 대상을 선정"
+      },
+      {
+        "finding": "급여가 높지만 몰입도가 낮은 직원의 성과가 상대적으로 낮음",
+        "impact": "효율적이지 않은 인건비 지출로 인한 비용 손실 발생",
+        "recommendation": "몰입도가 낮은 고급여 직원에 대한 재평가"
+      }
+    ],
+    "recommendations": {
+      "immediate_actions": [
+        "지각 빈도가 높은 직원에 대해 감원 검토",
+        "급여 대비 성과가 낮은 직원 목록 작성"
+      ],
+      "further_analysis": [
+        "각 부서별 성과 비교를 통한 최적 감원 대상 선정",
+        "몰입도와 성과 간의 상관관계에 대한 추가 분석"
+      ]
+    },
+    "RandomForest_case": {
+      "report_title": "랜덤 포레스트 예측 분석 결과",
+      "x-axis_title": "실제 성과",
+      "x-axis_description": "실제 측정된 성과를 나타내는 축으로, 예측 정확도를 평가하는 기준이 됩니다.",
+      "y-axis_title": "예측 성과",
+      "y-axis_description": "랜덤 포레스트 모델이 예측한 성과를 나타내며, 모델의 예측 결과를 통해 직원의 예상 성과를 평가합니다."
+    }
+  }
+}

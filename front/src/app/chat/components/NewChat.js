@@ -1,12 +1,12 @@
-import styles from "/styles/defaultPageStyle";
+import styles from "/styles/newChatStyle";
 import { useState, useEffect } from "react";
 
-export default function DefaultPage() {
+export default function NewChat() {
     const [displayText, setDisplayText] = useState(""); 
     const [index, setIndex] = useState(0); 
 
-    const text = "분석할 파일과 요구사항을 입력해주세요."; 
-    const speed = 80; 
+    const text = "새로운 채팅을 시작해주세요."; 
+    const speed = 50; 
 
     useEffect(() => {
         if (index < text.length) {
@@ -15,7 +15,6 @@ export default function DefaultPage() {
                 setIndex(index + 1); 
             }, speed);
 
-            // cleanup function to clear timeout if component unmounts or updates
             return () => clearTimeout(timeoutId);
         }
     }, [index, text]); 
@@ -23,7 +22,7 @@ export default function DefaultPage() {
     return (
         <div style={styles.contentContainer}>
             <div style={styles.messageBox}>
-                <img src="/img/icon.png" style={styles.logoImg} />
+                <img src="/img/chat.png" style={{ width: '50px', paddingBottom: '10px'}}/>
                 <span style={styles.message}>{displayText}</span>
             </div>
         </div>

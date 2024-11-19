@@ -1,33 +1,41 @@
+
 const styles = {
     mainContainer: {
         display: 'flex',
-        height: '100vh',
+        maxHeight: '100vh',
         backgroundColor: 'white',
+        overflowY: 'hidden',
+        
     },
     sidebar: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         width: '180px',
         backgroundColor: '#fdfaff',
         padding: '5px 10px',
         borderRight: '1px solid #d3d3d3',
-        zIndex: '2'
+        zIndex: '2',
+        maxHeight: '100vh'
     },
-    userInfo: {
+    info: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '20px',
+        paddingRight: '15px'
     },
     avatar: {
         display: 'flex',
         alignItems: 'center',
         paddingRight: '20px'
     },
-    profile: {
-        width: '30px',
-        margin: '10px'
+    icon: {
+        width: '50px',
     },
     menu: {
-        marginTop: '20px',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
     },
     menuItemTitle: {
         display: 'flex',
@@ -37,10 +45,31 @@ const styles = {
         padding: '5px 5px',
         margin: '10px'
     },
+    newButtonContainer: {
+        display: 'flex',
+        justifyContent: 'flex-end'
+    },
+    newButton: {
+        fontSize: '14px',
+        padding: '10px',
+        fontWeight: 'bold'
+    },
+    chatListContainer: {
+        display: 'flex',
+        width: '100%',
+        maxHeight: '100vh',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflowY: 'auto',
+        scrollbarWidth: 'none'
+    },
     menuItem: {
+        width: '100%',
         cursor: 'pointer',
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        cursor: 'pointer'
     },
     arrow: {
         width: '20px',
@@ -64,10 +93,11 @@ const styles = {
         borderBottom: '1px solid #d3d3d3'
     },
     headerMessage: {
-        paddingLeft: '200px',
         fontSize: '16px',
         color: '#545454',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        color: '#9370db'
     },
     contentContainer: {
         display: 'flex',
