@@ -218,7 +218,7 @@
 ---
 
 ### 2024년 10월 20일  
-- **PastAPI 모델 학습 및 결과 반환 개선**  
+- **FastAPI 모델 학습 및 결과 반환 개선**  
   - **모델 학습 단계**:  
     - 데이터 전처리 과정에서 Null 값 처리 로직 추가.  
     - 학습 도중 발생하는 에러를 최소화하기 위해 파라미터 튜닝 자동화 도입.  
@@ -250,6 +250,21 @@
 
 ---
 
+### 2024년 11월 4일  
+- **머신 러닝 5개 모델 10개 방법론 도입 완료**  
+  - 5개 모델 : Random Forest, Logistic Regression, K-means clustering, Support Vector Machine, Neural Network 
+  - 10가지 방법론 : Classification, Regression, Binary, Multinomial, Segmetation, Anomaly-Detection, GNN, NN... (모델 별 2개)
+  - 일반화된 모델로 LLM과 융합하여 LLM을 통해 각 모델별 필수 인자를 데이터에서 추출하고 이를 분석
+
+---
+
+### 2024년 11월 8일  
+- **모델 최적화 및 성능 개선**  
+  - 데이터 파싱, 프로세싱 과정에서 누락값, 이상치 등을 최소 에러로 다루어 모델 정확도 12% 향상
+  - SVM의 경우 모델 결과값에 영향을 주는 인자값(C, epsilon, gamma 등)을 조절하여 총 27개의 경우의 수를 시행하여 가장 최적 결과를 선택 -> 이를 통해 평균 모델 정확도 20% 향상
+---
+
+
 # 🔍 문제 발생 가능성 분석 및 대응 방안
 
 ### 1. **백엔드 데이터 전송**  
@@ -271,7 +286,7 @@
 
 ---
 
-### 3. **PastAPI (모델 학습 및 결과 반환)**  
+### 3. **FastAPI (모델 학습 및 결과 반환)**  
    - **문제**:  
      - 모델 학습 시 데이터 크기에 따른 메모리 초과 또는 학습 속도 저하 발생 가능.  
      - 결과 반환 시 요청 크기가 토큰 제한을 초과할 위험.  
@@ -315,8 +330,7 @@
 
 ##### 🤖 AI/ML 기술
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
-![TorchServe](https://img.shields.io/badge/TorchServe-FB4D3D?logo=pytorch&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)
+![ray](https://img.shields.io/badge/ray-FB4D3D?logo=ray&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 
 ##### 🚀 Infra
@@ -434,7 +448,7 @@ spring boot를 처음 사용해봐서 미숙한 부분이 많았는데 팀원들
 <br>
 
 ### 이수완
- Machine Learning을 통해 시계열 데이터를 예측하는 방법을 학습하고 탐구하는 과정을 통해서 ML, DL, LLM 등이 각각 어떤 상황에 적합하고, 우리 프로젝트에 ML이 어떻게 활용되어야 할지 고찰을 많이 한 프로젝트였습니다. 궁극적으로 End User가 ML과 AI를 통해 추출한 데이터를 유의미하게 받아들이게끔하는 것이 가장 어려운 부분이었습니다.
+ ML, DL, LLM 등이 각각 어떤 상황에 적합하고, 우리 프로젝트에 ML이 어떻게 활용되어야 할지 고찰을 많이 한 프로젝트였습니다. 궁극적으로 End User가 ML과 AI를 통해 추출한 데이터를 유의미하게 받아들이게끔하는 것이 가장 어려운 부분이었습니다. 유저의 모호한 부분은 LLM으로 메우되, LLM에게 많은 권한을 주지 않는 것이 중요했고, 모델 구현에서는 많은 상황들(데이터 문제, 정확도 저조, 적은 데이터, 많은 데이터)에 대처할 수 있는 일반화된 모델을 최대한 구축하였고, Kaggle에 나와있는 무작위 데이터로 테스트해본 결과 약 70% 이상의 데이터로 성공적인 데이터 분석을 실행할 수 있었습니다. 이를 통해, 모호하고 어려운 LLM과 그리고 현실적인 ML, DL 사용법에 대해 깊이 공부하였고, 앞으로도 훌륭한 개발자이자, AI를 잘 아는 개발자가 되도록 하겠습니다.
  Frontend 차원에서는 단순한 구현을 넘어서 이제는 최소한의 DB 호출, 쿠키 서버 활용에 대한 고민, API 통신 방식 변경, Components를 더 세밀하게 분리함으로서 사용성 증가 등을 했고, 이를 통해서 UX를 신경쓰는 동시에 User를 통해 발생하는 비용적 부분 최소화를 많이 고민했고, 지난 프로젝트보다 불필요한 호출을 50% 가량 줄이는 성과를 얻었습니다.(SSR을 적절히 사용해, 많은 데이터 호출의 경우 선재적 처리, 전부다 불러오는 방식의 API 호출이 아닌 유저의 각 움직임마다 API 송신으로 데이터 호출)
  이 모든 것이 가능했던 점은 합이 잘 맞는 팀과 팀원들이 맞은 바의 역할을 잘 수행해주었기에 ,가능했던 것 같습니다. 감사합니다.
 
