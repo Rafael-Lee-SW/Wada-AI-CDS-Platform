@@ -1,0 +1,91 @@
+spring:
+  profiles:
+    active: local
+  config:
+    import:
+      - monitoring.yml
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://localhost:3306/{secret}"
+    username: {secret}
+    password: {secret}
+
+  jpa:
+    database: mysql
+    properties:
+      hibernate:
+        storage_engine: innodb
+        format_sql: false
+        use_sql_comments: false
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show_sql: false
+
+  data:
+    mongodb:
+      uri: "mongodb://localhost:27017/{secret}"
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+openai:
+  api:
+    key: ${GPT_KEY}
+    url: "https://api.openai.com/v1"
+
+external:
+  fast-api: "{ML서버 URL}"
+
+aws:
+  bucket: wadada-bucket
+  url: https://s3.ap-northeast-2.amazonaws.com
+  access-key: ${S3_ACCESS}
+  secret-key: ${S3_SECRET}
+  region: ap-northeast-2
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show_sql: true
+
+  data:
+    mongodb:
+      uri: ${MONGO_URL}
+
+external:
+  fast-api: ${FAST_API_URL}
+
+  feign:
+    client:
+      config:
+        default:
+          connectTimeout: 30000  # 연결 타임아웃 (30초)
+          readTimeout: 30000
